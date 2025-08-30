@@ -1,6 +1,8 @@
 package chess;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * Represents a single chess piece
@@ -9,8 +11,13 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessPiece {
+    private final ChessGame.TeamColor pieceColor;
+    private ChessPiece.PieceType pieceType;
+
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        this.pieceColor = pieceColor;
+        this.pieceType = type;
     }
 
     /**
@@ -29,14 +36,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return this.pieceColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+        return this.pieceType;
     }
 
     /**
@@ -47,6 +54,80 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        ArrayList<ChessMove> validMoves = new ArrayList<ChessMove>();
+
+        if(this.pieceType == PieceType.KING)
+            kingMoves(board, myPosition, validMoves);
+
+        return validMoves;
+    }
+
+    /**
+     * Calculates the moves a king can make without considering check
+     */
+    private void kingMoves(ChessBoard board, ChessPosition position, ArrayList<ChessMove> validMoves) {
+        int row = position.getRow();
+        int col = position.getColumn();
+        boolean leftValid = col - 1 > 0;
+        boolean rightValid = col + 1 <= 8;
+        boolean upValid = row + 1 <= 8;
+        boolean downValid = row - 1 > 0;
+
+        //left
+        if(leftValid) {
+            ChessPosition left = new ChessPosition(row, col - 1);
+            addMove(position, left, board.getPiece(left), validMoves);
+        }
+
+        //right
+        if(rightValid) {
+            ChessPosition right = new ChessPosition(row, col + 1);
+            addMove(position, right, board.getPiece(right), validMoves);
+        }
+
+        //up
+        if(upValid) {
+            ChessPosition up = new ChessPosition(row + 1, col);
+            addMove(position, up, board.getPiece(up), validMoves);
+        }
+
+        //down
+        if(downValid) {
+            ChessPosition down = new ChessPosition(row - 1, col);
+            addMove(position, down, board.getPiece(down), validMoves);
+        }
+
+        //up-left
+        if(upValid && leftValid) {
+            ChessPosition upLeft = new ChessPosition(row + 1, col - 1);
+            addMove(position, upLeft, board.getPiece(upLeft), validMoves);
+        }
+
+        //up-right
+        if(upValid && rightValid) {
+            ChessPosition upRight = new ChessPosition(row + 1, col + 1);
+            addMove(position, upRight, board.getPiece(upRight), validMoves);
+        }
+
+        //down-left
+        if(downValid && leftValid) {
+            ChessPosition downLeft = new ChessPosition(row - 1, col - 1);
+            addMove(position, downLeft, board.getPiece(downLeft), validMoves);
+        }
+
+        //down-right
+        if(downValid && rightValid) {
+            ChessPosition downRight = new ChessPosition(row - 1, col + 1);
+            addMove(position, downRight, board.getPiece(downRight), validMoves);
+        }
+    }
+
+    /**
+     * Adds a move to the valid moves list if the new position is unoccupied or has an opposing piece.
+     */
+    private void addMove(ChessPosition oldPosition, ChessPosition newPosition,
+                         ChessPiece otherPiece, ArrayList<ChessMove> moves) {
+        if(otherPiece == null || otherPiece.pieceColor != this.pieceColor)
+            moves.add(new ChessMove(oldPosition, newPosition));
     }
 }
