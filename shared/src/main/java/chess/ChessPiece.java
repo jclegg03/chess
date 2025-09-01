@@ -3,6 +3,7 @@ package chess;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -18,6 +19,36 @@ public class ChessPiece {
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.pieceType = type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && pieceType == that.pieceType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, pieceType);
+    }
+
+    @Override
+    public String toString() {
+        String text = " ";
+
+        if(this.pieceType == PieceType.KING) text = "k";
+        else if(this.pieceType == PieceType.QUEEN) text = "q";
+        else if(this.pieceType == PieceType.BISHOP) text = "b";
+        else if(this.pieceType == PieceType.KNIGHT) text = "n";
+        else if(this.pieceType == PieceType.ROOK) text = "r";
+        else if(this.pieceType == PieceType.PAWN) text = "p";
+
+        if(this.pieceColor == ChessGame.TeamColor.WHITE) text = text.toUpperCase();
+
+        return text;
     }
 
     /**

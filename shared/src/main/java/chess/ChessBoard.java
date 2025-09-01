@@ -90,4 +90,21 @@ public class ChessBoard {
     public int hashCode() {
         return Objects.hashCode(board);
     }
+
+    @Override
+    public String toString() {
+        String text = "";
+        for(int row = 8; row >= 1; row--) {
+            for(int col = 1; col <=8; col++) {
+                ChessPiece piece = board.get(new ChessPosition(row, col));
+                if(piece != null) {
+                    text += "|" + piece.toString() + "|";
+                }
+                else text += "| |";
+            }
+            text += "\n";
+        }
+
+        return text;
+    }
 }
