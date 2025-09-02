@@ -88,77 +88,17 @@ public class ChessPiece {
         ArrayList<ChessMove> validMoves = new ArrayList<ChessMove>();
 
         if(this.pieceType == PieceType.KING)
-            kingMoves(board, myPosition, validMoves);
+            KingMoves.kingMoves(board, myPosition, this, validMoves);
 
         return validMoves;
     }
 
     /**
-     * Calculates the moves a king can make without considering check
-     */
-    private void kingMoves(ChessBoard board, ChessPosition position, ArrayList<ChessMove> validMoves) {
-        int row = position.getRow();
-        int col = position.getColumn();
-        boolean leftValid = col - 1 > 0;
-        boolean rightValid = col + 1 <= 8;
-        boolean upValid = row + 1 <= 8;
-        boolean downValid = row - 1 > 0;
-
-        //left
-        if(leftValid) {
-            ChessPosition left = new ChessPosition(row, col - 1);
-            addMove(position, left, board.getPiece(left), validMoves);
-        }
-
-        //right
-        if(rightValid) {
-            ChessPosition right = new ChessPosition(row, col + 1);
-            addMove(position, right, board.getPiece(right), validMoves);
-        }
-
-        //up
-        if(upValid) {
-            ChessPosition up = new ChessPosition(row + 1, col);
-            addMove(position, up, board.getPiece(up), validMoves);
-        }
-
-        //down
-        if(downValid) {
-            ChessPosition down = new ChessPosition(row - 1, col);
-            addMove(position, down, board.getPiece(down), validMoves);
-        }
-
-        //up-left
-        if(upValid && leftValid) {
-            ChessPosition upLeft = new ChessPosition(row + 1, col - 1);
-            addMove(position, upLeft, board.getPiece(upLeft), validMoves);
-        }
-
-        //up-right
-        if(upValid && rightValid) {
-            ChessPosition upRight = new ChessPosition(row + 1, col + 1);
-            addMove(position, upRight, board.getPiece(upRight), validMoves);
-        }
-
-        //down-left
-        if(downValid && leftValid) {
-            ChessPosition downLeft = new ChessPosition(row - 1, col - 1);
-            addMove(position, downLeft, board.getPiece(downLeft), validMoves);
-        }
-
-        //down-right
-        if(downValid && rightValid) {
-            ChessPosition downRight = new ChessPosition(row - 1, col + 1);
-            addMove(position, downRight, board.getPiece(downRight), validMoves);
-        }
-    }
-
-    /**
      * Adds a move to the valid moves list if the new position is unoccupied or has an opposing piece.
      */
-    private void addMove(ChessPosition oldPosition, ChessPosition newPosition,
-                         ChessPiece otherPiece, ArrayList<ChessMove> moves) {
-        if(otherPiece == null || otherPiece.pieceColor != this.pieceColor)
+    public static void addMove(ChessPosition oldPosition, ChessPosition newPosition,
+                         ChessPiece piece, ChessPiece otherPiece, ArrayList<ChessMove> moves) {
+        if(otherPiece == null || otherPiece.pieceColor != piece.pieceColor)
             moves.add(new ChessMove(oldPosition, newPosition));
     }
 }
