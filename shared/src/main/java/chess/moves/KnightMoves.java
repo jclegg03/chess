@@ -7,7 +7,7 @@ import chess.ChessPosition;
 
 import java.util.ArrayList;
 
-public class KnightMoves {
+public final class KnightMoves {
     /**
      * Calculates the moves a knight can make
      */
