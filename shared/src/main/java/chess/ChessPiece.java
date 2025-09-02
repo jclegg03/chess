@@ -1,6 +1,8 @@
 package chess;
 
-import java.lang.reflect.Array;
+import chess.moves.BishopMoves;
+import chess.moves.KingMoves;
+
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -89,6 +91,8 @@ public class ChessPiece {
 
         if(this.pieceType == PieceType.KING)
             KingMoves.kingMoves(board, myPosition, this, validMoves);
+        if(this.pieceType == PieceType.BISHOP)
+            BishopMoves.bishopMoves(board, myPosition, this, validMoves);
 
         return validMoves;
     }
