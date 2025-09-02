@@ -2,6 +2,7 @@ package chess;
 
 import chess.moves.BishopMoves;
 import chess.moves.KingMoves;
+import chess.moves.KnightMoves;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -91,8 +92,10 @@ public class ChessPiece {
 
         if(this.pieceType == PieceType.KING)
             KingMoves.kingMoves(board, myPosition, this, validMoves);
-        if(this.pieceType == PieceType.BISHOP)
+        else if(this.pieceType == PieceType.BISHOP)
             BishopMoves.bishopMoves(board, myPosition, this, validMoves);
+        else if(this.pieceType == PieceType.KNIGHT)
+            KnightMoves.knightMoves(board, myPosition, this, validMoves);
 
         return validMoves;
     }
