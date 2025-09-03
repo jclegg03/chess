@@ -28,7 +28,9 @@ public final class BishopMoves {
             ChessPiece pieceAtNewPos = board.getPiece(newPos);
             ChessPiece.addMove(currentPosition, newPos, piece, pieceAtNewPos, validMoves);
 
-            if(pieceAtNewPos != null) break;
+            if(pieceAtNewPos != null) {
+                break;
+            }
 
             newRow++;
             newCol--;
@@ -46,7 +48,9 @@ public final class BishopMoves {
             ChessPiece pieceAtNewPos = board.getPiece(newPos);
             ChessPiece.addMove(currentPosition, newPos, piece, pieceAtNewPos, validMoves);
 
-            if(pieceAtNewPos != null) break;
+            if(pieceAtNewPos != null) {
+                break;
+            }
 
             newRow--;
             newCol++;
@@ -64,7 +68,9 @@ public final class BishopMoves {
             ChessPiece pieceAtNewPos = board.getPiece(newPos);
             ChessPiece.addMove(currentPosition, newPos, piece, pieceAtNewPos, validMoves);
 
-            if(pieceAtNewPos != null) break;
+            if(pieceAtNewPos != null) {
+                break;
+            }
 
             newRow++;
             newCol++;
@@ -82,7 +88,9 @@ public final class BishopMoves {
             ChessPiece pieceAtNewPos = board.getPiece(newPos);
             ChessPiece.addMove(currentPosition, newPos, piece, pieceAtNewPos, validMoves);
 
-            if(pieceAtNewPos != null) break;
+            if(pieceAtNewPos != null) {
+                break;
+            }
 
             newRow--;
             newCol--;
