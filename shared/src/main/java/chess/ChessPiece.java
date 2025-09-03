@@ -98,6 +98,8 @@ public class ChessPiece {
             RookMoves.rookMoves(board, myPosition, this, validMoves);
         else if(this.pieceType == PieceType.QUEEN)
             QueenMoves.queenMoves(board, myPosition, this, validMoves);
+        else if(this.pieceType == PieceType.PAWN)
+            PawnMoves.pawnMoves(board, myPosition, this, validMoves);
 
         return validMoves;
     }
