@@ -24,7 +24,9 @@ public final class RookMoves {
             ChessPiece pieceAtPos = board.getPiece(newPos);
             ChessPiece.addMove(position, newPos, piece, pieceAtPos, validMoves);
 
-            if(pieceAtPos != null) break;
+            if(pieceAtPos != null) {
+                break;
+            }
 
             newCol++;
         }
@@ -37,7 +39,9 @@ public final class RookMoves {
             ChessPiece pieceAtPos = board.getPiece(newPos);
             ChessPiece.addMove(position, newPos, piece, pieceAtPos, validMoves);
 
-            if(pieceAtPos != null) break;
+            if(pieceAtPos != null) {
+                break;
+            }
 
             newCol--;
         }
@@ -50,7 +54,9 @@ public final class RookMoves {
             ChessPiece pieceAtPos = board.getPiece(newPos);
             ChessPiece.addMove(position, newPos, piece, pieceAtPos, validMoves);
 
-            if(pieceAtPos != null) break;
+            if(pieceAtPos != null) {
+                break;
+            }
 
             newRow++;
         }
@@ -63,7 +69,9 @@ public final class RookMoves {
             ChessPiece pieceAtPos = board.getPiece(newPos);
             ChessPiece.addMove(position, newPos, piece, pieceAtPos, validMoves);
 
-            if(pieceAtPos != null) break;
+            if(pieceAtPos != null) {
+                break;
+            }
 
             newRow--;
         }
