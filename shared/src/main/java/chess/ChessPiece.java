@@ -40,14 +40,28 @@ public class ChessPiece {
     public String toString() {
         String text = " ";
 
-        if(this.pieceType == PieceType.KING) text = "k";
-        else if(this.pieceType == PieceType.QUEEN) text = "q";
-        else if(this.pieceType == PieceType.BISHOP) text = "b";
-        else if(this.pieceType == PieceType.KNIGHT) text = "n";
-        else if(this.pieceType == PieceType.ROOK) text = "r";
-        else if(this.pieceType == PieceType.PAWN) text = "p";
+        if(this.pieceType == PieceType.KING) {
+            text = "k";
+        }
+        else if(this.pieceType == PieceType.QUEEN) {
+            text = "q";
+        }
+        else if(this.pieceType == PieceType.BISHOP) {
+            text = "b";
+        }
+        else if(this.pieceType == PieceType.KNIGHT) {
+            text = "n";
+        }
+        else if(this.pieceType == PieceType.ROOK) {
+            text = "r";
+        }
+        else if(this.pieceType == PieceType.PAWN) {
+            text = "p";
+        }
 
-        if(this.pieceColor == ChessGame.TeamColor.WHITE) text = text.toUpperCase();
+        if(this.pieceColor == ChessGame.TeamColor.WHITE) {
+            text = text.toUpperCase();
+        }
 
         return text;
     }
@@ -88,18 +102,24 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> validMoves = new ArrayList<ChessMove>();
 
-        if(this.pieceType == PieceType.KING)
+        if(this.pieceType == PieceType.KING) {
             KingMoves.kingMoves(board, myPosition, this, validMoves);
-        else if(this.pieceType == PieceType.BISHOP)
+        }
+        else if(this.pieceType == PieceType.BISHOP) {
             BishopMoves.bishopMoves(board, myPosition, this, validMoves);
-        else if(this.pieceType == PieceType.KNIGHT)
+        }
+        else if(this.pieceType == PieceType.KNIGHT) {
             KnightMoves.knightMoves(board, myPosition, this, validMoves);
-        else if(this.pieceType == PieceType.ROOK)
+        }
+        else if(this.pieceType == PieceType.ROOK) {
             RookMoves.rookMoves(board, myPosition, this, validMoves);
-        else if(this.pieceType == PieceType.QUEEN)
+        }
+        else if(this.pieceType == PieceType.QUEEN) {
             QueenMoves.queenMoves(board, myPosition, this, validMoves);
-        else if(this.pieceType == PieceType.PAWN)
+        }
+        else if(this.pieceType == PieceType.PAWN) {
             PawnMoves.pawnMoves(board, myPosition, this, validMoves);
+        }
 
         return validMoves;
     }
@@ -109,7 +129,8 @@ public class ChessPiece {
      */
     public static void addMove(ChessPosition oldPosition, ChessPosition newPosition,
                          ChessPiece piece, ChessPiece otherPiece, ArrayList<ChessMove> moves) {
-        if(otherPiece == null || otherPiece.pieceColor != piece.pieceColor)
+        if(otherPiece == null || otherPiece.pieceColor != piece.pieceColor) {
             moves.add(new ChessMove(oldPosition, newPosition));
+        }
     }
 }
