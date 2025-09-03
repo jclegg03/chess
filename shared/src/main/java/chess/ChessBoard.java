@@ -100,7 +100,9 @@ public class ChessBoard {
                 if(piece != null) {
                     text += "|" + piece.toString() + "|";
                 }
-                else text += "| |";
+                else {
+                    text += "| |";
+                }
             }
             text += "\n";
         }
