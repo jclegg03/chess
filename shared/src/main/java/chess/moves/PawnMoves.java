@@ -16,8 +16,13 @@ public final class PawnMoves {
             ChessPosition newPos = new ChessPosition(row - 1, col);
             ChessPiece pieceAtNewPos = board.getPiece(newPos);
             if (pieceAtNewPos == null) {
-                if(newPos.getRow() == 1) promotions(position, newPos, piece.getTeamColor(), validMoves);
-                else ChessPiece.addMove(position, newPos, piece, pieceAtNewPos, validMoves);
+                if(newPos.getRow() == 1) {
+                    promotions(position, newPos, piece.getTeamColor(), validMoves);
+                }
+                else {
+                    ChessPiece.addMove(position, newPos, piece, pieceAtNewPos, validMoves);
+                }
+
 
                 //sprint
                 if (row == 7) {
@@ -33,16 +38,24 @@ public final class PawnMoves {
             ChessPosition right = new ChessPosition(row - 1, col + 1);
             ChessPiece pieceAtRight = board.getPiece(right);
             if(pieceAtRight != null && pieceAtRight.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                if(right.getRow() == 1) promotions(position, right, piece.getTeamColor(), validMoves);
-                else ChessPiece.addMove(position, right, piece, pieceAtRight, validMoves);
+                if(right.getRow() == 1) {
+                    promotions(position, right, piece.getTeamColor(), validMoves);
+                }
+                else {
+                    ChessPiece.addMove(position, right, piece, pieceAtRight, validMoves);
+                }
             }
 
             //left take
             ChessPosition left = new ChessPosition(row - 1, col - 1);
             ChessPiece pieceAtLeft = board.getPiece(left);
             if(pieceAtLeft != null && pieceAtLeft.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                if(left.getRow() == 1) promotions(position, left, piece.getTeamColor(), validMoves);
-                else ChessPiece.addMove(position, left, piece, pieceAtLeft, validMoves);
+                if(left.getRow() == 1) {
+                    promotions(position, left, piece.getTeamColor(), validMoves);
+                }
+                else {
+                    ChessPiece.addMove(position, left, piece, pieceAtLeft, validMoves);
+                }
             }
         }
 
@@ -51,8 +64,12 @@ public final class PawnMoves {
             ChessPosition newPos = new ChessPosition(row + 1, col);
             ChessPiece pieceAtNewPos = board.getPiece(newPos);
             if(pieceAtNewPos == null) {
-                if(newPos.getRow() == 8) promotions(position, newPos, piece.getTeamColor(), validMoves);
-                else ChessPiece.addMove(position, newPos, piece, pieceAtNewPos, validMoves);
+                if(newPos.getRow() == 8) {
+                    promotions(position, newPos, piece.getTeamColor(), validMoves);
+                }
+                else {
+                    ChessPiece.addMove(position, newPos, piece, pieceAtNewPos, validMoves);
+                }
 
                 //sprint
                 if(row == 2) {
@@ -68,16 +85,24 @@ public final class PawnMoves {
             ChessPosition right = new ChessPosition(row + 1, col + 1);
             ChessPiece pieceAtRight = board.getPiece(right);
             if(pieceAtRight != null && pieceAtRight.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                if(right.getRow() == 8) promotions(position, right, piece.getTeamColor(), validMoves);
-                else ChessPiece.addMove(position, right, piece, pieceAtRight, validMoves);
+                if(right.getRow() == 8) {
+                    promotions(position, right, piece.getTeamColor(), validMoves);
+                }
+                else {
+                    ChessPiece.addMove(position, right, piece, pieceAtRight, validMoves);
+                }
             }
 
             //left take
             ChessPosition left = new ChessPosition(row + 1, col - 1);
             ChessPiece pieceAtLeft = board.getPiece(left);
             if(pieceAtLeft != null && pieceAtLeft.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                if(left.getRow() == 8) promotions(position, left, piece.getTeamColor(), validMoves);
-                else ChessPiece.addMove(position, left, piece, pieceAtLeft, validMoves);
+                if(left.getRow() == 8) {
+                    promotions(position, left, piece.getTeamColor(), validMoves);
+                }
+                else {
+                    ChessPiece.addMove(position, left, piece, pieceAtLeft, validMoves);
+                }
             }
         }
     }
