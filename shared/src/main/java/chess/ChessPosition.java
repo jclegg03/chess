@@ -47,4 +47,34 @@ public class ChessPosition {
     public int hashCode() {
         return Objects.hash(row, col);
     }
+
+    @Override
+    public String toString() {
+        String string = "";
+        if(col == 1) {
+            string = "a" + row;
+        }
+        else if(col == 2) {
+            string = "b" + row;
+        }
+        else if(col == 3) {
+            string = "c" + row;
+        }
+        else if(col == 4) {
+            string = "d" + row;
+        }
+        else if(col == 5) {
+            string = "e" + row;
+        }
+        else if(col == 6) {
+            string = "f" + row;
+        }
+        else if(col == 7) {
+            string = "g" + row;
+        }
+        else {
+            string = "h" + row;
+        }
+        return string;
+    }
 }

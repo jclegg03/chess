@@ -169,8 +169,10 @@ public class ChessGame {
                 }
             }
         }
-
-        throw new InvalidMoveException(move + " is invalid.");
+        else {
+            throw new InvalidMoveException(move + " is invalid because there is no piece at "
+                    + move.getStartPosition());
+        }
     }
 
     /**
