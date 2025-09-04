@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 
 /**
@@ -66,7 +67,70 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(startPosition);
+
+        if(piece != null) {
+            HashSet<ChessMove> moves = (HashSet<ChessMove>) piece.pieceMoves(board, startPosition);
+            HashSet<ChessMove> invalidMoves = new HashSet<ChessMove>();
+            for(ChessMove move : moves) {
+                if(! validateMove(move)) {
+                    invalidMoves.add(move);
+                }
+            }
+
+            moves.removeAll(invalidMoves);
+            return moves;
+        }
+
+        return null;
+    }
+
+    /**
+     * Checks if a move would leave the king in check
+     * @param move the move to be tested
+     * @return a boolean of if the move is valid or not
+     */
+    private boolean validateMove(ChessMove move) {
+        ChessBoard simulatedBoard = simulateMove(move);
+        return !isInCheck(simulatedBoard, turn);
+    }
+
+    /**
+     * Simulates making a move without affecting the data members
+     * @param move the move to simulate
+     * @return the simulated chess board after the move has been made.
+     */
+    private ChessBoard simulateMove(ChessMove move) {
+        ChessBoard simulatedBoard = new ChessBoard();
+
+        for(int row = 1; row <= 8; row++) {
+            for(int col = 1; col <= 8; col++) {
+                ChessPosition currentPos = new ChessPosition(row, col);
+                simulatedBoard.addPiece(currentPos, board.getPiece(currentPos));
+            }
+        }
+
+        makeMove(simulatedBoard, move);
+
+        return simulatedBoard;
+    }
+
+    /**
+     * Makes a move on a chess board. The move may not be valid
+     *
+     * @param board the board on which to make the move
+     * @param move the move to make
+     */
+    private void makeMove(ChessBoard board, ChessMove move) {
+        if(move.getPromotionPiece() == null) {
+            board.addPiece(move.getEndPosition(),
+                    board.getPiece(move.getStartPosition()));
+            board.addPiece(move.getStartPosition(), null);
+        }
+        else {
+            board.addPiece(move.getEndPosition(),
+                    new ChessPiece(turn, move.getPromotionPiece()));
+        }
     }
 
     /**
@@ -77,6 +141,16 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * Checks if a team is in check on a given board
+     * @param board the board to check
+     * @param teamColor the team to check
+     * @return True if the team is in check on the board
+     */
+    private boolean isInCheck(ChessBoard board, TeamColor teamColor) {
+
     }
 
     /**
