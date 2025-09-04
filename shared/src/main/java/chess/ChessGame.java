@@ -150,7 +150,35 @@ public class ChessGame {
      * @return True if the team is in check on the board
      */
     private boolean isInCheck(ChessBoard board, TeamColor teamColor) {
+        HashSet<ChessMove> moves = new HashSet<ChessMove>();
+        ChessPosition kingPosition = null;
 
+        //iterate through the entire board
+        for(int row = 1; row <= 8; row++) {
+            for(int col = 1; col <= 8; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(position);
+
+                //check if the piece is the opposite team and add its moves
+                if(piece != null && piece.getTeamColor() != teamColor) {
+                    moves.addAll(validMoves(position));
+                }
+                //check if the piece is the specified king
+                else if(piece != null && piece.getTeamColor() == teamColor
+                            && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                    kingPosition = position;
+                }
+            }
+        }
+
+        //check if any of the moves would capture the king
+        for(ChessMove move : moves) {
+            if(move.getEndPosition().equals(kingPosition)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -160,7 +188,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return isInCheck(board, teamColor);
     }
 
     /**
