@@ -149,11 +149,21 @@ public class ChessGame {
             for (ChessMove validMove : moves) {
                 if (validMove.equals(move)) {
                     makeMove(board, move);
+
                     //update saved king position
                     if (move.getStartPosition().equals(blackKingPos)) {
                         blackKingPos = move.getEndPosition();
-                    } else if (move.getStartPosition().equals(whiteKingPos)) {
+                    }
+                    else if (move.getStartPosition().equals(whiteKingPos)) {
                         whiteKingPos = move.getEndPosition();
+                    }
+
+                    //update team turn
+                    if(turn == TeamColor.WHITE) {
+                        turn = TeamColor.BLACK;
+                    }
+                    else {
+                        turn = TeamColor.WHITE;
                     }
                     return;
                 }
