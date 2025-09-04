@@ -13,12 +13,16 @@ import java.util.Objects;
 public class ChessGame {
     private ChessBoard board;
     private TeamColor turn;
+    private ChessPosition whiteKingPos;
+    private ChessPosition blackKingPos;
 
     public ChessGame() {
         this.board = new ChessBoard();
         this.turn = TeamColor.WHITE;
 
         this.board.resetBoard();
+        this.whiteKingPos = new ChessPosition(1, 5);
+        this.blackKingPos = new ChessPosition(8, 5);
     }
 
     /**
@@ -143,6 +147,13 @@ public class ChessGame {
         for (ChessMove validMove : validMoves(move.getStartPosition())) {
             if(validMove.equals(move)) {
                 makeMove(board, move);
+                //update saved king position
+                if(move.getStartPosition().equals(blackKingPos)) {
+                    blackKingPos = move.getEndPosition();
+                }
+                else if(move.getStartPosition().equals(whiteKingPos)) {
+                    whiteKingPos = move.getEndPosition();
+                }
                 return;
             }
         }
@@ -208,7 +219,12 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if(teamColor == TeamColor.BLACK) {
+            return isInCheck(teamColor) && validMoves(blackKingPos) == null;
+        }
+        else {
+            return isInCheck(teamColor) && validMoves(whiteKingPos) == null;
+        }
     }
 
     /**
