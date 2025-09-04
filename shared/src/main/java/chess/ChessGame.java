@@ -144,6 +144,11 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        TeamColor pieceColor = board.getPiece(move.getStartPosition()).getTeamColor();
+        if(pieceColor != turn) {
+            throw new InvalidMoveException("Uh, its not your turn bub.");
+        }
+
         Collection<ChessMove> moves = validMoves(move.getStartPosition());
         if(moves != null) {
             for (ChessMove validMove : moves) {
