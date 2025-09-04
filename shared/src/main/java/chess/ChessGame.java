@@ -88,7 +88,7 @@ public class ChessGame {
     /**
      * Checks if a move would leave the king in check
      * @param move the move to be tested
-     * @return a boolean of if the move is valid or not
+     * @return true if the move is valid
      */
     private boolean validateMove(ChessMove move) {
         ChessBoard simulatedBoard = simulateMove(move);
@@ -140,7 +140,14 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        for (ChessMove validMove : validMoves(move.getStartPosition())) {
+            if(validMove.equals(move)) {
+                makeMove(board, move);
+                return;
+            }
+        }
+
+        throw new InvalidMoveException(move + " is invalid.");
     }
 
     /**
