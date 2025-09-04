@@ -168,7 +168,7 @@ public class ChessGame {
 
                 //check if the piece is the opposite team and add its moves
                 if(piece != null && piece.getTeamColor() != teamColor) {
-                    Collection<ChessMove> validMoves = validMoves(position);
+                    Collection<ChessMove> validMoves = piece.pieceMoves(board, position);
                     if(validMoves != null) {
                         moves.addAll(validMoves);
                     }
