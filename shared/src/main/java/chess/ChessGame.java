@@ -168,7 +168,10 @@ public class ChessGame {
 
                 //check if the piece is the opposite team and add its moves
                 if(piece != null && piece.getTeamColor() != teamColor) {
-                    moves.addAll(validMoves(position));
+                    Collection<ChessMove> validMoves = validMoves(position);
+                    if(validMoves != null) {
+                        moves.addAll(validMoves);
+                    }
                 }
                 //check if the piece is the specified king
                 else if(piece != null && piece.getTeamColor() == teamColor
