@@ -2,12 +2,11 @@ package chess.moves;
 
 import chess.*;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
+import java.util.HashSet;
 
 public final class PawnMoves {
     public static void pawnMoves(ChessBoard board, ChessPosition position,
-                                 ChessPiece piece, ArrayList<ChessMove> validMoves) {
+                                 ChessPiece piece, HashSet<ChessMove> validMoves) {
         int row = position.getRow();
         int col = position.getColumn();
 
@@ -108,7 +107,7 @@ public final class PawnMoves {
     }
 
     private static void promotions(ChessPosition oldPos, ChessPosition newPos,
-                                   ChessGame.TeamColor teamColor, ArrayList<ChessMove> validMoves) {
+                                   ChessGame.TeamColor teamColor, HashSet<ChessMove> validMoves) {
         ChessPiece.PieceType[] promotionPieces =
                 {ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.KNIGHT,
                         ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.ROOK};

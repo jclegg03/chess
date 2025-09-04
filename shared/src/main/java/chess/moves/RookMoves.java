@@ -5,14 +5,14 @@ import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 public final class RookMoves {
     /**
      * Calculates the moves a rook can make
      */
     public static void rookMoves(ChessBoard board, ChessPosition position,
-                                 ChessPiece piece, ArrayList<ChessMove> validMoves) {
+                                 ChessPiece piece, HashSet<ChessMove> validMoves) {
         int row = position.getRow();
         int col = position.getColumn();
 

@@ -5,14 +5,14 @@ import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 public final class BishopMoves {
     /**
      * Calculates the moves a bishop can make
      */
     public static void bishopMoves(ChessBoard board, ChessPosition currentPosition,
-                                   ChessPiece piece, ArrayList<ChessMove> validMoves) {
+                                   ChessPiece piece, HashSet<ChessMove> validMoves) {
         int row = currentPosition.getRow();
         int col = currentPosition.getColumn();
 

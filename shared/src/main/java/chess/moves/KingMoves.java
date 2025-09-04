@@ -5,14 +5,14 @@ import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 public final class KingMoves {
     /**
      * Calculates the moves a king can make without considering check
      */
     public static void kingMoves(ChessBoard board, ChessPosition position,
-                                 ChessPiece piece, ArrayList<ChessMove> validMoves) {
+                                 ChessPiece piece, HashSet<ChessMove> validMoves) {
         int row = position.getRow();
         int col = position.getColumn();
         boolean leftValid = col - 1 > 0;

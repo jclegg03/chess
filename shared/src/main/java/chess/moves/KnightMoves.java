@@ -5,14 +5,14 @@ import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 public final class KnightMoves {
     /**
      * Calculates the moves a knight can make
      */
     public static void knightMoves(ChessBoard board, ChessPosition position,
-                                   ChessPiece piece, ArrayList<ChessMove> validMoves) {
+                                   ChessPiece piece, HashSet<ChessMove> validMoves) {
         int row = position.getRow();
         int col = position.getColumn();
         boolean up2 = row + 2 <= 8;

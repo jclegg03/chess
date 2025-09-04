@@ -3,7 +3,7 @@ package chess;
 import chess.moves.*;
 
 import java.util.Collection;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Objects;
 
 /**
@@ -100,7 +100,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ArrayList<ChessMove> validMoves = new ArrayList<ChessMove>();
+        HashSet<ChessMove> validMoves = new HashSet<ChessMove>();
 
         if(this.pieceType == PieceType.KING) {
             KingMoves.kingMoves(board, myPosition, this, validMoves);
@@ -128,7 +128,7 @@ public class ChessPiece {
      * Adds a move to the valid moves list if the new position is unoccupied or has an opposing piece.
      */
     public static void addMove(ChessPosition oldPosition, ChessPosition newPosition,
-                         ChessPiece piece, ChessPiece otherPiece, ArrayList<ChessMove> moves) {
+                         ChessPiece piece, ChessPiece otherPiece, HashSet<ChessMove> moves) {
         if(otherPiece == null || otherPiece.pieceColor != piece.pieceColor) {
             moves.add(new ChessMove(oldPosition, newPosition));
         }
