@@ -144,17 +144,19 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        for (ChessMove validMove : validMoves(move.getStartPosition())) {
-            if(validMove.equals(move)) {
-                makeMove(board, move);
-                //update saved king position
-                if(move.getStartPosition().equals(blackKingPos)) {
-                    blackKingPos = move.getEndPosition();
+        Collection<ChessMove> moves = validMoves(move.getStartPosition());
+        if(moves != null) {
+            for (ChessMove validMove : moves) {
+                if (validMove.equals(move)) {
+                    makeMove(board, move);
+                    //update saved king position
+                    if (move.getStartPosition().equals(blackKingPos)) {
+                        blackKingPos = move.getEndPosition();
+                    } else if (move.getStartPosition().equals(whiteKingPos)) {
+                        whiteKingPos = move.getEndPosition();
+                    }
+                    return;
                 }
-                else if(move.getStartPosition().equals(whiteKingPos)) {
-                    whiteKingPos = move.getEndPosition();
-                }
-                return;
             }
         }
 
