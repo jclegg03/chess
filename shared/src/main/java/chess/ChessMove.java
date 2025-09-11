@@ -69,11 +69,7 @@ public class ChessMove {
 
     @Override
     public String toString() {
-        String string = "";
-        string += startPosition + " -> " + endPosition;
-        if(promotionPiece != null) {
-            string += "\nPromotion Piece: " + promotionPiece;
-        }
-        return string;
+        return startPosition + " ->\n" + endPosition;
+
     }
 }
