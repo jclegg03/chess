@@ -108,6 +108,22 @@ public class ChessGame {
     }
 
     /**
+     * Makes a move on the chess board without updating turn or running any checks
+     * @param move the move to make
+     */
+    private void simulateMove(ChessMove move) {
+        if(move.getPromotionPiece() == null) {
+            board.addPiece(move.getEndPosition(),
+                    board.getPiece(move.getStartPosition()));
+        }
+        else {
+            board.addPiece(move.getEndPosition(), new ChessPiece(turn, move.getPromotionPiece()));
+        }
+        board.addPiece(move.getStartPosition(), null);
+    }
+
+
+    /**
      * Makes a move in a chess game
      *
      * @param move chess move to perform
@@ -122,15 +138,7 @@ public class ChessGame {
             throw new InvalidMoveException("Uh its not your turn bub.");
         }
 
-        if(move.getPromotionPiece() == null) {
-            board.addPiece(move.getEndPosition(),
-                    board.getPiece(move.getStartPosition()));
-        }
-        else {
-            board.addPiece(move.getEndPosition(),
-                    new ChessPiece(turn, move.getPromotionPiece()));
-        }
-        board.addPiece(move.getStartPosition(), null);
+        simulateMove(move);
 
         if(turn == TeamColor.BLACK) {
             turn = TeamColor.WHITE;
@@ -164,19 +172,27 @@ public class ChessGame {
     }
 
     /**
+     * Gives the opposing team
+     * @param teamColor the team
+     * @return the opposing team
+     */
+    private TeamColor getOtherTeam(TeamColor teamColor) {
+        if(teamColor == TeamColor.BLACK) {
+            return TeamColor.WHITE;
+        }
+        else {
+            return TeamColor.BLACK;
+        }
+    }
+
+    /**
      * Determines if the given team is in check
      *
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        TeamColor otherTeam;
-        if(teamColor == TeamColor.BLACK) {
-            otherTeam = TeamColor.WHITE;
-        }
-        else {
-            otherTeam = TeamColor.BLACK;
-        }
+        TeamColor otherTeam = getOtherTeam(teamColor);
         ChessPosition kingPosition = getKingPos(teamColor);
 
         Collection<ChessMove> otherTeamMoves = getAllMoves(otherTeam);
@@ -197,7 +213,36 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if(! isInCheck(teamColor)) {
+            return false;
+        }
+
+        Collection<ChessMove> moves = getAllMoves(teamColor);
+
+        for(ChessMove move : moves) {
+            System.out.println(move);
+            ChessPiece pieceAtEndPos = board.getPiece(move.getEndPosition());
+            ChessPiece pieceAtStartPos = board.getPiece(move.getStartPosition());
+            System.out.println(board);
+            //make the move
+            simulateMove(move);
+
+            System.out.println(board);
+            //assess if they are still in check
+            boolean inCheck = isInCheck(teamColor);
+
+            //undo the move
+            board.addPiece(move.getStartPosition(), pieceAtStartPos);
+            board.addPiece(move.getEndPosition(), pieceAtEndPos);
+            System.out.println(board);
+
+            if(! inCheck) {
+                System.out.println("Failed");
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
