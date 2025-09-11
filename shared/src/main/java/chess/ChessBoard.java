@@ -83,7 +83,27 @@ public class ChessBoard {
             return false;
         }
         ChessBoard that = (ChessBoard) o;
-        return Objects.equals(board, that.board);
+
+        for(int row = 1; row <= 8; row++) {
+            for(int col = 1; col <= 8; col++) {
+                ChessPosition pos = new ChessPosition(row, col);
+                ChessPiece thisPiece = this.getPiece(pos);
+                ChessPiece thatPiece = that.getPiece(pos);
+                if(thisPiece != null && thatPiece != null) {
+                    if(! thisPiece.equals(thatPiece)){
+                        return false;
+                    }
+                }
+                else {
+                    if((thisPiece == null && thatPiece != null) ||
+                        thisPiece != null && thatPiece == null) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     @Override
