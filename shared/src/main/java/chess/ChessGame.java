@@ -170,7 +170,24 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        TeamColor otherTeam;
+        if(teamColor == TeamColor.BLACK) {
+            otherTeam = TeamColor.WHITE;
+        }
+        else {
+            otherTeam = TeamColor.BLACK;
+        }
+        ChessPosition kingPosition = getKingPos(teamColor);
+
+        Collection<ChessMove> otherTeamMoves = getAllMoves(otherTeam);
+
+        for(ChessMove move: otherTeamMoves) {
+            if(move.getEndPosition().equals(kingPosition)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
