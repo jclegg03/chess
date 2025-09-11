@@ -210,6 +210,32 @@ public class ChessGame {
         return false;
     }
 
+    private boolean canMakeMoves(TeamColor teamColor) {
+        Collection<ChessMove> moves = getAllMoves(teamColor);
+
+        for(ChessMove move : moves) {
+            ChessPiece pieceAtEndPos = board.getPiece(move.getEndPosition());
+            ChessPiece pieceAtStartPos = board.getPiece(move.getStartPosition());
+
+            //make the move
+            simulateMove(move);
+
+            //assess if they are still in check
+            boolean inCheck = isInCheck(teamColor);
+
+            //undo the move
+            board.addPiece(move.getStartPosition(), pieceAtStartPos);
+            board.addPiece(move.getEndPosition(), pieceAtEndPos);
+
+
+            if(! inCheck) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
      * Determines if the given team is in checkmate
      *
@@ -221,32 +247,7 @@ public class ChessGame {
             return false;
         }
 
-        Collection<ChessMove> moves = getAllMoves(teamColor);
-
-        for(ChessMove move : moves) {
-            System.out.println(move);
-            ChessPiece pieceAtEndPos = board.getPiece(move.getEndPosition());
-            ChessPiece pieceAtStartPos = board.getPiece(move.getStartPosition());
-            System.out.println(board);
-            //make the move
-            simulateMove(move);
-
-            System.out.println(board);
-            //assess if they are still in check
-            boolean inCheck = isInCheck(teamColor);
-
-            //undo the move
-            board.addPiece(move.getStartPosition(), pieceAtStartPos);
-            board.addPiece(move.getEndPosition(), pieceAtEndPos);
-            System.out.println(board);
-
-            if(! inCheck) {
-                System.out.println("Failed");
-                return false;
-            }
-        }
-
-        return true;
+        return canMakeMoves(teamColor);
     }
 
     /**
@@ -257,7 +258,11 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if(isInCheck(teamColor)) {
+            return false;
+        }
+
+        return canMakeMoves(teamColor);
     }
 
     /**
