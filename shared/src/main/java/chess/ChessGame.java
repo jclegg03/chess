@@ -159,10 +159,18 @@ public class ChessGame {
         }
 
         ChessBoard boardBeforeMove = board.clone();
+        Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
         simulateMove(move);
         if(isInCheck(turn)) {
             board = boardBeforeMove;
             throw new InvalidMoveException("You must construct additional pylons, er I mean protect your king!");
+        }
+
+
+        if(! validMoves.contains(move)) {
+            board = boardBeforeMove;
+            throw new InvalidMoveException("Woah there! That isn't legal and the " +
+                    "programmer is too lazy to tell you why.");
         }
 
         if(turn == TeamColor.BLACK) {
