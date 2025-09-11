@@ -76,6 +76,38 @@ public class ChessGame {
     }
 
     /**
+     * Gets all moves a team can make
+     * @param teamColor the team to check
+     * @return moves the team can make. Null if there are no moves.
+     */
+    private Collection<ChessMove> getAllMoves(TeamColor teamColor) {
+        Collection<ChessMove> allMoves = null;
+
+        for(int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition pos = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(pos);
+                TeamColor pieceColor = null;
+
+                if (piece != null) {
+                    pieceColor = piece.getTeamColor();
+                }
+
+                if (pieceColor == teamColor) {
+                    Collection<ChessMove> moves = validMoves(pos);
+                    if (allMoves == null && moves != null) {
+                        allMoves = moves;
+                    } else if (allMoves != null && moves != null) {
+                        allMoves.addAll(moves);
+                    }
+                }
+            }
+        }
+
+        return allMoves;
+    }
+
+    /**
      * Makes a move in a chess game
      *
      * @param move chess move to perform
@@ -106,6 +138,29 @@ public class ChessGame {
         else {
             turn = TeamColor.BLACK;
         }
+    }
+
+    /**
+     * gives the position of the specified king
+     * @param teamcolor the team to look for
+     * @return the king's position or null if not found
+     */
+    private ChessPosition getKingPos(TeamColor teamcolor) {
+        ChessPosition kingPos = null;
+
+        for(int row = 1; row <= 8; row++) {
+            for(int col = 1; col <= 8; col++) {
+                ChessPosition pos = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(pos);
+
+                if(piece != null && piece.getPieceType() == ChessPiece.PieceType.KING
+                    && piece.getTeamColor() == teamcolor) {
+                    kingPos = pos;
+                }
+            }
+        }
+
+        return kingPos;
     }
 
     /**
