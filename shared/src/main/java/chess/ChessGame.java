@@ -247,6 +247,32 @@ public class ChessGame {
         return false;
     }
 
+    private boolean canMakeMoves(TeamColor teamColor) {
+        Collection<ChessMove> moves = getAllMoves(teamColor);
+
+        for(ChessMove move : moves) {
+            ChessPiece pieceAtEndPos = board.getPiece(move.getEndPosition());
+            ChessPiece pieceAtStartPos = board.getPiece(move.getStartPosition());
+
+            //make the move
+            simulateMove(move);
+
+            //assess if they are still in check
+            boolean inCheck = isInCheck(teamColor);
+
+            //undo the move
+            board.addPiece(move.getStartPosition(), pieceAtStartPos);
+            board.addPiece(move.getEndPosition(), pieceAtEndPos);
+
+
+            if(! inCheck) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
      * Determines if the given team is in check
      *
@@ -267,9 +293,8 @@ public class ChessGame {
         if(teamColor == TeamColor.BLACK) {
             return isInCheck(teamColor) && getAllValidMoves(board, TeamColor.BLACK).isEmpty();
         }
-        else {
-            return isInCheck(teamColor) && getAllValidMoves(board, TeamColor.WHITE).isEmpty();
-        }
+
+        return canMakeMoves(teamColor);
     }
 
     /**
@@ -280,12 +305,11 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if(teamColor == TeamColor.BLACK) {
-            return !isInCheck(teamColor) && getAllValidMoves(board, TeamColor.BLACK).isEmpty();
+        if(isInCheck(teamColor)) {
+            return false;
         }
-        else {
-            return !isInCheck(teamColor) && getAllValidMoves(board, TeamColor.WHITE).isEmpty();
-        }
+
+        return canMakeMoves(teamColor);
     }
 
     /**
