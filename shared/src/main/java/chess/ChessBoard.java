@@ -109,4 +109,17 @@ public class ChessBoard {
 
         return text;
     }
+
+    @Override
+    public ChessBoard clone() {
+        ChessBoard copy = new ChessBoard();
+        for(int row = 0; row <= 8; row++) {
+            for(int col = 0; col <= 8; col++) {
+                ChessPosition pos = new ChessPosition(row, col);
+                copy.addPiece(pos, this.getPiece(pos));
+            }
+        }
+
+        return copy;
+    }
 }

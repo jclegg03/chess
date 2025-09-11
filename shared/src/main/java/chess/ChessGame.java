@@ -73,7 +73,9 @@ public class ChessGame {
         ChessPiece piece = board.getPiece(startPosition);
 
         if(piece != null) {
-            return piece.pieceMoves(board, startPosition);
+            Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+
+            return moves;
         }
 
         return null;
@@ -142,7 +144,12 @@ public class ChessGame {
             throw new InvalidMoveException("Uh its not your turn bub.");
         }
 
+        ChessBoard boardBeforeMove = board.clone();
         simulateMove(move);
+        if(isInCheck(turn)) {
+            board = boardBeforeMove;
+            throw new InvalidMoveException("You must construct additional pylons, er I mean protect your king!");
+        }
 
         if(turn == TeamColor.BLACK) {
             turn = TeamColor.WHITE;
