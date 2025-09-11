@@ -12,12 +12,16 @@ import java.util.Objects;
 public class ChessGame {
     private ChessBoard board;
     private TeamColor turn;
+    private ChessPosition whiteKingPos;
+    private ChessPosition blackKingPos;
 
     public ChessGame() {
         this.board = new ChessBoard();
         this.turn = TeamColor.WHITE;
 
         this.board.resetBoard();
+        this.whiteKingPos = new ChessPosition(1, 5);
+        this.blackKingPos = new ChessPosition(8, 5);
     }
 
     /**
