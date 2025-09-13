@@ -110,15 +110,21 @@ public class ChessGame {
         ChessPiece piece = board.getPiece(startPosition);
 
         if(piece != null) {
-            HashSet<ChessMove> moves = (HashSet<ChessMove>) piece.pieceMoves(board, startPosition);
-            HashSet<ChessMove> invalidMoves = new HashSet<ChessMove>();
+            TeamColor team = piece.getTeamColor();
+            Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+            HashSet<ChessMove> invalidMoves = new HashSet<>();
+
             for(ChessMove move : moves) {
-                if(! validateMove(move)) {
+                ChessBoard boardBeforeMove = board.clone();
+                simulateMove(move);
+                if(isInCheck(team)) {
                     invalidMoves.add(move);
                 }
+                board = boardBeforeMove;
             }
 
             moves.removeAll(invalidMoves);
+
             return moves;
         }
 
@@ -130,9 +136,31 @@ public class ChessGame {
      * @param move the move to be tested
      * @return true if the move is valid
      */
-    private boolean validateMove(ChessMove move) {
-        ChessBoard simulatedBoard = simulateMove(move);
-        return !isInCheck(simulatedBoard, turn);
+    private Collection<ChessMove> getAllMoves(TeamColor teamColor) {
+        Collection<ChessMove> allMoves = null;
+
+        for(int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition pos = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(pos);
+                TeamColor pieceColor = null;
+
+                if (piece != null) {
+                    pieceColor = piece.getTeamColor();
+                }
+
+                if (pieceColor == teamColor) {
+                    Collection<ChessMove> moves = piece.pieceMoves(board, pos);
+                    if (allMoves == null && moves != null) {
+                        allMoves = moves;
+                    } else if (allMoves != null && moves != null) {
+                        allMoves.addAll(moves);
+                    }
+                }
+            }
+        }
+
+        return allMoves;
     }
 
     /**
@@ -192,13 +220,20 @@ public class ChessGame {
                 if (validMove.equals(move)) {
                     makeMove(board, move);
 
-                    //update saved king position
-                    if (move.getStartPosition().equals(blackKingPos)) {
-                        blackKingPos = move.getEndPosition();
-                    }
-                    else if (move.getStartPosition().equals(whiteKingPos)) {
-                        whiteKingPos = move.getEndPosition();
-                    }
+        ChessBoard boardBeforeMove = board.clone();
+        Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
+        simulateMove(move);
+        if(isInCheck(turn)) {
+            board = boardBeforeMove;
+            throw new InvalidMoveException("You must construct additional pylons, er I mean protect your king!");
+        }
+
+
+        if(! validMoves.contains(move)) {
+            board = boardBeforeMove;
+            throw new InvalidMoveException("Woah there! That isn't legal and the " +
+                    "programmer is too lazy to tell you why.");
+        }
 
                     //update team turn
                     if(turn == TeamColor.WHITE) {
