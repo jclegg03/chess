@@ -29,7 +29,7 @@ public class Service {
     }
 
     public static AuthData createUser(UserData user) {
-        UserData data = getUser(user.getUsername());
+        UserData data = getUser(user.username());
         if(data == null) {
             try {
                 userDAO.insertUser(user);
@@ -38,8 +38,8 @@ public class Service {
                 throw new RuntimeException(e);
             }
 
-            String authToken = "" + Objects.hash(user.getUsername(), user.getPassword());
-            AuthData auth = new AuthData(user.getUsername(), authToken);
+            String authToken = "" + Objects.hash(user.username(), user.password());
+            AuthData auth = new AuthData(user.username(), authToken);
 
             try {
                 authDAO.insertAuth(auth);

@@ -4,58 +4,16 @@ import chess.ChessGame;
 
 import java.util.Objects;
 
-public class GameData {
-    private final int gameID;
-    private String whiteUsername;
-    private String blackUsername;
-    private ChessGame game;
-
-    public GameData(int gameID, String whiteUsername, String blackUsername, ChessGame game) {
-        this.gameID = gameID;
-        this.whiteUsername = whiteUsername;
-        this.blackUsername = blackUsername;
-        this.game = game;
-    }
-
+public record GameData (int gameID, String whiteUsername, String blackUsername, ChessGame game) {
     public GameData(int gameID) {
         this(gameID, "", "", new ChessGame());
     }
 
-    public void setWhiteUsername(String whiteUsername) {
-        this.whiteUsername = whiteUsername;
+    public GameData setWhiteUsername(String whiteUsername) {
+        return new GameData(gameID, whiteUsername, blackUsername, game);
     }
 
-    public void setBlackUsername(String blackUsername) {
-        this.blackUsername = blackUsername;
-    }
-
-    public int getGameID() {
-        return gameID;
-    }
-
-    public String getWhiteUsername() {
-        return whiteUsername;
-    }
-
-    public String getBlackUsername() {
-        return blackUsername;
-    }
-
-    public ChessGame getGame() {
-        return game;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        GameData gameData = (GameData) o;
-        return gameID == gameData.gameID;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(gameID);
+    public GameData setBlackUsername(String blackUsername) {
+        return new GameData(gameID, whiteUsername, blackUsername, game);
     }
 }
