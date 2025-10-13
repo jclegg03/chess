@@ -1,5 +1,6 @@
-package dataaccess;
+package dataaccess.game;
 
+import dataaccess.DataAccessException;
 import model.GameData;
 
 public interface GameDAO {
