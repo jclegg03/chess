@@ -27,7 +27,7 @@ public class LocalGameDAO implements GameDAO {
     @Override
     public GameData selectGame(int gameID) throws DataAccessException {
         for(GameData game : games) {
-            if(game.getGameID() == gameID) {
+            if(game.gameID() == gameID) {
                 return game;
             }
         }

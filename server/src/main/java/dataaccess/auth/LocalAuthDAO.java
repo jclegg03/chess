@@ -21,7 +21,7 @@ public class LocalAuthDAO implements AuthDAO {
     @Override
     public AuthData selectAuth(String authToken) throws DataAccessException {
         for(AuthData auth : auths) {
-            if(auth.getAuthToken().equals(authToken)) return auth;
+            if(auth.authToken().equals(authToken)) return auth;
         }
 
         return null;

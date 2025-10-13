@@ -21,7 +21,7 @@ public class LocalUserDAO implements UserDAO{
     @Override
     public UserData selectUser(String username) throws DataAccessException {
         for(UserData user: users) {
-            if(user.getUsername().equals(username)) return user;
+            if(user.username().equals(username)) return user;
         }
         return null;
 
