@@ -7,8 +7,6 @@ import dataaccess.game.GameDAO;
 import dataaccess.game.LocalGameDAO;
 import dataaccess.user.LocalUserDAO;
 import dataaccess.user.UserDAO;
-import handlers.RegisterHandler;
-import kotlin.NotImplementedError;
 import model.AuthData;
 import model.UserData;
 

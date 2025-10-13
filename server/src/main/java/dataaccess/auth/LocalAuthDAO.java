@@ -1,7 +1,6 @@
 package dataaccess.auth;
 
 import dataaccess.DataAccessException;
-import dataaccess.game.LocalGameDAO;
 import model.AuthData;
 
 import java.util.HashSet;

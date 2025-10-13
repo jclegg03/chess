@@ -1,7 +1,6 @@
 package dataaccess.user;
 
 import dataaccess.DataAccessException;
-import io.javalin.http.HttpStatus;
 import model.UserData;
 
 import java.util.HashSet;
