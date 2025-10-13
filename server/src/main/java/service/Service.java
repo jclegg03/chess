@@ -3,6 +3,7 @@ package service;
 import dataaccess.DataAccessException;
 import dataaccess.auth.AuthDAO;
 import dataaccess.game.GameDAO;
+import dataaccess.game.LocalGameDAO;
 import dataaccess.user.LocalUserDAO;
 import dataaccess.user.UserDAO;
 import handlers.RegisterHandler;
@@ -14,7 +15,7 @@ import java.util.Objects;
 
 public class Service {
     private static UserDAO userDAO = new LocalUserDAO();
-    private static GameDAO gameDAO;
+    private static GameDAO gameDAO = new LocalGameDAO();
     private static AuthDAO authDAO;
 
     public static UserData getUser(String username) {
