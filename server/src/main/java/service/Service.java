@@ -5,20 +5,19 @@ import dataaccess.auth.AuthDAO;
 import dataaccess.game.GameDAO;
 import dataaccess.user.LocalUserDAO;
 import dataaccess.user.UserDAO;
+import handlers.RegisterHandler;
 import kotlin.NotImplementedError;
 import model.AuthData;
 import model.UserData;
 
+import java.util.Objects;
+
 public class Service {
-    private UserDAO userDAO;
-    private GameDAO gameDAO;
-    private AuthDAO authDAO;
+    private static UserDAO userDAO = new LocalUserDAO();
+    private static GameDAO gameDAO;
+    private static AuthDAO authDAO;
 
-    public Service() {
-        this.userDAO = new LocalUserDAO();
-    }
-
-    public UserData getUser(String username) {
+    public static UserData getUser(String username) {
         try {
             return userDAO.selectUser(username);
         }
@@ -27,7 +26,30 @@ public class Service {
         }
     }
 
-    public AuthData createUser(UserData user) {
-        throw new NotImplementedError();
+    public static AuthData createUser(UserData user) {
+        UserData data = getUser(user.getUsername());
+        if(data == null) {
+            try {
+                userDAO.insertUser(user);
+            }
+            catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
+
+            String authToken = "" + Objects.hash(user.getUsername(), user.getPassword());
+            AuthData auth = new AuthData(user.getUsername(), authToken);
+
+            try {
+                authDAO.insertAuth(auth);
+            }
+            catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
+
+            return auth;
+        }
+        else {
+            return null;
+        }
     }
 }

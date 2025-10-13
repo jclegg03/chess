@@ -14,7 +14,7 @@ public class ServiceUnitTests {
     public void createUserSuccess() {
         UserData sampleUser = new UserData("username", "password", "email@mail.com");
         AuthData sampleAuth = new AuthData("username", "" + Objects.hash("username", "password"));
-        AuthData auth = service.createUser(sampleUser);
+        AuthData auth = Service.createUser(sampleUser);
 
         assert auth.equals(sampleAuth);
     }
