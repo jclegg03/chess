@@ -2,6 +2,8 @@ package model;
 
 import chess.ChessGame;
 
+import java.util.Objects;
+
 public class GameData {
     private final int gameID;
     private String whiteUsername;
@@ -41,5 +43,19 @@ public class GameData {
 
     public ChessGame getGame() {
         return game;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        GameData gameData = (GameData) o;
+        return gameID == gameData.gameID;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(gameID);
     }
 }
