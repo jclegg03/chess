@@ -1,6 +1,7 @@
 package dataaccess.user;
 
 import dataaccess.DataAccessException;
+import io.javalin.http.HttpStatus;
 import model.UserData;
 
 import java.util.HashSet;
@@ -22,9 +23,9 @@ public class LocalUserDAO implements UserDAO{
         for(UserData user: users) {
             if(user.getUsername().equals(username)) return user;
         }
+        return null;
 
-        throw new DataAccessException("There is no user with the username "
-                                        + username + ".\n");
+//        throw new DataAccessException("Error: unauthorized", HttpStatus.UNAUTHORIZED);
     }
 
     @Override
