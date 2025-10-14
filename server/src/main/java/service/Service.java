@@ -87,6 +87,37 @@ public class Service {
         }
     }
 
+    public static void joinGame(AuthData auth, ChessGame.TeamColor color, int gameID) {
+        isAuthorized(auth);
+        try {
+            GameData game = gameDAO.selectGame(gameID);
+            if(color == ChessGame.TeamColor.WHITE) {
+                if("".equals(game.whiteUsername()))
+                    game = game.setWhiteUsername(auth.username());
+                else throw new RuntimeException();
+            }
+            else if(color == ChessGame.TeamColor.BLACK){
+                if("".equals(game.blackUsername()))
+                    game = game.setBlackUsername(auth.username());
+                else throw new RuntimeException();
+            }
+
+            updateGame(game);
+        }
+        catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void updateGame(GameData game) {
+        try {
+            gameDAO.updateGame(game.gameID(), game);
+        }
+        catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static void addGame(GameData game) {
         try {
             gameDAO.insertGame(game);

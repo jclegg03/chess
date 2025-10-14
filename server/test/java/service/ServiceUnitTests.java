@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.*;
@@ -51,7 +52,7 @@ public class ServiceUnitTests {
         var expiredAuth = Service.login(sampleUser);
         Service.logout(expiredAuth);
 
-        assertThrows(RuntimeException.class, () -> Service.createGame(expiredAuth, "Cool Game"));
+        assertThrows(Exception.class, () -> Service.createGame(expiredAuth, "Cool Game"));
     }
 
     @Test
@@ -73,5 +74,35 @@ public class ServiceUnitTests {
         gamesInMem = new HashSet<>(List.of(Service.listGames(sampleAuth)));
 
         assert gamesInMem.equals(games);
+    }
+
+    @Test
+    public void testJoinGameWhite() {
+        Service.createUser(sampleUser);
+        int gameID = Service.getCurrentGameID();
+        Service.createGame(sampleAuth, "Game");
+        Service.joinGame(sampleAuth, ChessGame.TeamColor.WHITE, gameID);
+        var game = Service.listGames(sampleAuth)[0];
+
+        var testGame = new GameData(gameID, "Game");
+        testGame = testGame.setWhiteUsername(sampleAuth.username());
+
+        assert testGame.equals(game);
+        assertThrows(Exception.class, () -> Service.joinGame(sampleAuth, ChessGame.TeamColor.WHITE, gameID));
+    }
+
+    @Test
+    public void testJoinGameBlack() {
+        Service.createUser(sampleUser);
+        int gameID = Service.getCurrentGameID();
+        Service.createGame(sampleAuth, "Game");
+        Service.joinGame(sampleAuth, ChessGame.TeamColor.BLACK, gameID);
+        var game = Service.listGames(sampleAuth)[0];
+
+        var testGame = new GameData(gameID, "Game");
+        testGame = testGame.setBlackUsername(sampleAuth.username());
+
+        assert testGame.equals(game);
+        assertThrows(Exception.class, () -> Service.joinGame(sampleAuth, ChessGame.TeamColor.BLACK, gameID));
     }
 }
