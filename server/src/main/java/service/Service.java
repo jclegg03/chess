@@ -36,20 +36,39 @@ public class Service {
                 throw new RuntimeException(e);
             }
 
-            String authToken = "" + Objects.hash(user.username(), user.password());
-            AuthData auth = new AuthData(user.username(), authToken);
-
-            try {
-                authDAO.insertAuth(auth);
-            }
-            catch (DataAccessException e) {
-                throw new RuntimeException(e);
-            }
-
+            AuthData auth = makeAuthData(user);
+            addAuth(auth);
             return auth;
         }
         else {
             return null;
         }
+    }
+
+    public static AuthData login(UserData user) {
+        UserData userOnRecord = getUser(user.username());
+
+        if(!user.equals(userOnRecord)) {
+            return null;
+        }
+        else {
+            var auth = makeAuthData(user);
+            addAuth(auth);
+            return auth;
+        }
+    }
+
+    private static void addAuth(AuthData auth) {
+        try {
+            authDAO.insertAuth(auth);
+        }
+        catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static AuthData makeAuthData(UserData user) {
+        var authToken =  "" + Objects.hash(user.username(), user.password());
+        return new AuthData(user.username(), authToken);
     }
 }
