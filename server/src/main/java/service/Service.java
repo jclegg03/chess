@@ -8,6 +8,7 @@ import dataaccess.game.GameDAO;
 import dataaccess.game.LocalGameDAO;
 import dataaccess.user.LocalUserDAO;
 import dataaccess.user.UserDAO;
+import kotlin.NotImplementedError;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -15,14 +16,14 @@ import model.UserData;
 import java.util.Objects;
 
 public class Service {
-    private static final UserDAO USER_DAO = new LocalUserDAO();
-    private static final GameDAO GAME_DAO = new LocalGameDAO();
-    private static final AuthDAO AUTH_DAO = new LocalAuthDAO();
+    private static UserDAO userDAO = new LocalUserDAO();
+    private static GameDAO gameDAO = new LocalGameDAO();
+    private static AuthDAO authDAO = new LocalAuthDAO();
     private static int currentGameID = 1;
 
     public static UserData getUser(String username) {
         try {
-            return USER_DAO.selectUser(username);
+            return userDAO.selectUser(username);
         }
         catch (DataAccessException e) {
             return null;
@@ -33,7 +34,7 @@ public class Service {
         UserData data = getUser(user.username());
         if(data == null) {
             try {
-                USER_DAO.insertUser(user);
+                userDAO.insertUser(user);
             }
             catch (DataAccessException e) {
                 throw new RuntimeException(e);
@@ -63,7 +64,7 @@ public class Service {
 
     public static void logout(AuthData auth) {
         try {
-            AUTH_DAO.deleteAuth(auth);
+            authDAO.deleteAuth(auth);
         }
         catch (DataAccessException e) {
             throw new RuntimeException(e);
@@ -71,82 +72,28 @@ public class Service {
     }
 
     public static void createGame(AuthData auth, String gameName) {
-        isAuthorized(auth);
-        var game = new GameData(currentGameID++, gameName);
-        addGame(game);
-    }
-
-    public static GameData[] listGames(AuthData auth) {
-        isAuthorized(auth);
-        try {
-            return GAME_DAO.selectAllGames();
+        if(!isAuthorized(auth)) {
+            throw new RuntimeException();
         }
-        catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void joinGame(AuthData auth, ChessGame.TeamColor color, int gameID) {
-        isAuthorized(auth);
-        try {
-            GameData game = GAME_DAO.selectGame(gameID);
-            if(color == ChessGame.TeamColor.WHITE) {
-                if("".equals(game.whiteUsername()))
-                    game = game.setWhiteUsername(auth.username());
-                else throw new RuntimeException();
-            }
-            else if(color == ChessGame.TeamColor.BLACK){
-                if("".equals(game.blackUsername()))
-                    game = game.setBlackUsername(auth.username());
-                else throw new RuntimeException();
-            }
-
-            updateGame(game);
-        }
-        catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void clearData() {
-        try {
-            AUTH_DAO.clearAuths();
-            GAME_DAO.clearGames();
-            USER_DAO.clearUsers();
-        }
-        catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static void updateGame(GameData game) {
-        try {
-            GAME_DAO.updateGame(game.gameID(), game);
-        }
-        catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        else {
+            var game = new GameData(currentGameID++, gameName);
+            addGame(game);
         }
     }
 
     private static void addGame(GameData game) {
         try {
-            GAME_DAO.insertGame(game);
+            gameDAO.insertGame(game);
         }
         catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static int getCurrentGameID() {
-        return currentGameID;
-    }
-
-    private static void isAuthorized(AuthData auth) {
+    private static boolean isAuthorized(AuthData auth) {
         try {
-            var authOnRecord = AUTH_DAO.selectAuth(auth.authToken());
-            if(!auth.equals(authOnRecord)) {
-                throw new RuntimeException();
-            }
+            var authOnRecord = authDAO.selectAuth(auth.authToken());
+            return auth.equals(authOnRecord);
         }
         catch (DataAccessException e) {
             throw new RuntimeException(e);
@@ -155,7 +102,7 @@ public class Service {
 
     private static void addAuth(AuthData auth) {
         try {
-            AUTH_DAO.insertAuth(auth);
+            authDAO.insertAuth(auth);
         }
         catch (DataAccessException e) {
             throw new RuntimeException(e);
