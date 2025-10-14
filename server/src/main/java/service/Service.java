@@ -58,6 +58,10 @@ public class Service {
         }
     }
 
+    public static void logout(AuthData auth) {
+
+    }
+
     private static void addAuth(AuthData auth) {
         try {
             authDAO.insertAuth(auth);

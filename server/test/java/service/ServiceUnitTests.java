@@ -37,4 +37,13 @@ public class ServiceUnitTests {
 
         assert sampleAuth.equals(authFromCreate) && sampleAuth.equals(authFromLogin);
     }
+
+    //Best to test this one after writing functions that check auth status.
+    @Test
+    public void testLogout() {
+        //attempt to logout with no one logged in. This should just do nothing.
+        Service.logout(sampleAuth);
+
+
+    }
 }
