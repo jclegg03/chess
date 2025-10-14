@@ -19,7 +19,7 @@ public class ServiceUnitTests {
     @Test
     public void testCreateUser() {
         AuthData auth = Service.createUser(sampleUser);
-        assert auth.equals(sampleAuth);
+        assert sampleAuth.equals(auth);
     }
 
     // Unfortunately it is impossible to test getUser without first implementing createUser.
@@ -28,7 +28,7 @@ public class ServiceUnitTests {
         assert Service.getUser("username") == null;
 
         Service.createUser(sampleUser);
-        assert Service.getUser(sampleUser.username()).equals(sampleUser);
+        assert sampleUser.equals(Service.getUser(sampleUser.username()));
     }
 
     //Again impossible to test without implementing createUser
@@ -64,8 +64,7 @@ public class ServiceUnitTests {
 
         Service.createGame(sampleAuth, "game1");
 
-        HashSet<GameData> gamesInMem = new HashSet<>();
-        gamesInMem.addAll(List.of(Service.listGames(sampleAuth)));
+        HashSet<GameData> gamesInMem = new HashSet<>(List.of(Service.listGames(sampleAuth)));
 
         assert gamesInMem.equals(games);
 
@@ -104,5 +103,15 @@ public class ServiceUnitTests {
 
         assert testGame.equals(game);
         assertThrows(Exception.class, () -> Service.joinGame(sampleAuth, ChessGame.TeamColor.BLACK, gameID));
+    }
+
+    @Test
+    public void testClearData() {
+        Service.createUser(sampleUser);
+        Service.createGame(sampleAuth, "");
+        Service.clearData();
+
+        assert Service.getUser(sampleUser.username()) == null;
+        assertThrows(Exception.class, () -> Service.listGames(sampleAuth));
     }
 }

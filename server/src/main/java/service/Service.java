@@ -8,7 +8,6 @@ import dataaccess.game.GameDAO;
 import dataaccess.game.LocalGameDAO;
 import dataaccess.user.LocalUserDAO;
 import dataaccess.user.UserDAO;
-import kotlin.NotImplementedError;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -16,14 +15,14 @@ import model.UserData;
 import java.util.Objects;
 
 public class Service {
-    private static UserDAO userDAO = new LocalUserDAO();
-    private static GameDAO gameDAO = new LocalGameDAO();
-    private static AuthDAO authDAO = new LocalAuthDAO();
+    private static final UserDAO USER_DAO = new LocalUserDAO();
+    private static final GameDAO GAME_DAO = new LocalGameDAO();
+    private static final AuthDAO AUTH_DAO = new LocalAuthDAO();
     private static int currentGameID = 1;
 
     public static UserData getUser(String username) {
         try {
-            return userDAO.selectUser(username);
+            return USER_DAO.selectUser(username);
         }
         catch (DataAccessException e) {
             return null;
@@ -34,7 +33,7 @@ public class Service {
         UserData data = getUser(user.username());
         if(data == null) {
             try {
-                userDAO.insertUser(user);
+                USER_DAO.insertUser(user);
             }
             catch (DataAccessException e) {
                 throw new RuntimeException(e);
@@ -64,7 +63,7 @@ public class Service {
 
     public static void logout(AuthData auth) {
         try {
-            authDAO.deleteAuth(auth);
+            AUTH_DAO.deleteAuth(auth);
         }
         catch (DataAccessException e) {
             throw new RuntimeException(e);
@@ -80,7 +79,7 @@ public class Service {
     public static GameData[] listGames(AuthData auth) {
         isAuthorized(auth);
         try {
-            return gameDAO.selectAllGames();
+            return GAME_DAO.selectAllGames();
         }
         catch (DataAccessException e) {
             throw new RuntimeException(e);
@@ -90,7 +89,7 @@ public class Service {
     public static void joinGame(AuthData auth, ChessGame.TeamColor color, int gameID) {
         isAuthorized(auth);
         try {
-            GameData game = gameDAO.selectGame(gameID);
+            GameData game = GAME_DAO.selectGame(gameID);
             if(color == ChessGame.TeamColor.WHITE) {
                 if("".equals(game.whiteUsername()))
                     game = game.setWhiteUsername(auth.username());
@@ -109,9 +108,20 @@ public class Service {
         }
     }
 
+    public static void clearData() {
+        try {
+            AUTH_DAO.clearAuths();
+            GAME_DAO.clearGames();
+            USER_DAO.clearUsers();
+        }
+        catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static void updateGame(GameData game) {
         try {
-            gameDAO.updateGame(game.gameID(), game);
+            GAME_DAO.updateGame(game.gameID(), game);
         }
         catch (DataAccessException e) {
             throw new RuntimeException(e);
@@ -120,7 +130,7 @@ public class Service {
 
     private static void addGame(GameData game) {
         try {
-            gameDAO.insertGame(game);
+            GAME_DAO.insertGame(game);
         }
         catch (DataAccessException e) {
             throw new RuntimeException(e);
@@ -133,7 +143,7 @@ public class Service {
 
     private static void isAuthorized(AuthData auth) {
         try {
-            var authOnRecord = authDAO.selectAuth(auth.authToken());
+            var authOnRecord = AUTH_DAO.selectAuth(auth.authToken());
             if(!auth.equals(authOnRecord)) {
                 throw new RuntimeException();
             }
@@ -145,7 +155,7 @@ public class Service {
 
     private static void addAuth(AuthData auth) {
         try {
-            authDAO.insertAuth(auth);
+            AUTH_DAO.insertAuth(auth);
         }
         catch (DataAccessException e) {
             throw new RuntimeException(e);
