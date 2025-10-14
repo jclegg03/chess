@@ -1,9 +1,12 @@
 package service;
 
 import model.AuthData;
+import model.GameData;
 import org.junit.jupiter.api.*;
 import model.UserData;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -51,5 +54,24 @@ public class ServiceUnitTests {
         assertThrows(RuntimeException.class, () -> Service.createGame(expiredAuth, "Cool Game"));
     }
 
+    @Test
+    public void testCreateAndListGames() {
+        Service.createUser(sampleUser);
 
+        HashSet<GameData> games = new HashSet<>();
+        games.add(new GameData(Service.getCurrentGameID(), "game1"));
+
+        Service.createGame(sampleAuth, "game1");
+
+        HashSet<GameData> gamesInMem = new HashSet<>();
+        gamesInMem.addAll(List.of(Service.listGames(sampleAuth)));
+
+        assert gamesInMem.equals(games);
+
+        games.add(new GameData(Service.getCurrentGameID(), "game2"));
+        Service.createGame(sampleAuth, "game2");
+        gamesInMem = new HashSet<>(List.of(Service.listGames(sampleAuth)));
+
+        assert gamesInMem.equals(games);
+    }
 }

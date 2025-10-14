@@ -72,12 +72,18 @@ public class Service {
     }
 
     public static void createGame(AuthData auth, String gameName) {
-        if(!isAuthorized(auth)) {
-            throw new RuntimeException();
+        isAuthorized(auth);
+        var game = new GameData(currentGameID++, gameName);
+        addGame(game);
+    }
+
+    public static GameData[] listGames(AuthData auth) {
+        isAuthorized(auth);
+        try {
+            return gameDAO.selectAllGames();
         }
-        else {
-            var game = new GameData(currentGameID++, gameName);
-            addGame(game);
+        catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -90,10 +96,16 @@ public class Service {
         }
     }
 
-    private static boolean isAuthorized(AuthData auth) {
+    public static int getCurrentGameID() {
+        return currentGameID;
+    }
+
+    private static void isAuthorized(AuthData auth) {
         try {
             var authOnRecord = authDAO.selectAuth(auth.authToken());
-            return auth.equals(authOnRecord);
+            if(!auth.equals(authOnRecord)) {
+                throw new RuntimeException();
+            }
         }
         catch (DataAccessException e) {
             throw new RuntimeException(e);
