@@ -58,6 +58,8 @@ public class ServiceUnitTests {
 
     @Test
     public void testCreateAndListGames() {
+        service.createUser(sampleUser);
+
         HashSet<GameData> games = new HashSet<>();
         games.add(new GameData(service.getCurrentGameID(), "game1"));
 
