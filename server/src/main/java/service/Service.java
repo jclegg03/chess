@@ -15,12 +15,20 @@ import model.UserData;
 import java.util.Objects;
 
 public class Service {
-    private static final UserDAO USER_DAO = new LocalUserDAO();
-    private static final GameDAO GAME_DAO = new LocalGameDAO();
-    private static final AuthDAO AUTH_DAO = new LocalAuthDAO();
+    private final UserDAO USER_DAO;
+    private final GameDAO GAME_DAO;
+    private final AuthDAO AUTH_DAO;
     private static int currentGameID = 1;
 
-    public static UserData getUser(String username) {
+
+    public Service() {
+        USER_DAO = new LocalUserDAO();
+        GAME_DAO = new LocalGameDAO();
+        AUTH_DAO = new LocalAuthDAO();
+    }
+
+
+    public UserData getUser(String username) {
         try {
             return USER_DAO.selectUser(username);
         }
@@ -29,7 +37,7 @@ public class Service {
         }
     }
 
-    public static AuthData createUser(UserData user) {
+    public AuthData createUser(UserData user) {
         UserData data = getUser(user.username());
         if(data == null) {
             try {
@@ -48,7 +56,7 @@ public class Service {
         }
     }
 
-    public static AuthData login(UserData user) {
+    public AuthData login(UserData user) {
         UserData userOnRecord = getUser(user.username());
 
         if(!user.equals(userOnRecord)) {
@@ -61,7 +69,7 @@ public class Service {
         }
     }
 
-    public static void logout(AuthData auth) {
+    public void logout(AuthData auth) {
         try {
             AUTH_DAO.deleteAuth(auth);
         }
@@ -70,13 +78,13 @@ public class Service {
         }
     }
 
-    public static void createGame(AuthData auth, String gameName) {
+    public void createGame(AuthData auth, String gameName) {
         isAuthorized(auth);
         var game = new GameData(currentGameID++, gameName);
         addGame(game);
     }
 
-    public static GameData[] listGames(AuthData auth) {
+    public GameData[] listGames(AuthData auth) {
         isAuthorized(auth);
         try {
             return GAME_DAO.selectAllGames();
@@ -86,7 +94,7 @@ public class Service {
         }
     }
 
-    public static void joinGame(AuthData auth, ChessGame.TeamColor color, int gameID) {
+    public void joinGame(AuthData auth, ChessGame.TeamColor color, int gameID) {
         isAuthorized(auth);
         try {
             GameData game = GAME_DAO.selectGame(gameID);
@@ -108,7 +116,7 @@ public class Service {
         }
     }
 
-    public static void clearData() {
+    public void clearData() {
         try {
             AUTH_DAO.clearAuths();
             GAME_DAO.clearGames();
@@ -119,7 +127,7 @@ public class Service {
         }
     }
 
-    private static void updateGame(GameData game) {
+    private void updateGame(GameData game) {
         try {
             GAME_DAO.updateGame(game.gameID(), game);
         }
@@ -128,7 +136,7 @@ public class Service {
         }
     }
 
-    private static void addGame(GameData game) {
+    private void addGame(GameData game) {
         try {
             GAME_DAO.insertGame(game);
         }
@@ -137,7 +145,7 @@ public class Service {
         }
     }
 
-    private static void isAuthorized(AuthData auth) {
+    private void isAuthorized(AuthData auth) {
         try {
             var authOnRecord = AUTH_DAO.selectAuth(auth.authToken());
             if(!auth.equals(authOnRecord)) {
@@ -149,7 +157,7 @@ public class Service {
         }
     }
 
-    private static void addAuth(AuthData auth) {
+    private void addAuth(AuthData auth) {
         try {
             AUTH_DAO.insertAuth(auth);
         }
@@ -158,12 +166,12 @@ public class Service {
         }
     }
 
-    private static AuthData makeAuthData(UserData user) {
+    private AuthData makeAuthData(UserData user) {
         var authToken =  "" + Objects.hash(user.username(), user.password());
         return new AuthData(user.username(), authToken);
     }
 
-    public static int getCurrentGameID() {
+    public int getCurrentGameID() {
         return currentGameID;
     }
 }
