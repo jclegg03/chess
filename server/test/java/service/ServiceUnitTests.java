@@ -44,6 +44,12 @@ public class ServiceUnitTests {
         //attempt to logout with no one logged in. This should just do nothing.
         Service.logout(sampleAuth);
 
+        //try doing somethign with an auth that has been logged out
+        var expiredAuth = Service.login(sampleUser);
+        Service.logout(expiredAuth);
 
+        assertThrows(RuntimeException.class, () -> Service.createGame(expiredAuth, "Cool Game"));
     }
+
+
 }
