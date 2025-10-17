@@ -30,7 +30,7 @@ public class Service {
     }
 
 
-    public UserData getUser(String username) {
+    UserData getUser(String username) {
         try {
             return USER_DAO.selectUser(username);
         }
@@ -40,14 +40,18 @@ public class Service {
     }
 
     public AuthData createUser(UserData user) throws ServerException {
+        try {
+            assert user.username() != null;
+            assert user.password() != null;
+            assert user.email() != null;
+        }
+        catch (AssertionError e) {
+            throw new ServerException("bad request", HttpStatus.BAD_REQUEST);
+        }
+
         UserData data = getUser(user.username());
         if(data == null) {
-            try {
-                USER_DAO.insertUser(user);
-            }
-            catch (DataAccessException e) {
-                throw new RuntimeException(e);
-            }
+            USER_DAO.insertUser(user);
 
             AuthData auth = makeAuthData(user);
             addAuth(auth);
@@ -58,11 +62,21 @@ public class Service {
         }
     }
 
-    public AuthData login(UserData user) {
+    public AuthData login(UserData user) throws ServerException {
+        try {
+            assert user.username() != null;
+            assert user.password() != null;
+        }
+        catch (AssertionError e) {
+            throw new ServerException("bad request", HttpStatus.BAD_REQUEST);
+        }
+
         UserData userOnRecord = getUser(user.username());
 
-        if(!user.equals(userOnRecord)) {
-            return null;
+        if(userOnRecord == null ||
+                !user.username().equals(userOnRecord.username()) ||
+                !user.password().equals(userOnRecord.password())) {
+            throw new ServerException("unauthorized", HttpStatus.UNAUTHORIZED);
         }
         else {
             var auth = makeAuthData(user);
@@ -160,12 +174,7 @@ public class Service {
     }
 
     private void addAuth(AuthData auth) {
-        try {
-            AUTH_DAO.insertAuth(auth);
-        }
-        catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+        AUTH_DAO.insertAuth(auth);
     }
 
     private AuthData makeAuthData(UserData user) {

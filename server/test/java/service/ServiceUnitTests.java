@@ -5,6 +5,7 @@ import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.*;
 import model.UserData;
+import server.ServerException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +36,7 @@ public class ServiceUnitTests {
     //Again impossible to test without implementing createUser
     @Test
     public void testLogin() {
-        assert service.login(sampleUser) == null;
+        assertThrows(ServerException.class, () -> service.login(sampleUser));
 
         AuthData authFromCreate = service.createUser(sampleUser);
         AuthData authFromLogin = service.login(sampleUser);
@@ -50,7 +51,7 @@ public class ServiceUnitTests {
         service.logout(sampleAuth);
 
         //try doing something with an auth that has been logged out
-        var expiredAuth = service.login(sampleUser);
+        var expiredAuth = service.createUser(sampleUser);
         service.logout(expiredAuth);
 
         assertThrows(Exception.class, () -> service.createGame(expiredAuth, "Cool Game"));

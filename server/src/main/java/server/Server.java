@@ -30,28 +30,32 @@ public class Server {
         try {
             var user = getUser(ctx);
 
-            assert user.username() != null;
-            assert user.password() != null;
-            assert user.email() != null;
-
             var res = service.createUser(user);
             ctx.result(serializer.toJson(res));
         }
-        catch (AssertionError | JsonSyntaxException e) {
+        catch (JsonSyntaxException e) {
             ctx.status(HttpStatus.BAD_REQUEST);
             ctx.result(serializer.toJson(makeErrorMessage("bad request")));
         }
         catch (ServerException e) {
-            ctx.status(e.getStatus());
-            ctx.result(serializer.toJson(makeErrorMessage(e.getMessage())));
+            handleError(e, ctx);
         }
     }
 
     private void login(Context ctx) {
-        var req = getRequest(ctx);
-        var res = Map.of("username", req.get("username"), "authToken", req.get("password").hashCode());
+        try {
+            var user = getUser(ctx);
+            var res = service.login(user);
+            ctx.result(serializer.toJson(res));
+        }
+        catch (ServerException e) {
+            handleError(e, ctx);
+        }
+    }
 
-        ctx.result(serializer.toJson(res));
+    private void handleError(ServerException e, Context ctx) {
+        ctx.status(e.getStatus());
+        ctx.result(serializer.toJson(makeErrorMessage(e.getMessage())));
     }
 
     private Map<String, String> makeErrorMessage(String message) {
