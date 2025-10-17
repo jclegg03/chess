@@ -1,22 +1,13 @@
 package dataaccess;
 
 import io.javalin.http.HttpStatus;
+import server.ServerException;
 
 /**
  * Indicates there was an error connecting to the database
  */
-public class DataAccessException extends Exception{
-    public HttpStatus getStatus() {
-        return status;
-    }
-
-    private final HttpStatus status;
+public class DataAccessException extends ServerException {
     public DataAccessException(String message, HttpStatus status) {
-        super(message);
-        this.status = status;
-    }
-    public DataAccessException(String message, Throwable ex, HttpStatus status) {
-        super(message, ex);
-        this.status = status;
+        super(message, status);
     }
 }
