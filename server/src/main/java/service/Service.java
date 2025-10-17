@@ -8,9 +8,11 @@ import dataaccess.game.GameDAO;
 import dataaccess.game.LocalGameDAO;
 import dataaccess.user.LocalUserDAO;
 import dataaccess.user.UserDAO;
+import io.javalin.http.HttpStatus;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import server.ServerException;
 
 import java.util.Objects;
 
@@ -37,7 +39,7 @@ public class Service {
         }
     }
 
-    public AuthData createUser(UserData user) {
+    public AuthData createUser(UserData user) throws ServerException {
         UserData data = getUser(user.username());
         if(data == null) {
             try {
@@ -52,7 +54,7 @@ public class Service {
             return auth;
         }
         else {
-            return null;
+            throw new ServerException("already taken", HttpStatus.FORBIDDEN);
         }
     }
 
