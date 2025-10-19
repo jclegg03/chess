@@ -132,15 +132,11 @@ public class Service {
         }
     }
 
-    public void clearData() {
-        try {
-            AUTH_DAO.clearAuths();
-            GAME_DAO.clearGames();
-            USER_DAO.clearUsers();
-        }
-        catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+    public void clearData() throws DataAccessException{
+        AUTH_DAO.clearAuths();
+        GAME_DAO.clearGames();
+        USER_DAO.clearUsers();
+
     }
 
     private void updateGame(GameData game) {

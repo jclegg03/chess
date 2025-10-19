@@ -21,9 +21,19 @@ public class Server {
         serializer = new Gson();
         service = new Service();
 
-        server.delete("db", ctx -> ctx.result("{}"));
+        server.delete("db", this::clear);
         server.post("user", this::register);
         server.post("session", this::login);
+    }
+
+    private void clear(Context ctx) {
+        try {
+            service.clearData();
+            ctx.result();
+        }
+        catch (ServerException e) {
+            handleServerException(e, ctx);
+        }
     }
 
     private void register(Context ctx) {
@@ -38,7 +48,7 @@ public class Server {
             ctx.result(serializer.toJson(makeErrorMessage("bad request")));
         }
         catch (ServerException e) {
-            handleError(e, ctx);
+            handleServerException(e, ctx);
         }
     }
 
@@ -49,11 +59,11 @@ public class Server {
             ctx.result(serializer.toJson(res));
         }
         catch (ServerException e) {
-            handleError(e, ctx);
+            handleServerException(e, ctx);
         }
     }
 
-    private void handleError(ServerException e, Context ctx) {
+    private void handleServerException(ServerException e, Context ctx) {
         ctx.status(e.getStatus());
         ctx.result(serializer.toJson(makeErrorMessage(e.getMessage())));
     }
