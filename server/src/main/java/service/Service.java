@@ -100,13 +100,9 @@ public class Service {
         }
     }
 
-    public GameData[] listGames(AuthData auth) {
+    public GameData[] listGames(AuthData auth) throws ServerException {
         isAuthorized(auth);
-        try {
-            return gameDAO.selectAllGames();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+        return gameDAO.selectAllGames();
     }
 
     public void joinGame(AuthData auth, ChessGame.TeamColor color, int gameID) throws ServerException {
@@ -151,20 +147,13 @@ public class Service {
         return authDAO.selectAuth(authToken);
     }
 
-    private void updateGame(GameData game) {
-        try {
-            gameDAO.updateGame(game.gameID(), game);
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+    private void updateGame(GameData game) throws DataAccessException {
+        gameDAO.updateGame(game.gameID(), game);
     }
 
-    private void addGame(GameData game) {
-        try {
-            gameDAO.insertGame(game);
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+    private void addGame(GameData game) throws DataAccessException {
+        gameDAO.insertGame(game);
+
     }
 
     private void isAuthorized(AuthData auth) throws ServerException {

@@ -2,7 +2,7 @@ package server;
 
 import io.javalin.http.HttpStatus;
 
-public class ServerException extends RuntimeException {
+public class ServerException extends Exception {
     public HttpStatus getStatus() {
         return status;
     }

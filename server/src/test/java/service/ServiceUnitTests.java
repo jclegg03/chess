@@ -19,14 +19,24 @@ public class ServiceUnitTests {
 
 
     public void setup() {
-        sampleAuth = service.createUser(sampleUser);
+        try {
+            sampleAuth = service.createUser(sampleUser);
+        }
+        catch (ServerException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
     public void testCreateUserSuccess() {
-        AuthData auth = service.createUser(sampleUser);
-        sampleAuth = new AuthData("username", auth.authToken());
-        assertEquals(sampleAuth, auth);
+        try {
+            AuthData auth = service.createUser(sampleUser);
+            sampleAuth = new AuthData("username", auth.authToken());
+            assertEquals(sampleAuth, auth);
+        }
+        catch (ServerException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -35,13 +45,34 @@ public class ServiceUnitTests {
         assertThrows(ServerException.class, () -> service.createUser(sampleUser));
     }
 
+    @Test
+    public void testGetAuthSuccess() {
+        try {
+            setup();
+            assertEquals(sampleAuth, service.getAuth(sampleAuth.authToken()));
+        }
+        catch (ServerException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void testGetAuthFails() {
+//        assertNull(service.get)
+    }
+
     //Again impossible to test without implementing createUser
     @Test
     public void testLoginSuccess() {
-        setup();
-        AuthData authFromLogin = service.login(sampleUser);
+        try {
+            setup();
+            AuthData authFromLogin = service.login(sampleUser);
 
-        assertEquals(sampleAuth.username(), authFromLogin.username());
+            assertEquals(sampleAuth.username(), authFromLogin.username());
+        }
+        catch (ServerException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -52,10 +83,15 @@ public class ServiceUnitTests {
     //Best to test this one after writing functions that check auth status.
     @Test
     public void testLogoutWorks() {
-        //try doing something with an auth that has been logged out
-        setup();
-        service.logout(sampleAuth);
-        assertThrows(ServerException.class, () -> service.createGame(sampleAuth, "Cool Game"));
+        try {
+            //try doing something with an auth that has been logged out
+            setup();
+            service.logout(sampleAuth);
+            assertThrows(ServerException.class, () -> service.createGame(sampleAuth, "Cool Game"));
+        }
+        catch (ServerException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -65,23 +101,28 @@ public class ServiceUnitTests {
 
     @Test
     public void testCreateAndListGamesWorks() {
-        setup();
+        try {
+            setup();
 
-        HashSet<GameData> games = new HashSet<>();
+            HashSet<GameData> games = new HashSet<>();
 
-        var gameID = service.createGame(sampleAuth, "game1");
-        games.add(new GameData(gameID, "game1"));
+            var gameID = service.createGame(sampleAuth, "game1");
+            games.add(new GameData(gameID, "game1"));
 
-        HashSet<GameData> gamesInMem = new HashSet<>(List.of(service.listGames(sampleAuth)));
+            HashSet<GameData> gamesInMem = new HashSet<>(List.of(service.listGames(sampleAuth)));
 
-        assertEquals(gamesInMem, games);
+            assertEquals(gamesInMem, games);
 
 
-        gameID = service.createGame(sampleAuth, "game2");
-        games.add(new GameData(gameID, "game2"));
-        gamesInMem = new HashSet<>(List.of(service.listGames(sampleAuth)));
+            gameID = service.createGame(sampleAuth, "game2");
+            games.add(new GameData(gameID, "game2"));
+            gamesInMem = new HashSet<>(List.of(service.listGames(sampleAuth)));
 
-        assertEquals(gamesInMem, games);
+            assertEquals(gamesInMem, games);
+        }
+        catch (ServerException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -102,40 +143,55 @@ public class ServiceUnitTests {
 
     @Test
     public void testJoinGameWhite() {
-        setup();
-        var gameID = service.createGame(sampleAuth, "Game");
+        try {
+            setup();
+            var gameID = service.createGame(sampleAuth, "Game");
 
-        service.joinGame(sampleAuth, ChessGame.TeamColor.WHITE, gameID);
-        var game = service.listGames(sampleAuth)[0];
+            service.joinGame(sampleAuth, ChessGame.TeamColor.WHITE, gameID);
+            var game = service.listGames(sampleAuth)[0];
 
-        var testGame = new GameData(gameID, "Game");
-        testGame = testGame.setWhiteUsername(sampleAuth.username());
+            var testGame = new GameData(gameID, "Game");
+            testGame = testGame.setWhiteUsername(sampleAuth.username());
 
-        assertEquals(testGame, game);
-        assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, ChessGame.TeamColor.WHITE, gameID));
+            assertEquals(testGame, game);
+            assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, ChessGame.TeamColor.WHITE, gameID));
+        }
+        catch (ServerException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
     public void testJoinGameBlack() {
-        setup();
-        var gameID = service.createGame(sampleAuth, "Game");
-        service.joinGame(sampleAuth, ChessGame.TeamColor.BLACK, gameID);
-        var game = service.listGames(sampleAuth)[0];
+        try {
+            setup();
+            var gameID = service.createGame(sampleAuth, "Game");
+            service.joinGame(sampleAuth, ChessGame.TeamColor.BLACK, gameID);
+            var game = service.listGames(sampleAuth)[0];
 
-        var testGame = new GameData(gameID, "Game");
-        testGame = testGame.setBlackUsername(sampleAuth.username());
+            var testGame = new GameData(gameID, "Game");
+            testGame = testGame.setBlackUsername(sampleAuth.username());
+            assertEquals(testGame, game);
 
-        assertEquals(testGame, game);
-        assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, ChessGame.TeamColor.BLACK, gameID));
+            assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, ChessGame.TeamColor.BLACK, gameID));
+        }
+        catch (ServerException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
     public void testClearData() {
-        setup();
-        service.createGame(sampleAuth, "");
-        service.clearData();
+        try {
+            setup();
+            service.createGame(sampleAuth, "");
+            service.clearData();
 
-        assertThrows(ServerException.class, () -> service.login(sampleUser));
-        assertThrows(ServerException.class, () -> service.listGames(sampleAuth));
+            assertThrows(ServerException.class, () -> service.login(sampleUser));
+            assertThrows(ServerException.class, () -> service.listGames(sampleAuth));
+        }
+        catch (ServerException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

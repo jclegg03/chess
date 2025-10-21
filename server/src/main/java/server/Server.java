@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import dataaccess.DataAccessException;
 import io.javalin.*;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
@@ -127,7 +128,7 @@ public class Server {
         return serializer.fromJson(ctx.body(), UserData.class);
     }
 
-    private AuthData getAuth(Context ctx) {
+    private AuthData getAuth(Context ctx) throws DataAccessException {
         return service.getAuth(ctx.header("authorization"));
     }
 
