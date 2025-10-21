@@ -17,25 +17,21 @@ import server.ServerException;
 import java.util.UUID;
 
 public class Service {
-    private final UserDAO USER_DAO;
-    private final GameDAO GAME_DAO;
-    private final AuthDAO AUTH_DAO;
+    private final UserDAO userDAO;
+    private final GameDAO gameDAO;
+    private final AuthDAO authDAO;
     private static int currentGameID = 1;
 
 
     public Service() {
-        USER_DAO = new LocalUserDAO();
-        GAME_DAO = new LocalGameDAO();
-        AUTH_DAO = new LocalAuthDAO();
+        userDAO = new LocalUserDAO();
+        gameDAO = new LocalGameDAO();
+        authDAO = new LocalAuthDAO();
     }
 
 
-    private UserData getUser(String username) {
-        try {
-            return USER_DAO.selectUser(username);
-        } catch (DataAccessException e) {
-            return null;
-        }
+    private UserData getUser(String username) throws DataAccessException {
+        return userDAO.selectUser(username);
     }
 
     public AuthData createUser(UserData user) throws ServerException {
@@ -49,7 +45,7 @@ public class Service {
 
         UserData data = getUser(user.username());
         if (data == null) {
-            USER_DAO.insertUser(user);
+            userDAO.insertUser(user);
 
             AuthData auth = makeAuthData(user);
             addAuth(auth);
@@ -83,8 +79,8 @@ public class Service {
     public void logout(AuthData auth) throws ServerException {
         try {
             assert auth != null;
-            assert AUTH_DAO.selectAuth(auth.authToken()) != null;
-            AUTH_DAO.deleteAuth(auth);
+            assert authDAO.selectAuth(auth.authToken()) != null;
+            authDAO.deleteAuth(auth);
         } catch (AssertionError e) {
             throw new ServerException("Error: unauthorized", HttpStatus.UNAUTHORIZED);
         }
@@ -107,7 +103,7 @@ public class Service {
     public GameData[] listGames(AuthData auth) {
         isAuthorized(auth);
         try {
-            return GAME_DAO.selectAllGames();
+            return gameDAO.selectAllGames();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -116,20 +112,27 @@ public class Service {
     public void joinGame(AuthData auth, ChessGame.TeamColor color, int gameID) throws ServerException {
         isAuthorized(auth);
         try {
-            GameData game = GAME_DAO.selectGame(gameID);
+            GameData game = gameDAO.selectGame(gameID);
             assert game != null;
             if(color == null) {
                 throw new ServerException("Error: bad request", HttpStatus.BAD_REQUEST);
             }
 
             if (color == ChessGame.TeamColor.WHITE) {
-                if (game.whiteUsername() == null)
+                if (game.whiteUsername() == null) {
                     game = game.setWhiteUsername(auth.username());
-                else throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
-            } else if (color == ChessGame.TeamColor.BLACK) {
-                if (game.blackUsername() == null)
+                }
+                else {
+                    throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
+                }
+            }
+            else if (color == ChessGame.TeamColor.BLACK) {
+                if (game.blackUsername() == null) {
                     game = game.setBlackUsername(auth.username());
-                else throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
+                }
+                else {
+                    throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
+                }
             }
 
             updateGame(game);
@@ -139,18 +142,18 @@ public class Service {
     }
 
     public void clearData() throws DataAccessException {
-        AUTH_DAO.clearAuths();
-        GAME_DAO.clearGames();
-        USER_DAO.clearUsers();
+        authDAO.clearAuths();
+        gameDAO.clearGames();
+        userDAO.clearUsers();
     }
 
     public AuthData getAuth(String authToken) throws DataAccessException {
-        return AUTH_DAO.selectAuth(authToken);
+        return authDAO.selectAuth(authToken);
     }
 
     private void updateGame(GameData game) {
         try {
-            GAME_DAO.updateGame(game.gameID(), game);
+            gameDAO.updateGame(game.gameID(), game);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -158,7 +161,7 @@ public class Service {
 
     private void addGame(GameData game) {
         try {
-            GAME_DAO.insertGame(game);
+            gameDAO.insertGame(game);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -167,7 +170,7 @@ public class Service {
     private void isAuthorized(AuthData auth) throws ServerException {
         try {
             assert auth != null;
-            var authOnRecord = AUTH_DAO.selectAuth(auth.authToken());
+            var authOnRecord = authDAO.selectAuth(auth.authToken());
             if (!auth.equals(authOnRecord)) {
                 throw new ServerException("error: unauthorized", HttpStatus.UNAUTHORIZED);
             }
@@ -177,7 +180,7 @@ public class Service {
     }
 
     private void addAuth(AuthData auth) throws DataAccessException {
-        AUTH_DAO.insertAuth(auth);
+        authDAO.insertAuth(auth);
     }
 
     private AuthData makeAuthData(UserData user) {
