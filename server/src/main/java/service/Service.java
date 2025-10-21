@@ -15,6 +15,7 @@ import model.UserData;
 import server.ServerException;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class Service {
     private final UserDAO USER_DAO;
@@ -87,11 +88,13 @@ public class Service {
 
     public void logout(AuthData auth) throws ServerException{
         try {
-            assert auth != null;
+            assert AUTH_DAO.selectAuth(auth.authToken()) != null;
             AUTH_DAO.deleteAuth(auth);
         }
         catch (AssertionError e) {
             throw new ServerException("Error: unauthorized", HttpStatus.UNAUTHORIZED);
+        } catch (NullPointerException e) {
+            throw new ServerException("Error: invalid syntax", HttpStatus.BAD_REQUEST);
         }
 
     }
@@ -112,25 +115,27 @@ public class Service {
         }
     }
 
-    public void joinGame(AuthData auth, ChessGame.TeamColor color, int gameID) {
+    public void joinGame(AuthData auth, ChessGame.TeamColor color, int gameID) throws ServerException {
         isAuthorized(auth);
         try {
             GameData game = GAME_DAO.selectGame(gameID);
+            assert game != null;
+
             if(color == ChessGame.TeamColor.WHITE) {
                 if("".equals(game.whiteUsername()))
                     game = game.setWhiteUsername(auth.username());
-                else throw new RuntimeException();
+                else throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
             }
             else if(color == ChessGame.TeamColor.BLACK){
                 if("".equals(game.blackUsername()))
                     game = game.setBlackUsername(auth.username());
-                else throw new RuntimeException();
+                else throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
             }
 
             updateGame(game);
         }
-        catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        catch (AssertionError e) {
+            throw new ServerException("Error: Requested game does not exist", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -166,7 +171,7 @@ public class Service {
         try {
             var authOnRecord = AUTH_DAO.selectAuth(auth.authToken());
             if(!auth.equals(authOnRecord)) {
-                throw new RuntimeException();
+                throw new ServerException("error: unauthorized", HttpStatus.UNAUTHORIZED);
             }
         }
         catch (DataAccessException e) {
@@ -174,12 +179,12 @@ public class Service {
         }
     }
 
-    private void addAuth(AuthData auth) {
+    private void addAuth(AuthData auth) throws DataAccessException {
         AUTH_DAO.insertAuth(auth);
     }
 
     private AuthData makeAuthData(UserData user) {
-        var authToken =  "" + Objects.hash(user.username(), user.password());
+        var authToken = UUID.randomUUID().toString();
         return new AuthData(user.username(), authToken);
     }
 
