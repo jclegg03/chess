@@ -30,7 +30,7 @@ public class Service {
     }
 
 
-    UserData getUser(String username) {
+    private UserData getUser(String username) {
         try {
             return USER_DAO.selectUser(username);
         } catch (DataAccessException e) {

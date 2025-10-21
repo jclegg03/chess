@@ -1,4 +1,4 @@
-package service;
+package passoff.service;
 
 import chess.ChessGame;
 import model.AuthData;
@@ -6,6 +6,7 @@ import model.GameData;
 import org.junit.jupiter.api.*;
 import model.UserData;
 import server.ServerException;
+import service.Service;
 
 import java.util.HashSet;
 import java.util.List;
@@ -23,51 +24,48 @@ public class ServiceUnitTests {
     }
 
     @Test
-    public void testCreateUser() {
+    public void testCreateUserSuccess() {
         AuthData auth = service.createUser(sampleUser);
         sampleAuth = new AuthData("username", auth.authToken());
         assertEquals(sampleAuth, auth);
-
-        assertThrows(ServerException.class, () -> service.createUser(sampleUser));
     }
 
-    // Unfortunately it is impossible to test getUser without first implementing createUser.
     @Test
-    public void testGetUser() {
-        assertNull(service.getUser("username"));
-
-        service.createUser(sampleUser);
-        assertEquals(sampleUser, service.getUser(sampleUser.username()));
+    public void testCreateUserTwice() {
+        setup();
+        assertThrows(ServerException.class, () -> service.createUser(sampleUser));
     }
 
     //Again impossible to test without implementing createUser
     @Test
-    public void testLogin() {
-        assertThrows(ServerException.class, () -> service.login(sampleUser));
-
+    public void testLoginSuccess() {
         setup();
         AuthData authFromLogin = service.login(sampleUser);
 
         assertEquals(sampleAuth.username(), authFromLogin.username());
     }
 
+    @Test
+    public void testLoginFails() {
+        assertThrows(ServerException.class, () -> service.login(sampleUser));
+    }
+
     //Best to test this one after writing functions that check auth status.
     @Test
-    public void testLogout() {
+    public void testLogoutWorks() {
         //try doing something with an auth that has been logged out
         setup();
         service.logout(sampleAuth);
-        //attempt to log out with no one logged in. This should just throw a server error.
-        assertThrows(ServerException.class, () -> service.logout(sampleAuth));
-
-        assertThrows(Exception.class, () -> service.createGame(sampleAuth, "Cool Game"));
+        assertThrows(ServerException.class, () -> service.createGame(sampleAuth, "Cool Game"));
     }
 
     @Test
-    public void testCreateAndListGames() {
-        assertThrows(ServerException.class, () -> service.createGame(sampleAuth, ""));
-        assertThrows(ServerException.class, () -> service.listGames(sampleAuth));
+    public void testLogoutFails() {
+        assertThrows(ServerException.class, () -> service.logout(sampleAuth));
+    }
 
+    @Test
+    public void testCreateAndListGamesWorks() {
         setup();
 
         HashSet<GameData> games = new HashSet<>();
@@ -88,7 +86,13 @@ public class ServiceUnitTests {
     }
 
     @Test
-    public void testJoinGameGeneral() {
+    public void testCreateAndListGamesFails() {
+        assertThrows(ServerException.class, () -> service.createGame(sampleAuth, ""));
+        assertThrows(ServerException.class, () -> service.listGames(sampleAuth));
+    }
+
+    @Test
+    public void testJoinGameGeneralFails() {
         assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, ChessGame.TeamColor.WHITE, 0));
 
         setup();
@@ -132,7 +136,7 @@ public class ServiceUnitTests {
         service.createGame(sampleAuth, "");
         service.clearData();
 
-        assertNull(service.getUser(sampleUser.username()));
+        assertThrows(ServerException.class, () -> service.login(sampleUser));
         assertThrows(ServerException.class, () -> service.listGames(sampleAuth));
     }
 }
