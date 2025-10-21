@@ -119,6 +119,9 @@ public class Service {
         try {
             GameData game = GAME_DAO.selectGame(gameID);
             assert game != null;
+            if(color == null) {
+                throw new ServerException("Error: bad request", HttpStatus.BAD_REQUEST);
+            }
 
             if (color == ChessGame.TeamColor.WHITE) {
                 if ("".equals(game.whiteUsername()))

@@ -6,6 +6,8 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 import model.AuthData;
+import model.CreateGameRequest;
+import model.JoinGameRequest;
 import model.UserData;
 import service.Service;
 
@@ -80,8 +82,8 @@ public class Server {
     private void createGame(Context ctx) {
         try {
             var auth = getAuth(ctx);
-            var req = getRequest(ctx);
-            var gameID = service.createGame(auth, req.get("gameName"));
+            var req = serializer.fromJson(ctx.body(), CreateGameRequest.class);
+            var gameID = service.createGame(auth, req.gameName());
             var res = Map.of("gameID", gameID);
             ctx.result(serializer.toJson(res, Map.class));
         }
@@ -91,7 +93,16 @@ public class Server {
     }
 
     private void joinGame(Context ctx) {
-
+        try {
+            var auth = getAuth(ctx);
+            var req = serializer.fromJson(ctx.body(), JoinGameRequest.class);
+            service.joinGame(auth,
+                    req.playerColor(),
+                    req.gameID());
+        }
+        catch (ServerException e) {
+            handleServerException(e, ctx);
+        }
     }
 
     private void listGames(Context ctx) {
@@ -113,10 +124,6 @@ public class Server {
 
     private AuthData getAuth(Context ctx) {
         return service.getAuth(ctx.header("authorization"));
-    }
-
-    private Map<String, String> getRequest(Context ctx) {
-        return serializer.fromJson(ctx.body(), Map.class);
     }
 
     public int run(int desiredPort) {
