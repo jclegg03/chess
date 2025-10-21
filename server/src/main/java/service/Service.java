@@ -92,11 +92,17 @@ public class Service {
 
     }
 
-    public int createGame(AuthData auth, String gameName) {
-        isAuthorized(auth);
-        var game = new GameData(currentGameID, gameName);
-        addGame(game);
-        return currentGameID++;
+    public int createGame(AuthData auth, String gameName) throws ServerException {
+        try {
+            isAuthorized(auth);
+            assert gameName != null;
+            var game = new GameData(currentGameID, gameName);
+            addGame(game);
+            return currentGameID++;
+        }
+        catch (AssertionError e) {
+            throw new ServerException("Error: bad request", HttpStatus.BAD_REQUEST);
+        }
     }
 
     public GameData[] listGames(AuthData auth) {

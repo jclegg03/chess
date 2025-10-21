@@ -43,9 +43,7 @@ public class Server {
 
     private void logout(Context ctx) {
         try {
-            var req = getAuthToken(ctx);
-            AuthData auth = service.getAuth(req);
-            service.logout(auth);
+            service.logout(getAuth(ctx));
         }
         catch (ServerException e) {
             handleServerException(e, ctx);
@@ -80,7 +78,16 @@ public class Server {
     }
 
     private void createGame(Context ctx) {
-
+        try {
+            var auth = getAuth(ctx);
+            var req = getRequest(ctx);
+            var gameID = service.createGame(auth, req.get("gameName"));
+            var res = Map.of("gameID", gameID);
+            ctx.result(serializer.toJson(res, Map.class));
+        }
+        catch (ServerException e) {
+            handleServerException(e, ctx);
+        }
     }
 
     private void joinGame(Context ctx) {
@@ -104,8 +111,12 @@ public class Server {
         return serializer.fromJson(ctx.body(), UserData.class);
     }
 
-    private String getAuthToken(Context ctx) {
-        return ctx.header("authorization");
+    private AuthData getAuth(Context ctx) {
+        return service.getAuth(ctx.header("authorization"));
+    }
+
+    private Map<String, String> getRequest(Context ctx) {
+        return serializer.fromJson(ctx.body(), Map.class);
     }
 
     public int run(int desiredPort) {
