@@ -26,6 +26,9 @@ public class Server {
         server.delete("session", this::logout);
         server.post("user", this::register);
         server.post("session", this::login);
+        server.post("game", this::createGame);
+        server.put("game", this::joinGame);
+        server.get("game", this::listGames);
     }
 
     private void clear(Context ctx) {
@@ -74,6 +77,18 @@ public class Server {
         catch (ServerException e) {
             handleServerException(e, ctx);
         }
+    }
+
+    private void createGame(Context ctx) {
+
+    }
+
+    private void joinGame(Context ctx) {
+
+    }
+
+    private void listGames(Context ctx) {
+
     }
 
     private void handleServerException(ServerException e, Context ctx) {
