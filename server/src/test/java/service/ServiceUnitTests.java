@@ -1,4 +1,4 @@
-package passoff.service;
+package service;
 
 import chess.ChessGame;
 import model.AuthData;
@@ -6,7 +6,6 @@ import model.GameData;
 import org.junit.jupiter.api.*;
 import model.UserData;
 import server.ServerException;
-import service.Service;
 
 import java.util.HashSet;
 import java.util.List;
@@ -126,7 +125,7 @@ public class ServiceUnitTests {
         var testGame = new GameData(gameID, "Game");
         testGame = testGame.setBlackUsername(sampleAuth.username());
 
-        assertEquals(testGame, game);;
+        assertEquals(testGame, game);
         assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, ChessGame.TeamColor.BLACK, gameID));
     }
 
