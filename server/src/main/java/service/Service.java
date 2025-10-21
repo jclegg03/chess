@@ -34,8 +34,7 @@ public class Service {
     UserData getUser(String username) {
         try {
             return USER_DAO.selectUser(username);
-        }
-        catch (DataAccessException e) {
+        } catch (DataAccessException e) {
             return null;
         }
     }
@@ -45,20 +44,18 @@ public class Service {
             assert user.username() != null;
             assert user.password() != null;
             assert user.email() != null;
-        }
-        catch (AssertionError e) {
+        } catch (AssertionError e) {
             throw new ServerException("bad request", HttpStatus.BAD_REQUEST);
         }
 
         UserData data = getUser(user.username());
-        if(data == null) {
+        if (data == null) {
             USER_DAO.insertUser(user);
 
             AuthData auth = makeAuthData(user);
             addAuth(auth);
             return auth;
-        }
-        else {
+        } else {
             throw new ServerException("already taken", HttpStatus.FORBIDDEN);
         }
     }
@@ -67,50 +64,46 @@ public class Service {
         try {
             assert user.username() != null;
             assert user.password() != null;
-        }
-        catch (AssertionError e) {
+        } catch (AssertionError e) {
             throw new ServerException("bad request", HttpStatus.BAD_REQUEST);
         }
 
         UserData userOnRecord = getUser(user.username());
 
-        if(userOnRecord == null ||
+        if (userOnRecord == null ||
                 !user.username().equals(userOnRecord.username()) ||
                 !user.password().equals(userOnRecord.password())) {
             throw new ServerException("unauthorized", HttpStatus.UNAUTHORIZED);
-        }
-        else {
+        } else {
             var auth = makeAuthData(user);
             addAuth(auth);
             return auth;
         }
     }
 
-    public void logout(AuthData auth) throws ServerException{
+    public void logout(AuthData auth) throws ServerException {
         try {
+            assert auth != null;
             assert AUTH_DAO.selectAuth(auth.authToken()) != null;
             AUTH_DAO.deleteAuth(auth);
-        }
-        catch (AssertionError e) {
+        } catch (AssertionError e) {
             throw new ServerException("Error: unauthorized", HttpStatus.UNAUTHORIZED);
-        } catch (NullPointerException e) {
-            throw new ServerException("Error: invalid syntax", HttpStatus.BAD_REQUEST);
         }
 
     }
 
-    public void createGame(AuthData auth, String gameName) {
+    public int createGame(AuthData auth, String gameName) {
         isAuthorized(auth);
-        var game = new GameData(currentGameID++, gameName);
+        var game = new GameData(currentGameID, gameName);
         addGame(game);
+        return currentGameID++;
     }
 
     public GameData[] listGames(AuthData auth) {
         isAuthorized(auth);
         try {
             return GAME_DAO.selectAllGames();
-        }
-        catch (DataAccessException e) {
+        } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
     }
@@ -121,39 +114,36 @@ public class Service {
             GameData game = GAME_DAO.selectGame(gameID);
             assert game != null;
 
-            if(color == ChessGame.TeamColor.WHITE) {
-                if("".equals(game.whiteUsername()))
+            if (color == ChessGame.TeamColor.WHITE) {
+                if ("".equals(game.whiteUsername()))
                     game = game.setWhiteUsername(auth.username());
                 else throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
-            }
-            else if(color == ChessGame.TeamColor.BLACK){
-                if("".equals(game.blackUsername()))
+            } else if (color == ChessGame.TeamColor.BLACK) {
+                if ("".equals(game.blackUsername()))
                     game = game.setBlackUsername(auth.username());
                 else throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
             }
 
             updateGame(game);
-        }
-        catch (AssertionError e) {
+        } catch (AssertionError e) {
             throw new ServerException("Error: Requested game does not exist", HttpStatus.BAD_REQUEST);
         }
     }
 
-    public void clearData() throws DataAccessException{
+    public void clearData() throws DataAccessException {
         AUTH_DAO.clearAuths();
         GAME_DAO.clearGames();
         USER_DAO.clearUsers();
     }
 
-    public AuthData getAuth(String authToken) throws DataAccessException{
+    public AuthData getAuth(String authToken) throws DataAccessException {
         return AUTH_DAO.selectAuth(authToken);
     }
 
     private void updateGame(GameData game) {
         try {
             GAME_DAO.updateGame(game.gameID(), game);
-        }
-        catch (DataAccessException e) {
+        } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
     }
@@ -161,21 +151,20 @@ public class Service {
     private void addGame(GameData game) {
         try {
             GAME_DAO.insertGame(game);
-        }
-        catch (DataAccessException e) {
+        } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void isAuthorized(AuthData auth) {
+    private void isAuthorized(AuthData auth) throws ServerException {
         try {
+            assert auth != null;
             var authOnRecord = AUTH_DAO.selectAuth(auth.authToken());
-            if(!auth.equals(authOnRecord)) {
+            if (!auth.equals(authOnRecord)) {
                 throw new ServerException("error: unauthorized", HttpStatus.UNAUTHORIZED);
             }
-        }
-        catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        } catch (AssertionError e) {
+            throw new ServerException("Error: unauthorized", HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -186,9 +175,5 @@ public class Service {
     private AuthData makeAuthData(UserData user) {
         var authToken = UUID.randomUUID().toString();
         return new AuthData(user.username(), authToken);
-    }
-
-    public int getCurrentGameID() {
-        return currentGameID;
     }
 }

@@ -71,16 +71,17 @@ public class ServiceUnitTests {
         setup();
 
         HashSet<GameData> games = new HashSet<>();
-        games.add(new GameData(service.getCurrentGameID(), "game1"));
 
-        service.createGame(sampleAuth, "game1");
+        var gameID = service.createGame(sampleAuth, "game1");
+        games.add(new GameData(gameID, "game1"));
 
         HashSet<GameData> gamesInMem = new HashSet<>(List.of(service.listGames(sampleAuth)));
 
         assertEquals(gamesInMem, games);
 
-        games.add(new GameData(service.getCurrentGameID(), "game2"));
-        service.createGame(sampleAuth, "game2");
+
+        gameID = service.createGame(sampleAuth, "game2");
+        games.add(new GameData(gameID, "game2"));
         gamesInMem = new HashSet<>(List.of(service.listGames(sampleAuth)));
 
         assertEquals(gamesInMem, games);
@@ -91,7 +92,7 @@ public class ServiceUnitTests {
         assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, ChessGame.TeamColor.WHITE, 0));
 
         setup();
-        int gameID = service.getCurrentGameID();
+        int gameID = 0;
         // test joining a nonexistent game
         assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, ChessGame.TeamColor.BLACK, gameID));
     }
@@ -99,8 +100,7 @@ public class ServiceUnitTests {
     @Test
     public void testJoinGameWhite() {
         setup();
-        int gameID = service.getCurrentGameID();
-        service.createGame(sampleAuth, "Game");
+        var gameID = service.createGame(sampleAuth, "Game");
 
         service.joinGame(sampleAuth, ChessGame.TeamColor.WHITE, gameID);
         var game = service.listGames(sampleAuth)[0];
@@ -115,8 +115,7 @@ public class ServiceUnitTests {
     @Test
     public void testJoinGameBlack() {
         setup();
-        int gameID = service.getCurrentGameID();
-        service.createGame(sampleAuth, "Game");
+        var gameID = service.createGame(sampleAuth, "Game");
         service.joinGame(sampleAuth, ChessGame.TeamColor.BLACK, gameID);
         var game = service.listGames(sampleAuth)[0];
 
