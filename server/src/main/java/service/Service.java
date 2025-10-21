@@ -14,7 +14,6 @@ import model.GameData;
 import model.UserData;
 import server.ServerException;
 
-import java.util.Objects;
 import java.util.UUID;
 
 public class Service {
@@ -124,11 +123,11 @@ public class Service {
             }
 
             if (color == ChessGame.TeamColor.WHITE) {
-                if ("".equals(game.whiteUsername()))
+                if (game.whiteUsername() == null)
                     game = game.setWhiteUsername(auth.username());
                 else throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
             } else if (color == ChessGame.TeamColor.BLACK) {
-                if ("".equals(game.blackUsername()))
+                if (game.blackUsername() == null)
                     game = game.setBlackUsername(auth.username());
                 else throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
             }

@@ -5,10 +5,7 @@ import com.google.gson.JsonSyntaxException;
 import io.javalin.*;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
-import model.AuthData;
-import model.CreateGameRequest;
-import model.JoinGameRequest;
-import model.UserData;
+import model.*;
 import service.Service;
 
 import java.util.Map;
@@ -106,7 +103,15 @@ public class Server {
     }
 
     private void listGames(Context ctx) {
+        try {
+            var auth = getAuth(ctx);
+            var games = new GameDataList(service.listGames(auth));
 
+            ctx.result(serializer.toJson(games, GameDataList.class));
+        }
+        catch (ServerException e) {
+            handleServerException(e, ctx);
+        }
     }
 
     private void handleServerException(ServerException e, Context ctx) {

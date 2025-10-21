@@ -7,10 +7,10 @@ public record GameData (int gameID, String whiteUsername, String blackUsername, 
      * Calls the normal constructor with the given gameID.
      * username parameters are empty strings, not null.
      * creates a new ChessGame.
-     * @param gameID
+     * @param gameID the ID for the game
      */
     public GameData(int gameID, String gameName) {
-        this(gameID, "", "", gameName, new ChessGame());
+        this(gameID, null, null, gameName, new ChessGame());
     }
 
     public GameData setWhiteUsername(String whiteUsername) {
