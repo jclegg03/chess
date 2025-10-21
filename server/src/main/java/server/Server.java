@@ -5,6 +5,7 @@ import com.google.gson.JsonSyntaxException;
 import io.javalin.*;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
+import model.AuthData;
 import model.UserData;
 import service.Service;
 
@@ -22,6 +23,7 @@ public class Server {
         service = new Service();
 
         server.delete("db", this::clear);
+        server.delete("session", this::logout);
         server.post("user", this::register);
         server.post("session", this::login);
     }
@@ -30,6 +32,17 @@ public class Server {
         try {
             service.clearData();
             ctx.result();
+        }
+        catch (ServerException e) {
+            handleServerException(e, ctx);
+        }
+    }
+
+    private void logout(Context ctx) {
+        try {
+            var req = getAuthToken(ctx);
+            AuthData auth = service.getAuth(req);
+            service.logout(auth);
         }
         catch (ServerException e) {
             handleServerException(e, ctx);
@@ -76,8 +89,8 @@ public class Server {
         return serializer.fromJson(ctx.body(), UserData.class);
     }
 
-    private Map getRequest(Context ctx) {
-        return serializer.fromJson(ctx.body(), Map.class);
+    private String getAuthToken(Context ctx) {
+        return ctx.header("authorization");
     }
 
     public int run(int desiredPort) {

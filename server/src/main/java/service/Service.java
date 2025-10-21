@@ -85,13 +85,15 @@ public class Service {
         }
     }
 
-    public void logout(AuthData auth) {
+    public void logout(AuthData auth) throws ServerException{
         try {
+            assert auth != null;
             AUTH_DAO.deleteAuth(auth);
         }
-        catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        catch (AssertionError e) {
+            throw new ServerException("Error: unauthorized", HttpStatus.UNAUTHORIZED);
         }
+
     }
 
     public void createGame(AuthData auth, String gameName) {
@@ -136,7 +138,10 @@ public class Service {
         AUTH_DAO.clearAuths();
         GAME_DAO.clearGames();
         USER_DAO.clearUsers();
+    }
 
+    public AuthData getAuth(String authToken) throws DataAccessException{
+        return AUTH_DAO.selectAuth(authToken);
     }
 
     private void updateGame(GameData game) {
