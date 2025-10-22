@@ -3,10 +3,8 @@ package service;
 import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
-import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.*;
 import model.UserData;
-import server.Server;
 import server.ServerException;
 
 import java.util.HashSet;
@@ -117,7 +115,14 @@ public class ServiceUnitTests {
 
     @Test
     public void testLogoutFails() {
+        try {
+            service.logout(sampleAuth);
+        }
+        catch (ServerException e) {
+            throw new RuntimeException();
+        }
         assertThrows(ServerException.class, () -> service.logout(sampleAuth));
+
         assertThrows(ServerException.class, () -> service.logout(null));
     }
 
