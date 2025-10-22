@@ -57,6 +57,7 @@ public class Service {
 
     public AuthData login(UserData user) throws ServerException {
         try {
+            assert user != null;
             assert user.username() != null;
             assert user.password() != null;
         } catch (AssertionError e) {
@@ -66,7 +67,6 @@ public class Service {
         UserData userOnRecord = getUser(user.username());
 
         if (userOnRecord == null ||
-                !user.username().equals(userOnRecord.username()) ||
                 !user.password().equals(userOnRecord.password())) {
             throw new ServerException("unauthorized", HttpStatus.UNAUTHORIZED);
         } else {
@@ -122,7 +122,7 @@ public class Service {
                     throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
                 }
             }
-            else if (color == ChessGame.TeamColor.BLACK) {
+            else {
                 if (game.blackUsername() == null) {
                     game = game.setBlackUsername(auth.username());
                 }

@@ -32,7 +32,7 @@ public class LocalGameDAO implements GameDAO {
             }
         }
 
-        throw new DataAccessException("Error: no game with gameID " + gameID, HttpStatus.BAD_REQUEST);
+        return null;
     }
 
     @Override

@@ -3,8 +3,10 @@ package service;
 import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
+import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.*;
 import model.UserData;
+import server.Server;
 import server.ServerException;
 
 import java.util.HashSet;
@@ -40,9 +42,12 @@ public class ServiceUnitTests {
     }
 
     @Test
-    public void testCreateUserTwice() {
+    public void testCreateUserFails() {
         setup();
         assertThrows(ServerException.class, () -> service.createUser(sampleUser));
+        assertThrows(ServerException.class, () -> service.createUser(new UserData(null, "", "")));
+        assertThrows(ServerException.class, () -> service.createUser(new UserData("", null, "")));
+        assertThrows(ServerException.class, () -> service.createUser(new UserData("", "", null)));
     }
 
     @Test
@@ -57,8 +62,8 @@ public class ServiceUnitTests {
     }
 
     @Test
-    public void testGetAuthFails() {
-//        assertNull(service.get)
+    public void testNullAuthCausesFail() {
+        assertThrows(ServerException.class, () -> service.joinGame(null, ChessGame.TeamColor.WHITE, 0));
     }
 
     //Again impossible to test without implementing createUser
@@ -76,8 +81,24 @@ public class ServiceUnitTests {
     }
 
     @Test
+    public void testLoginSuccessNoEmail() {
+        try {
+            setup();
+            service.login(new UserData(sampleUser.username(), sampleUser.password(), null));
+        }
+        catch (ServerException e) {
+            throw new RuntimeException();
+        }
+    }
+
+    @Test
     public void testLoginFails() {
         assertThrows(ServerException.class, () -> service.login(sampleUser));
+        setup();
+        assertThrows(ServerException.class, () -> service.login(new UserData(null, "", "")));
+        assertThrows(ServerException.class, () -> service.login(new UserData("", null, "")));
+        assertThrows(ServerException.class, () -> service.login(null));
+        assertThrows(ServerException.class, () -> service.login(new UserData(sampleUser.username(), "", "")));
     }
 
     //Best to test this one after writing functions that check auth status.
@@ -97,6 +118,7 @@ public class ServiceUnitTests {
     @Test
     public void testLogoutFails() {
         assertThrows(ServerException.class, () -> service.logout(sampleAuth));
+        assertThrows(ServerException.class, () -> service.logout(null));
     }
 
     @Test
@@ -129,6 +151,22 @@ public class ServiceUnitTests {
     public void testCreateAndListGamesFails() {
         assertThrows(ServerException.class, () -> service.createGame(sampleAuth, ""));
         assertThrows(ServerException.class, () -> service.listGames(sampleAuth));
+
+        setup();
+        assertThrows(ServerException.class, () -> service.createGame(sampleAuth, null));
+    }
+
+    @Test
+    public void testJoinGameBadColor() {
+        try {
+            setup();
+            var gameID = service.createGame(sampleAuth, "Game");
+
+            assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, null, gameID));
+        }
+        catch (ServerException e) {
+            throw new RuntimeException();
+        }
     }
 
     @Test
