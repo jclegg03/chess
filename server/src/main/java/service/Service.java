@@ -94,8 +94,7 @@ public class Service {
             var game = new GameData(currentGameID, gameName);
             addGame(game);
             return currentGameID++;
-        }
-        catch (AssertionError e) {
+        } catch (AssertionError e) {
             throw new ServerException("Error: bad request", HttpStatus.BAD_REQUEST);
         }
     }
@@ -107,34 +106,26 @@ public class Service {
 
     public void joinGame(AuthData auth, ChessGame.TeamColor color, int gameID) throws ServerException {
         isAuthorized(auth);
-        try {
-            GameData game = gameDAO.selectGame(gameID);
-            assert game != null;
-            if(color == null) {
-                throw new ServerException("Error: bad request", HttpStatus.BAD_REQUEST);
-            }
-
-            if (color == ChessGame.TeamColor.WHITE) {
-                if (game.whiteUsername() == null) {
-                    game = game.setWhiteUsername(auth.username());
-                }
-                else {
-                    throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
-                }
-            }
-            else {
-                if (game.blackUsername() == null) {
-                    game = game.setBlackUsername(auth.username());
-                }
-                else {
-                    throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
-                }
-            }
-
-            updateGame(game);
-        } catch (AssertionError e) {
-            throw new ServerException("Error: Requested game does not exist", HttpStatus.BAD_REQUEST);
+        GameData game = gameDAO.selectGame(gameID);
+        if (color == null ||
+            game == null) {
+            throw new ServerException("Error: bad request", HttpStatus.BAD_REQUEST);
         }
+
+        if (color == ChessGame.TeamColor.WHITE) {
+            if (game.whiteUsername() == null) {
+                game = game.setWhiteUsername(auth.username());
+            } else {
+                throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
+            }
+        } else {
+            if (game.blackUsername() == null) {
+                game = game.setBlackUsername(auth.username());
+            } else {
+                throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
+            }
+        }
+        updateGame(game);
     }
 
     public void clearData() throws DataAccessException {
