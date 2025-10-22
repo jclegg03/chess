@@ -140,14 +140,13 @@ public class Service {
     }
 
     private void isAuthorized(AuthData auth) throws ServerException {
-        try {
-            assert auth != null;
-            var authOnRecord = authDAO.selectAuth(auth.authToken());
-            if (!auth.equals(authOnRecord)) {
-                throw new ServerException("error: unauthorized", HttpStatus.UNAUTHORIZED);
-            }
-        } catch (AssertionError e) {
+        if (auth == null) {
             throw new ServerException("Error: unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+
+        var authOnRecord = authDAO.selectAuth(auth.authToken());
+        if (!auth.equals(authOnRecord)) {
+            throw new ServerException("error: unauthorized", HttpStatus.UNAUTHORIZED);
         }
     }
 
