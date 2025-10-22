@@ -88,15 +88,13 @@ public class Service {
     }
 
     public int createGame(AuthData auth, String gameName) throws ServerException {
-        try {
-            isAuthorized(auth);
-            assert gameName != null;
-            var game = new GameData(currentGameID, gameName);
-            addGame(game);
-            return currentGameID++;
-        } catch (AssertionError e) {
+        isAuthorized(auth);
+        if(gameName == null) {
             throw new ServerException("Error: bad request", HttpStatus.BAD_REQUEST);
         }
+        var game = new GameData(currentGameID, gameName);
+        addGame(game);
+        return currentGameID++;
     }
 
     public GameData[] listGames(AuthData auth) throws ServerException {
@@ -108,7 +106,7 @@ public class Service {
         isAuthorized(auth);
         GameData game = gameDAO.selectGame(gameID);
         if (color == null ||
-            game == null) {
+                game == null) {
             throw new ServerException("Error: bad request", HttpStatus.BAD_REQUEST);
         }
 
