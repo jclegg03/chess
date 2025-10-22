@@ -77,14 +77,12 @@ public class Service {
     }
 
     public void logout(AuthData auth) throws ServerException {
-        try {
-            assert auth != null;
-            assert authDAO.selectAuth(auth.authToken()) != null;
-            authDAO.deleteAuth(auth);
-        } catch (AssertionError e) {
-            throw new ServerException("Error: unauthorized", HttpStatus.UNAUTHORIZED);
-        }
+            if(auth == null ||
+                    authDAO.selectAuth(auth.authToken()) == null) {
+                throw new ServerException("Error: unauthorized", HttpStatus.UNAUTHORIZED);
+            }
 
+            authDAO.deleteAuth(auth);
     }
 
     public int createGame(AuthData auth, String gameName) throws ServerException {
