@@ -115,12 +115,6 @@ public class ServiceUnitTests {
 
     @Test
     public void testLogoutFails() {
-        try {
-            service.logout(sampleAuth);
-        }
-        catch (ServerException e) {
-            throw new RuntimeException();
-        }
         assertThrows(ServerException.class, () -> service.logout(sampleAuth));
 
         assertThrows(ServerException.class, () -> service.logout(null));
