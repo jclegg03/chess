@@ -35,11 +35,9 @@ public class Service {
     }
 
     public AuthData createUser(UserData user) throws ServerException {
-        try {
-            assert user.username() != null;
-            assert user.password() != null;
-            assert user.email() != null;
-        } catch (AssertionError e) {
+        if (user.username() == null ||
+                user.password() == null ||
+                user.email() == null) {
             throw new ServerException("bad request", HttpStatus.BAD_REQUEST);
         }
 
