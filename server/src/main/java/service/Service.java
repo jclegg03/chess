@@ -56,11 +56,9 @@ public class Service {
     }
 
     public AuthData login(UserData user) throws ServerException {
-        try {
-            assert user != null;
-            assert user.username() != null;
-            assert user.password() != null;
-        } catch (AssertionError e) {
+        if (user == null ||
+                user.username() == null ||
+                user.password() == null) {
             throw new ServerException("bad request", HttpStatus.BAD_REQUEST);
         }
 
@@ -77,17 +75,17 @@ public class Service {
     }
 
     public void logout(AuthData auth) throws ServerException {
-            if(auth == null ||
-                    authDAO.selectAuth(auth.authToken()) == null) {
-                throw new ServerException("Error: unauthorized", HttpStatus.UNAUTHORIZED);
-            }
+        if (auth == null ||
+                authDAO.selectAuth(auth.authToken()) == null) {
+            throw new ServerException("Error: unauthorized", HttpStatus.UNAUTHORIZED);
+        }
 
-            authDAO.deleteAuth(auth);
+        authDAO.deleteAuth(auth);
     }
 
     public int createGame(AuthData auth, String gameName) throws ServerException {
         isAuthorized(auth);
-        if(gameName == null) {
+        if (gameName == null) {
             throw new ServerException("Error: bad request", HttpStatus.BAD_REQUEST);
         }
         var game = new GameData(currentGameID, gameName);
