@@ -1,6 +1,10 @@
 package service;
 
 import chess.ChessGame;
+import dataaccess.DataAccessException;
+import dataaccess.auth.LocalAuthDAO;
+import dataaccess.game.LocalGameDAO;
+import dataaccess.user.DatabaseUserDAO;
 import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.*;
@@ -15,7 +19,17 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ServiceUnitTests {
     final UserData sampleUser = new UserData("username", "password", "email@mail.com");
     static AuthData sampleAuth = new AuthData("", "");
-    final Service service = new Service();
+    final Service service;
+    DatabaseUserDAO userDAO;
+
+    {
+        try {
+            userDAO = new DatabaseUserDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        service = new Service(userDAO, new LocalGameDAO(), new LocalAuthDAO());
+    }
 
 
     public void setup() {
@@ -23,6 +37,15 @@ public class ServiceUnitTests {
             sampleAuth = service.createUser(sampleUser);
         }
         catch (ServerException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @BeforeEach
+    public void clearDB() {
+        try {
+            userDAO.clearUsers();
+        } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
     }
