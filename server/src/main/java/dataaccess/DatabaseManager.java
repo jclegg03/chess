@@ -1,6 +1,8 @@
 package dataaccess;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class DatabaseManager {
@@ -29,6 +31,32 @@ public class DatabaseManager {
         }
     }
 
+    public static void executeVoidStatement(String statement) throws DataAccessException {
+        try (var conn = getConnection();
+             var preparedStatement = conn.prepareStatement(statement)) {
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("There was a database error", e);
+        }
+    }
+
+    public static <T> List<T> executeSelectStatement(String statement, SQLtoJavaInator<T> converter)
+            throws DataAccessException {
+        try (var conn = getConnection();
+             var preparedStatement = conn.prepareStatement(statement)) {
+            try (var result = preparedStatement.executeQuery()) {
+                var list = new ArrayList<T>();
+                while(result.next()) {
+                    list.add(converter.convert(result));
+                }
+
+                return list;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("There was a database error while selecting", e);
+        }
+    }
+
     /**
      * Create a connection to the database and sets the catalog based upon the
      * properties specified in db.properties. Connections to the database should
@@ -41,7 +69,7 @@ public class DatabaseManager {
      * }
      * </code>
      */
-    static Connection getConnection() throws DataAccessException {
+    public static Connection getConnection() throws DataAccessException {
         try {
             //do not wrap the following line with a try-with-resources
             var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
