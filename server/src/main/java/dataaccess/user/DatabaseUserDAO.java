@@ -40,8 +40,8 @@ public class DatabaseUserDAO implements UserDAO {
 
     @Override
     public UserData selectUser(String username) throws DataAccessException {
-        String statement = "SELECT password, email FROM users WHERE username = " +
-                username + ";";
+        String statement = "SELECT password, email FROM users WHERE username = '" +
+                username + "';";
         var res = DatabaseManager.executeSelectStatement(statement,
                 result -> new UserData(
                         username,
