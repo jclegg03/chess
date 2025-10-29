@@ -43,7 +43,8 @@ public class DatabaseUserDAO implements UserDAO {
         String statement = "SELECT password, email FROM users WHERE username = " +
                 username + ";";
         var res = DatabaseManager.executeSelectStatement(statement,
-                result -> new UserData(username,
+                result -> new UserData(
+                        username,
                         result.getString("password"),
                         result.getString("email")
                 ));
