@@ -12,4 +12,9 @@ public class ServerException extends Exception {
         super(message);
         this.status = status;
     }
+
+    public ServerException(String message, HttpStatus status, Throwable ex) {
+        super(message, ex);
+        this.status = status;
+    }
 }
