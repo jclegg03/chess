@@ -3,15 +3,19 @@ package service;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.auth.AuthDAO;
+import dataaccess.auth.DatabaseAuthDAO;
 import dataaccess.auth.LocalAuthDAO;
+import dataaccess.game.DatabaseGameDAO;
 import dataaccess.game.GameDAO;
 import dataaccess.game.LocalGameDAO;
+import dataaccess.user.DatabaseUserDAO;
 import dataaccess.user.LocalUserDAO;
 import dataaccess.user.UserDAO;
 import io.javalin.http.HttpStatus;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import server.ServerException;
 
 import java.util.UUID;
@@ -24,9 +28,30 @@ public class Service {
 
 
     public Service() {
-        userDAO = new LocalUserDAO();
+        UserDAO userDAO;
+        GameDAO gameDAO;
+        AuthDAO authDAO;
+
+        try {
+            userDAO = new DatabaseUserDAO();
+        } catch (DataAccessException e) {
+            userDAO = new LocalUserDAO();
+            gameDAO = new LocalGameDAO();
+            authDAO = new LocalAuthDAO();
+        }
+
         gameDAO = new LocalGameDAO();
         authDAO = new LocalAuthDAO();
+
+        this.userDAO = userDAO;
+        this.gameDAO = gameDAO;
+        this.authDAO = authDAO;
+    }
+
+    public Service(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
+        this.userDAO = userDAO;
+        this.gameDAO = gameDAO;
+        this.authDAO = authDAO;
     }
 
 
@@ -43,7 +68,9 @@ public class Service {
 
         UserData data = getUser(user.username());
         if (data == null) {
-            userDAO.insertUser(user);
+            userDAO.insertUser(new UserData(user.username(),
+                    BCrypt.hashpw(user.password(), BCrypt.gensalt()),
+                    user.email()));
 
             AuthData auth = makeAuthData(user);
             addAuth(auth);
@@ -63,7 +90,7 @@ public class Service {
         UserData userOnRecord = getUser(user.username());
 
         if (userOnRecord == null ||
-                !user.password().equals(userOnRecord.password())) {
+                !BCrypt.checkpw(user.password(), userOnRecord.password())) {
             throw new ServerException("unauthorized", HttpStatus.UNAUTHORIZED);
         } else {
             var auth = makeAuthData(user);
