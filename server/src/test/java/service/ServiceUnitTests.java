@@ -2,6 +2,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.DataAccessException;
+import dataaccess.auth.DatabaseAuthDAO;
 import dataaccess.auth.LocalAuthDAO;
 import dataaccess.game.LocalGameDAO;
 import dataaccess.user.DatabaseUserDAO;
@@ -21,14 +22,16 @@ public class ServiceUnitTests {
     static AuthData sampleAuth = new AuthData("", "");
     final Service service;
     DatabaseUserDAO userDAO;
+    DatabaseAuthDAO authDAO;
 
     {
         try {
             userDAO = new DatabaseUserDAO();
+            authDAO = new DatabaseAuthDAO();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-        service = new Service(userDAO, new LocalGameDAO(), new LocalAuthDAO());
+        service = new Service(userDAO, new LocalGameDAO(), authDAO);
     }
 
 
@@ -45,6 +48,7 @@ public class ServiceUnitTests {
     public void clearDB() {
         try {
             userDAO.clearUsers();
+            authDAO.clearAuths();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -92,6 +96,7 @@ public class ServiceUnitTests {
     public void testLoginSuccess() {
         try {
             setup();
+            authDAO.deleteAuth(sampleAuth);
             AuthData authFromLogin = service.login(sampleUser);
 
             assertEquals(sampleAuth.username(), authFromLogin.username());
@@ -105,6 +110,7 @@ public class ServiceUnitTests {
     public void testLoginSuccessNoEmail() {
         try {
             setup();
+            authDAO.deleteAuth(sampleAuth);
             service.login(new UserData(sampleUser.username(), sampleUser.password(), null));
         }
         catch (ServerException e) {

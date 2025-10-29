@@ -34,6 +34,7 @@ public class Service {
 
         try {
             userDAO = new DatabaseUserDAO();
+            authDAO = new DatabaseAuthDAO();
         } catch (DataAccessException e) {
             userDAO = new LocalUserDAO();
             gameDAO = new LocalGameDAO();
@@ -41,7 +42,6 @@ public class Service {
         }
 
         gameDAO = new LocalGameDAO();
-        authDAO = new LocalAuthDAO();
 
         this.userDAO = userDAO;
         this.gameDAO = gameDAO;
