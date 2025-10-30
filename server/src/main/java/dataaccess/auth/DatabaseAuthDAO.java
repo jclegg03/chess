@@ -10,7 +10,7 @@ public class DatabaseAuthDAO implements AuthDAO {
     public DatabaseAuthDAO() throws DataAccessException {
         String init = "CREATE TABLE IF NOT EXISTS auth(\n" +
                 "id INT NOT NULL AUTO_INCREMENT,\n" +
-                "username VARCHAR(100) NOT NULL UNIQUE,\n" +
+                "username VARCHAR(100) NOT NULL,\n" +
                 "token CHAR(36) NOT NULL UNIQUE,\n" +
                 "PRIMARY KEY (id),\n" +
                 "INDEX(token)\n" +
