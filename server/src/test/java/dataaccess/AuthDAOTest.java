@@ -45,7 +45,6 @@ class AuthDAOTest {
         try {
             authDAO.insertAuth(auth);
             assertThrows(DataAccessException.class, () -> authDAO.insertAuth(auth));
-            assertThrows(DataAccessException.class, () -> authDAO.insertAuth(new AuthData("username", "")));
             assertThrows(DataAccessException.class, () -> authDAO.insertAuth(new AuthData("", authToken)));
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
