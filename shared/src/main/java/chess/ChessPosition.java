@@ -10,11 +10,30 @@ import java.util.Objects;
  */
 public class ChessPosition {
     private int row;
-    private int col;
+    private Column col;
+
+    public enum Column {
+        a(1), b(2), c(3), d(4), e(5), f(6), g(7), h(8);
+
+        private final int col;
+
+        Column(int col) {
+            this.col = col;
+        }
+
+        public int getCol() {
+            return col;
+        }
+    }
 
     public ChessPosition(int row, int col) {
         this.row = row;
-        this.col = col;
+        for(Column name : Column.values()) {
+            if(name.getCol() == col) {
+                this.col = name;
+                break;
+            }
+        }
     }
 
     /**
@@ -30,7 +49,7 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-        return this.col;
+        return this.col.getCol();
     }
 
 
@@ -50,31 +69,19 @@ public class ChessPosition {
 
     @Override
     public String toString() {
-        String string = "";
-        if(col == 1) {
-            string = "a" + row;
+        return col.name() + row;
+    }
+
+    public static ChessPosition fromString(String key) {
+        String colString = key.substring(0, 1);
+        int row = Integer.parseInt(key.substring(1));
+        int col = 0;
+        for(Column name : Column.values()) {
+            if(name.name().equals(colString)) {
+                col = name.getCol();
+                break;
+            }
         }
-        else if(col == 2) {
-            string = "b" + row;
-        }
-        else if(col == 3) {
-            string = "c" + row;
-        }
-        else if(col == 4) {
-            string = "d" + row;
-        }
-        else if(col == 5) {
-            string = "e" + row;
-        }
-        else if(col == 6) {
-            string = "f" + row;
-        }
-        else if(col == 7) {
-            string = "g" + row;
-        }
-        else {
-            string = "h" + row;
-        }
-        return string;
+        return new ChessPosition(row, col);
     }
 }
