@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class DatabaseGameDAO implements GameDAO {
-    private Gson serializer;
+    private final Gson serializer;
 
     public DatabaseGameDAO() throws DataAccessException {
         this.serializer = new GsonBuilder()
@@ -51,15 +51,16 @@ public class DatabaseGameDAO implements GameDAO {
                 .serializeNulls()
                 .create();
 
-        String init = "CREATE TABLE IF NOT EXISTS game(\n" +
-                "id INT NOT NULL,\n" +
-                "name VARCHAR(100) NOT NULL UNIQUE,\n" +
-                "white_username VARCHAR(100) DEFAULT NULL,\n" +
-                "black_username VARCHAR(100) DEFAULT NULL,\n" +
-                "game_data JSON NOT NULL,\n" +
-                "PRIMARY KEY (id),\n" +
-                "INDEX(name)\n" +
-                ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
+        String init = """
+                CREATE TABLE IF NOT EXISTS game(
+                id INT NOT NULL,
+                name VARCHAR(100) NOT NULL UNIQUE,
+                white_username VARCHAR(100) DEFAULT NULL,
+                black_username VARCHAR(100) DEFAULT NULL,
+                game_data JSON NOT NULL,
+                PRIMARY KEY (id),
+                INDEX(name)
+                )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;""";
 
         DatabaseManager.executeVoidStatement(init);
     }

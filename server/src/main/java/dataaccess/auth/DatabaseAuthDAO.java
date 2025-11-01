@@ -2,19 +2,18 @@ package dataaccess.auth;
 
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
-import dataaccess.user.DatabaseUserDAO;
 import model.AuthData;
-import model.UserData;
 
 public class DatabaseAuthDAO implements AuthDAO {
     public DatabaseAuthDAO() throws DataAccessException {
-        String init = "CREATE TABLE IF NOT EXISTS auth(\n" +
-                "id INT NOT NULL AUTO_INCREMENT,\n" +
-                "username VARCHAR(100) NOT NULL,\n" +
-                "token CHAR(36) NOT NULL UNIQUE,\n" +
-                "PRIMARY KEY (id),\n" +
-                "INDEX(token)\n" +
-                ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
+        String init = """
+                CREATE TABLE IF NOT EXISTS auth(
+                id INT NOT NULL AUTO_INCREMENT,
+                username VARCHAR(100) NOT NULL,
+                token CHAR(36) NOT NULL UNIQUE,
+                PRIMARY KEY (id),
+                INDEX(token)
+                )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;""";
 
         DatabaseManager.executeVoidStatement(init);
     }
