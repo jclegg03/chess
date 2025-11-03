@@ -70,6 +70,13 @@ class GameDAOTest {
 
     @Test
     void updateGameFail() {
+        try {
+            gameDAO.updateGame(game.gameID(), game);
+            assertNull(gameDAO.selectGame(game.gameID()));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Test
