@@ -69,15 +69,31 @@ public class DatabaseGameDAO implements GameDAO {
         return serializer.toJson(game);
     }
 
+    private String addEscapes(String string) {
+        if(string == null) {
+            return null;
+        }
+
+        String result = "";
+        for(char c : string.toCharArray()) {
+            if(c == '\'') {
+                result += "\\";
+            }
+            result += c;
+        }
+
+        return result;
+    }
+
     @Override
     public void insertGame(GameData game) throws DataAccessException {
         String statement = "INSERT INTO game (id, name, white_username, black_username, game_data)\n";
         String values = "VALUES ('";
 
-        values += game.gameID() + "', '" +
-                  game.gameName() + "', '" +
-                  game.whiteUsername() + "', '" +
-                  game.blackUsername() + "', '" +
+        values += game.gameID() + "', '";
+        values += addEscapes(game.gameName()) + "', '";
+        values += addEscapes(game.whiteUsername()) + "', '" +
+                  addEscapes(game.blackUsername()) + "', '" +
                   gameToJSON(game.game()) + "');";
 
         statement += values;
@@ -88,8 +104,8 @@ public class DatabaseGameDAO implements GameDAO {
     @Override
     public void updateGame(int gameID, GameData game) throws DataAccessException {
         String statement = "UPDATE game SET white_username = '" +
-                game.whiteUsername() + "', black_username = '" +
-                game.blackUsername() + "', game_data = '" +
+                addEscapes(game.whiteUsername()) + "', black_username = '" +
+                addEscapes(game.blackUsername()) + "', game_data = '" +
                 gameToJSON(game.game()) + "' " +
                 "WHERE id = '" + gameID + "';";
 
