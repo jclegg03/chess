@@ -90,7 +90,7 @@ public class DatabaseGameDAO implements GameDAO {
         String statement = "UPDATE game SET white_username = '" +
                 game.whiteUsername() + "', black_username = '" +
                 game.blackUsername() + "', game_data = '" +
-                game.game() + "' " +
+                gameToJSON(game.game()) + "' " +
                 "WHERE id = '" + gameID + "';";
 
         DatabaseManager.executeVoidStatement(statement);
