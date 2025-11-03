@@ -53,7 +53,7 @@ public class DatabaseGameDAO implements GameDAO {
 
         String init = """
                 CREATE TABLE IF NOT EXISTS game(
-                id INT NOT NULL,
+                id INT NOT NULL UNIQUE,
                 name VARCHAR(100) NOT NULL UNIQUE,
                 white_username VARCHAR(100) DEFAULT NULL,
                 black_username VARCHAR(100) DEFAULT NULL,
@@ -130,7 +130,7 @@ public class DatabaseGameDAO implements GameDAO {
                 fixNullUser(result.getString("white_username")),
                 fixNullUser(result.getString("black_username")),
                 result.getString("name"),
-                getGameFromString(result.getString("game"))
+                getGameFromString(result.getString("game_data"))
             )
         );
 
