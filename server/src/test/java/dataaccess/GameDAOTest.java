@@ -74,10 +74,16 @@ class GameDAOTest {
 
     @Test
     void selectGameSuccess() {
+        insertGameSuccess();
     }
 
     @Test
     void selectGameFail() {
+        try {
+            assertNull(gameDAO.selectGame(0));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
