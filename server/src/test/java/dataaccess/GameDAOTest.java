@@ -133,6 +133,13 @@ class GameDAOTest {
 
     @Test
     void clearGames() {
-
+        try {
+            gameDAO.insertGame(game);
+            gameDAO.clearGames();
+            assertEquals(0, gameDAO.selectAllGames().length);
+            assertNull(gameDAO.selectGame(id));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
