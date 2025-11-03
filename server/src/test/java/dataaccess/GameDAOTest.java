@@ -125,9 +125,15 @@ class GameDAOTest {
 
     @Test
     void selectAllGamesFail() {
+        try {
+            assertEquals(0, gameDAO.selectAllGames().length);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
     void clearGames() {
+
     }
 }
