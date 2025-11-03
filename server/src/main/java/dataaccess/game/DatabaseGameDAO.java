@@ -157,7 +157,10 @@ public class DatabaseGameDAO implements GameDAO {
         if("null".equals(user)) {
             return null;
         }
-        else return user;
+        else
+        {
+            return user;
+        }
     }
 
     @Override
