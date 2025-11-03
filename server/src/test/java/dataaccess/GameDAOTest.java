@@ -8,6 +8,11 @@ import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameDAOTest {
@@ -95,6 +100,27 @@ class GameDAOTest {
 
     @Test
     void selectAllGamesSuccess() {
+        try {
+            gameDAO.insertGame(game);
+            var games = gameDAO.selectAllGames();
+            GameData[] expected = {game};
+            assertEquals(expected.length, games.length);
+            for(int i = 0; i < expected.length; i++) {
+                var expectedData = expected[i];
+                var actualData = games[i];
+                assertEquals(expectedData, actualData);
+            }
+
+            var game2 = new GameData(game.gameID() + 1, "cool");
+            gameDAO.insertGame(game2);
+            var expected2 = new HashSet<>(List.of(game, game2));
+            var arr = gameDAO.selectAllGames();
+            var actual2 = new HashSet<GameData>();
+            Collections.addAll(actual2, arr);
+            assertEquals(expected2, actual2);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
