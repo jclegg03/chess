@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import model.AuthData;
 import model.UserData;
 
 import java.net.URI;
@@ -40,7 +41,7 @@ public class ServerFacade {
         }
     }
 
-    public void register(UserData user) {
+    public String register(UserData user) {
         try {
             String json = serializer.toJson(user, UserData.class);
             var request = buildRequest("/user", json, HTTPMethod.POST);
@@ -50,12 +51,24 @@ public class ServerFacade {
 
             if(response.statusCode() == 200) {
                 System.out.println("User registered. You are logged in as " + user.username() + ".");
+                return serializer.fromJson(response.body(), AuthData.class).authToken();
             }
             else if(response.statusCode() == 403){
                 System.out.println("Username " + user.username() + " is already taken!");
             }
         } catch (Exception e) {
             defaultErrorHandling();
+        }
+
+        return null;
+    }
+
+    public void logout(AuthData auth) {
+        var request = buildRequest("/session", auth.authToken(), null, HTTPMethod.DELETE);
+
+        var response = makeRequest(request);
+        if(response.statusCode() == 200) {
+            System.out.println("Bye " + auth.username() + "!");
         }
     }
 
@@ -107,6 +120,15 @@ public class ServerFacade {
 
     private HttpRequest buildRequest(String path, String body, HTTPMethod method) {
         return buildRequest(path, null, body, method);
+    }
+
+    private HttpResponse<String> makeRequest(HttpRequest request) {
+        try {
+            return client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            defaultErrorHandling();
+        }
+        return null;
     }
 
     private void defaultErrorHandling() {

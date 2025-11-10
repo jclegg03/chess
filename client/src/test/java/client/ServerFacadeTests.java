@@ -1,5 +1,6 @@
 package client;
 
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -58,5 +59,15 @@ public class ServerFacadeTests {
         output.reset();
         serverFacade.register(user);
         assertEquals("Username " + user.username() + " is already taken!" + lineEnd, output.toString());
+    }
+
+    @Test
+    public void logoutPositiveTest() {
+        var user = new UserData("username", "password", "email");
+        var authToken = serverFacade.register(user);
+        var auth = new AuthData(user.username(), authToken);
+        output.reset();
+        serverFacade.logout(auth);
+        assertEquals("Bye " + user.username() + "!" + lineEnd, output.toString());
     }
 }
