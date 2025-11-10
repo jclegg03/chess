@@ -25,9 +25,14 @@ public class ServerFacadeTests {
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
         serverFacade = new ServerFacade(port);
-        serverFacade.clearDatabase();
 
         System.setOut(new PrintStream(output));
+    }
+
+    @BeforeEach
+    public void reset() {
+        serverFacade.clearDatabase();
+        output.reset();
     }
 
     @AfterAll
