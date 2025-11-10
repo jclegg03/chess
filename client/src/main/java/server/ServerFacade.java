@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import com.sun.net.httpserver.HttpExchange;
 import model.UserData;
 
 import java.net.URI;
@@ -15,11 +16,14 @@ public class ServerFacade {
     private static final HttpClient client = HttpClient.newHttpClient();
     private final String host;
     private final Gson serializer;
+    private final Duration defaultTimeout = Duration.ofMillis(5000);
 
     public ServerFacade(int port) {
         host = "http://localhost:" + port;
         serializer = new Gson();
     }
+
+    private enum HTTPMethod {GET, POST, DELETE, PUT}
 
     public void login(UserData user) {
         try {
@@ -29,7 +33,7 @@ public class ServerFacade {
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(url))
-                    .timeout(Duration.ofMillis(5000))
+                    .timeout(defaultTimeout)
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
@@ -42,7 +46,63 @@ public class ServerFacade {
         } catch (URISyntaxException syntaxException) {
             System.out.println("The login function is currently broken. Sorry!");
         } catch (Exception e) {
-            System.out.println("There was an error with the server.");
+            defaultErrorHandling();
         }
+    }
+
+    public void register(UserData user) {
+        try {
+            String json = serializer.toJson(user, UserData.class);
+            var request = buildRequest("/session", json, HTTPMethod.POST);
+
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        } catch (Exception e) {
+            defaultErrorHandling();
+        }
+    }
+
+    private HttpRequest buildRequest(String path, String header, String body, HTTPMethod method) {
+        try {
+            String url = String.format(Locale.getDefault(), host + path);
+
+            HttpRequest.Builder request = HttpRequest.newBuilder()
+                    .uri(new URI(url))
+                    .timeout(defaultTimeout);
+
+            if(header != null) {
+                request.header("authorization", header);
+            }
+
+            switch (method) {
+                case GET:
+                    request.GET();
+                    break;
+                case PUT:
+                    request.PUT(HttpRequest.BodyPublishers.ofString(body));
+                    break;
+                case POST:
+                    request.POST(HttpRequest.BodyPublishers.ofString(body));
+                    break;
+                case DELETE:
+                    request.DELETE();
+                    break;
+            }
+
+            return request.build();
+        } catch (URISyntaxException e) {
+            System.out.println("That command is currently broken. Sorry!");
+        }
+
+        return null;
+    }
+
+    private HttpRequest buildRequest(String path, String body, HTTPMethod method) {
+        return buildRequest(path, null, body, method);
+    }
+
+    private void defaultErrorHandling() {
+        System.out.println("There was an error with the server.");
     }
 }

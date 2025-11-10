@@ -32,6 +32,7 @@ public class ServerFacadeTests {
     @AfterAll
     static void stopServer() {
         server.stop();
+
         System.setOut(System.out);
     }
 
@@ -43,4 +44,18 @@ public class ServerFacadeTests {
         assertEquals("Username and password do not match." + lineEnd, output.toString());
     }
 
+    @Test
+    public void registerPositiveTest() {
+        var user = new UserData("username", "password", "email");
+        serverFacade.register(user);
+        assertEquals("Logged in as " + user.username() + "." + lineEnd, output.toString());
+    }
+
+    @Test
+    public void registerUserTwice() {
+        var user = new UserData("username", "password", "email");
+        serverFacade.register(user);
+        serverFacade.register(user);
+        assertEquals("Username " + user.username() + " is already taken!" + lineEnd, output.toString());
+    }
 }
