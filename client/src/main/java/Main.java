@@ -1,6 +1,4 @@
-import chess.*;
 import model.User;
-import ui.BoardPrinter;
 import ui.CLIManager;
 
 public class Main {
