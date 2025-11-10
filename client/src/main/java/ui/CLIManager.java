@@ -2,6 +2,7 @@ package ui;
 
 import model.User;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class CLIManager {
@@ -17,6 +18,7 @@ public class CLIManager {
         while(true) {
             String input = scanner.nextLine();
             var inputs = input.split(" ");
+            System.out.println(Arrays.toString(inputs));
             if(inputs[0].equalsIgnoreCase("quit")) {
                 break;
             }
@@ -37,18 +39,24 @@ public class CLIManager {
         switch (inputs[0].toLowerCase()) {
             case "help":
                 printHelp();
+                break;
             case "login":
                 if(inputs.length != 4) {
                     invalidInput(inputs);
+                    break;
                 }
                 login(inputs[1], inputs[2], inputs[3]);
+                break;
             case "register":
                 if(inputs.length != 4) {
                     invalidInput(inputs);
+                    break;
                 }
                 register(inputs[1], inputs[2], inputs[3]);
+                break;
             default:
                 invalidInput(inputs);
+                break;
         }
     }
 
