@@ -70,6 +70,9 @@ public class ServerFacade {
         if(response.statusCode() == 200) {
             System.out.println("Bye " + auth.username() + "!");
         }
+        else {
+            System.out.println("Uh, doesn't look like you were even logged in to begin with.");
+        }
     }
 
     public void clearDatabase() {

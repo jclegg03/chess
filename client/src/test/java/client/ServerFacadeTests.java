@@ -70,4 +70,13 @@ public class ServerFacadeTests {
         serverFacade.logout(auth);
         assertEquals("Bye " + user.username() + "!" + lineEnd, output.toString());
     }
+
+    @Test
+    public void logoutNoOne() {
+        serverFacade.logout(new AuthData("", ""));
+        assertEquals("Uh, doesn't look like you were even logged in to begin with." + lineEnd,
+                output.toString());
+    }
+
+
 }
