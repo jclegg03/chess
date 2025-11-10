@@ -26,38 +26,29 @@ public class ServerFacade {
     private enum HTTPMethod {GET, POST, DELETE, PUT}
 
     public void login(UserData user) {
-        try {
-            String json = serializer.toJson(user, UserData.class);
-            var request = buildRequest("/session", json, HTTPMethod.POST);
+        String json = serializer.toJson(user, UserData.class);
+        var request = buildRequest("/session", json, HTTPMethod.POST);
 
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = makeRequest(request);
 
-            if(response.statusCode() != 200) {
-                System.out.println("Username and password do not match.");
-            }
-        } catch (Exception e) {
-            defaultErrorHandling();
+        if (response.statusCode() != 200) {
+            System.out.println("Username and password do not match.");
         }
     }
 
     public String register(UserData user) {
-        try {
-            String json = serializer.toJson(user, UserData.class);
-            var request = buildRequest("/user", json, HTTPMethod.POST);
+        String json = serializer.toJson(user, UserData.class);
+        var request = buildRequest("/user", json, HTTPMethod.POST);
 
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = makeRequest(request);
 
-            if(response.statusCode() == 200) {
-                System.out.println("User registered. You are logged in as " + user.username() + ".");
-                return serializer.fromJson(response.body(), AuthData.class).authToken();
-            }
-            else if(response.statusCode() == 403){
-                System.out.println("Username " + user.username() + " is already taken!");
-            }
-        } catch (Exception e) {
-            defaultErrorHandling();
+        if (response.statusCode() == 200) {
+            System.out.println("User registered. You are logged in as " + user.username() + ".");
+            return serializer.fromJson(response.body(), AuthData.class).authToken();
+        } else if (response.statusCode() == 403) {
+            System.out.println("Username " + user.username() + " is already taken!");
         }
 
         return null;
@@ -67,10 +58,9 @@ public class ServerFacade {
         var request = buildRequest("/session", auth.authToken(), null, HTTPMethod.DELETE);
 
         var response = makeRequest(request);
-        if(response.statusCode() == 200) {
+        if (response.statusCode() == 200) {
             System.out.println("Bye " + auth.username() + "!");
-        }
-        else {
+        } else {
             System.out.println("Uh, doesn't look like you were even logged in to begin with.");
         }
     }
@@ -94,7 +84,7 @@ public class ServerFacade {
                     .uri(new URI(url))
                     .timeout(defaultTimeout);
 
-            if(header != null) {
+            if (header != null) {
                 request.header("authorization", header);
             }
 
