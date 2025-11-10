@@ -1,6 +1,5 @@
 package client;
 
-import model.User;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -25,7 +24,7 @@ public class ServerFacadeTests {
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
         serverFacade = new ServerFacade(port);
-        serverFacade.blastRebels();
+        serverFacade.clearDatabase();
 
         System.setOut(new PrintStream(output));
     }
@@ -56,6 +55,7 @@ public class ServerFacadeTests {
     public void registerUserTwice() {
         var user = new UserData("username", "password", "email");
         serverFacade.register(user);
+        output.reset();
         serverFacade.register(user);
         assertEquals("Username " + user.username() + " is already taken!" + lineEnd, output.toString());
     }

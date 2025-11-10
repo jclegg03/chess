@@ -1,10 +1,8 @@
 package server;
 
 import com.google.gson.Gson;
-import com.sun.net.httpserver.HttpExchange;
 import model.UserData;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -53,21 +51,22 @@ public class ServerFacade {
             if(response.statusCode() == 200) {
                 System.out.println("User registered. You are logged in as " + user.username() + ".");
             }
-            else {
-                System.out.println(response.body());
+            else if(response.statusCode() == 403){
+                System.out.println("Username " + user.username() + " is already taken!");
             }
         } catch (Exception e) {
             defaultErrorHandling();
         }
     }
 
-    public void blastRebels() {
+    public void clearDatabase() {
         try {
             var request = buildRequest("/db", null, null, HTTPMethod.DELETE);
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception e) {
             System.out.println("There was an error clearing the db.");
+            throw new RuntimeException(e);
         }
     }
 
