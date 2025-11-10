@@ -27,24 +27,15 @@ public class ServerFacade {
 
     public void login(UserData user) {
         try {
-            String url = String.format(Locale.getDefault(), host + "/session");
-
             String json = serializer.toJson(user, UserData.class);
+            var request = buildRequest("/session", json, HTTPMethod.POST);
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(url))
-                    .timeout(defaultTimeout)
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
-                    .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if(response.statusCode() != 200) {
                 System.out.println("Username and password do not match.");
             }
-
-        } catch (URISyntaxException syntaxException) {
-            System.out.println("The login function is currently broken. Sorry!");
         } catch (Exception e) {
             defaultErrorHandling();
         }
