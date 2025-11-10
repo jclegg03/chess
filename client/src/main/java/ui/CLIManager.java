@@ -68,7 +68,33 @@ public class CLIManager {
     }
 
     private void printHelp() {
+        var helpString = EscapeSequences.SET_TEXT_COLOR_GREEN + "help" + EscapeSequences.RESET_TEXT_COLOR +
+                " - Tells you what commands you can use";
+        var quitString = EscapeSequences.SET_TEXT_COLOR_GREEN + "quit" + EscapeSequences.RESET_TEXT_COLOR +
+                " - Exits the program";
+        System.out.println(helpString);
+        System.out.println(quitString);
+        if(user.isLoggedIn()) {
 
+        }
+        else {
+            var loginString = new StringBuilder(EscapeSequences.SET_TEXT_COLOR_GREEN);
+            for(String item : expectedLogin) {
+                loginString.append(item);
+                loginString.append(" ");
+            }
+            loginString.append(EscapeSequences.RESET_TEXT_COLOR);
+            loginString.append("- to gain access to our premium chess servers and games");
+            System.out.println(loginString);
+
+            var registerString = new StringBuilder(EscapeSequences.SET_TEXT_COLOR_GREEN);
+            for(String item : expectedRegister) {
+                registerString.append(item).append(" ");
+            }
+            registerString.append(EscapeSequences.RESET_TEXT_COLOR);
+            registerString.append("- to create a user and login to our great server");
+            System.out.println(registerString);
+        }
     }
 
     private void invalidInput(String[] inputs) {
