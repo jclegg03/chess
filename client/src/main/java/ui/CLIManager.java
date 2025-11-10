@@ -1,13 +1,13 @@
 package ui;
 
 import model.User;
-
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class CLIManager {
-    private User user;
-    private Scanner scanner;
+    private final User user;
+    private final Scanner scanner;
+    private final String[] expectedLogin = {"login", "<username>", "<password>"};
+    private final String[] expectedRegister = {"login", "<username>", "<password>", "<email>"};
 
     public CLIManager(User user) {
         this.user = user;
@@ -18,8 +18,7 @@ public class CLIManager {
         while(true) {
             String input = scanner.nextLine();
             var inputs = input.split(" ");
-            System.out.println(Arrays.toString(inputs));
-            if(inputs[0].equalsIgnoreCase("quit")) {
+            if(inputs[0].equalsIgnoreCase("quit") || inputs[0].equalsIgnoreCase("exit")) {
                 break;
             }
             if(user.isLoggedIn()) {
@@ -41,15 +40,15 @@ public class CLIManager {
                 printHelp();
                 break;
             case "login":
-                if(inputs.length != 4) {
-                    invalidInput(inputs);
+                if(inputs.length != expectedLogin.length) {
+                    invalidInput(inputs, expectedLogin);
                     break;
                 }
-                login(inputs[1], inputs[2], inputs[3]);
+                login(inputs[1], inputs[2]);
                 break;
             case "register":
-                if(inputs.length != 4) {
-                    invalidInput(inputs);
+                if(inputs.length != expectedRegister.length) {
+                    invalidInput(inputs, expectedRegister);
                     break;
                 }
                 register(inputs[1], inputs[2], inputs[3]);
@@ -64,7 +63,7 @@ public class CLIManager {
 
     }
 
-    private void login(String username, String password, String email) {
+    private void login(String username, String password) {
 
     }
 
@@ -73,6 +72,16 @@ public class CLIManager {
     }
 
     private void invalidInput(String[] inputs) {
+            System.out.println("Command " + inputs[0] + " is not a valid input. Type help for a list of valid" +
+                    "inputs.");
+    }
 
+    private void invalidInput(String[] inputs, String[] expectedFormat) {
+        System.out.println("Invalid use of " + inputs[0] + ".");
+        System.out.print("Expected: ");
+        for(String string : expectedFormat) {
+            System.out.print(string + " ");
+        }
+        System.out.print("\n");
     }
 }
