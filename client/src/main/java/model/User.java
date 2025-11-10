@@ -1,3 +1,5 @@
+package model;
+
 public class User {
     private boolean isLoggedIn;
     private String authToken;
