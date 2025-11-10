@@ -1,6 +1,9 @@
 package ui;
 
 import model.User;
+import model.UserData;
+import server.ServerFacade;
+
 import java.util.Scanner;
 
 public class CLIManager {
@@ -8,10 +11,12 @@ public class CLIManager {
     private final Scanner scanner;
     private final String[] expectedLogin = {"login", "<username>", "<password>"};
     private final String[] expectedRegister = {"login", "<username>", "<password>", "<email>"};
+    private final ServerFacade serverFacade;
 
-    public CLIManager(User user) {
+    public CLIManager(User user, ServerFacade serverFacade) {
         this.user = user;
         this.scanner = new Scanner(System.in);
+        this.serverFacade = serverFacade;
     }
 
     public void repl() {
@@ -64,7 +69,7 @@ public class CLIManager {
     }
 
     private void login(String username, String password) {
-
+        serverFacade.login(new UserData(username, password, null));
     }
 
     private void printHelp() {
