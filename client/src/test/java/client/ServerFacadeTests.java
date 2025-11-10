@@ -83,5 +83,17 @@ public class ServerFacadeTests {
                 output.toString());
     }
 
-
+    @Test
+    public void loginPositiveTest() {
+        var user = new UserData("username", "password", "email");
+        var auth = serverFacade.register(user);
+        serverFacade.logout(new AuthData(user.username(), auth));
+        output.reset();
+        var newAuth = serverFacade.login(user);
+        assertEquals("You are logged in as " + user.username() + "." + lineEnd, output.toString());
+        output.reset();
+        var otherAuth = serverFacade.login(user);
+        assertNotEquals(newAuth, otherAuth);
+        assertEquals("You are logged in as " + user.username() + "." + lineEnd, output.toString());
+    }
 }

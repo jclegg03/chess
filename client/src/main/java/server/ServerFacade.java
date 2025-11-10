@@ -25,7 +25,7 @@ public class ServerFacade {
 
     private enum HTTPMethod {GET, POST, DELETE, PUT}
 
-    public void login(UserData user) {
+    public String login(UserData user) {
         String json = serializer.toJson(user, UserData.class);
         var request = buildRequest("/session", json, HTTPMethod.POST);
 
@@ -34,7 +34,11 @@ public class ServerFacade {
 
         if (response.statusCode() != 200) {
             System.out.println("Username and password do not match.");
+            return null;
         }
+
+        System.out.println("You are logged in as " + user.username() + ".");
+        return serializer.fromJson(response.body(), AuthData.class).authToken();
     }
 
     public String register(UserData user) {
