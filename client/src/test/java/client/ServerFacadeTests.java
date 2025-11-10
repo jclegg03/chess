@@ -48,7 +48,7 @@ public class ServerFacadeTests {
     public void registerPositiveTest() {
         var user = new UserData("username", "password", "email");
         serverFacade.register(user);
-        assertEquals("Logged in as " + user.username() + "." + lineEnd, output.toString());
+        assertEquals("User registered. You are logged in as " + user.username() + "." + lineEnd, output.toString());
     }
 
     @Test

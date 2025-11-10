@@ -44,11 +44,17 @@ public class ServerFacade {
     public void register(UserData user) {
         try {
             String json = serializer.toJson(user, UserData.class);
-            var request = buildRequest("/session", json, HTTPMethod.POST);
+            var request = buildRequest("/user", json, HTTPMethod.POST);
 
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
+            if(response.statusCode() == 200) {
+                System.out.println("User registered. You are logged in as " + user.username() + ".");
+            }
+            else {
+                System.out.println(response.body());
+            }
         } catch (Exception e) {
             defaultErrorHandling();
         }
