@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import model.UserData;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -57,6 +58,16 @@ public class ServerFacade {
             }
         } catch (Exception e) {
             defaultErrorHandling();
+        }
+    }
+
+    public void blastRebels() {
+        try {
+            var request = buildRequest("/db", null, null, HTTPMethod.DELETE);
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            System.out.println("There was an error clearing the db.");
         }
     }
 
