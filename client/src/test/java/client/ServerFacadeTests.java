@@ -27,6 +27,7 @@ public class ServerFacadeTests {
     private UserData user = new UserData("username", "password", "email");
     private AuthData auth;
     private static PrintStream normalOut = System.out;
+    private static int port;
 
 
     @BeforeAll
@@ -34,7 +35,7 @@ public class ServerFacadeTests {
         PrintStream normalErr = System.err;
         System.setErr(new PrintStream(output));
         server = new Server();
-        var port = server.run(0);
+        port = server.run(0);
         System.setErr(normalErr);
         System.out.println("Started test HTTP server on " + port);
         serverFacade = new ServerFacade(port);
@@ -44,6 +45,7 @@ public class ServerFacadeTests {
     @BeforeEach
     public void reset() {
         serverFacade.clearDatabase();
+        serverFacade = new ServerFacade(port);
         output.reset();
     }
 
