@@ -122,7 +122,7 @@ public class Service {
         return gameDAO.selectAllGames();
     }
 
-    public void joinGame(AuthData auth, ChessGame.TeamColor color, int gameID) throws ServerException {
+    public GameData joinGame(AuthData auth, ChessGame.TeamColor color, int gameID) throws ServerException {
         isAuthorized(auth);
         GameData game = gameDAO.selectGame(gameID);
         if (color == null ||
@@ -144,6 +144,7 @@ public class Service {
             }
         }
         updateGame(game);
+        return game;
     }
 
     public void clearData() throws DataAccessException {

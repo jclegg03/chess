@@ -94,9 +94,11 @@ public class Server {
         try {
             var auth = getAuth(ctx);
             var req = serializer.fromJson(ctx.body(), JoinGameRequest.class);
-            service.joinGame(auth,
+            var res = service.joinGame(auth,
                     req.playerColor(),
                     req.gameID());
+
+            ctx.result(serializer.toJson(res, GameData.class));
         }
         catch (ServerException e) {
             handleServerException(e, ctx);
