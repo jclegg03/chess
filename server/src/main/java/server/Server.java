@@ -82,8 +82,8 @@ public class Server {
             var auth = getAuth(ctx);
             var req = serializer.fromJson(ctx.body(), CreateGameRequest.class);
             var gameID = service.createGame(auth, req.gameName());
-            var res = Map.of("gameID", gameID);
-            ctx.result(serializer.toJson(res, Map.class));
+            var json = serializer.toJson(new GameID(gameID), GameID.class);
+            ctx.result(json);
         }
         catch (ServerException e) {
             handleServerException(e, ctx);
