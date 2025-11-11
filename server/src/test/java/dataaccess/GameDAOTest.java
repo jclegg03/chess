@@ -61,7 +61,7 @@ class GameDAOTest {
     void updateGameSuccess() {
         try {
             id = gameDAO.insertGame(game);
-            game = new GameData(id, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+            game = new GameData(id, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game(), 0);
             game.game().makeMove(new ChessMove(new ChessPosition(2, 1), new ChessPosition(4, 1)));
             gameDAO.updateGame(game.gameID(), game);
             assertEquals(game, gameDAO.selectGame(game.gameID()));
@@ -98,7 +98,7 @@ class GameDAOTest {
     }
 
     GameData updateID(int id, GameData game) {
-        return new GameData(id, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+        return new GameData(id, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game(), 0);
     }
 
     @Test

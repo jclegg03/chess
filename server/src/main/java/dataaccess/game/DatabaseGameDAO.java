@@ -58,6 +58,7 @@ public class DatabaseGameDAO implements GameDAO {
                 white_username VARCHAR(100) DEFAULT NULL,
                 black_username VARCHAR(100) DEFAULT NULL,
                 game_data JSON NOT NULL,
+                num_observers INT DEFAULT 0,
                 PRIMARY KEY (id),
                 INDEX(name)
                 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;""";
@@ -89,14 +90,6 @@ public class DatabaseGameDAO implements GameDAO {
     public int insertGame(GameData game) throws DataAccessException {
         String statement = "INSERT INTO game (name, white_username, black_username, game_data)\n" +
                 "VALUES (?, ?, ?, ?);";
-//        String values = "VALUES ('";
-//
-//        values += addEscapes(game.gameName()) + "', '";
-//        values += addEscapes(game.whiteUsername()) + "', '" +
-//                  addEscapes(game.blackUsername()) + "', '" +
-//                  gameToJSON(game.game()) + "');";
-//
-//        statement += values;
 
         return DatabaseManager.executeInsertStatement(statement, game.gameName(), game.whiteUsername(),
                 game.blackUsername(), gameToJSON(game.game()));
@@ -104,18 +97,17 @@ public class DatabaseGameDAO implements GameDAO {
 
     @Override
     public void updateGame(int gameID, GameData game) throws DataAccessException {
-        String statement = "UPDATE game SET white_username = '" +
-                addEscapes(game.whiteUsername()) + "', black_username = '" +
-                addEscapes(game.blackUsername()) + "', game_data = '" +
-                gameToJSON(game.game()) + "' " +
-                "WHERE id = '" + gameID + "';";
+        String statement = "UPDATE game SET white_username = ?, black_username = ?, " +
+                "game_data = ?, num_observers = ? " +
+                "WHERE id = ?;";
 
-        DatabaseManager.executeVoidStatement(statement);
+        DatabaseManager.executeVoidStatement(statement, game.whiteUsername(),
+                game.blackUsername(), gameToJSON(game.game()), game.numObservers(), gameID);
     }
 
     @Override
     public GameData selectGame(int gameID) throws DataAccessException {
-        String statement = "SELECT name, white_username, black_username, game_data FROM game WHERE id = '" +
+        String statement = "SELECT name, white_username, black_username, game_data, num_observers FROM game WHERE id = '" +
                 gameID + "';";
 
         var res = DatabaseManager.executeSelectStatement(statement, result -> new GameData(
@@ -123,7 +115,8 @@ public class DatabaseGameDAO implements GameDAO {
                 fixNullUser(result.getString("white_username")),
                 fixNullUser(result.getString("black_username")),
                 result.getString("name"),
-                getGameFromString(result.getString("game_data"))
+                getGameFromString(result.getString("game_data")),
+                result.getInt("num_observers")
                 )
         );
 
@@ -147,7 +140,8 @@ public class DatabaseGameDAO implements GameDAO {
                 fixNullUser(result.getString("white_username")),
                 fixNullUser(result.getString("black_username")),
                 result.getString("name"),
-                getGameFromString(result.getString("game_data"))
+                getGameFromString(result.getString("game_data")),
+                result.getInt("num_observers")
             )
         );
 

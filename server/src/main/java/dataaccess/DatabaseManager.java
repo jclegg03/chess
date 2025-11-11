@@ -33,9 +33,12 @@ public class DatabaseManager {
         }
     }
 
-    public static void executeVoidStatement(String statement) throws DataAccessException {
+    public static void executeVoidStatement(String statement, Object ... args) throws DataAccessException {
         try (var conn = getConnection();
              var preparedStatement = conn.prepareStatement(statement)) {
+            for(int i = 0; i < args.length; i++) {
+                preparedStatement.setObject(i+1, args[i]);
+            }
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new DataAccessException("There was a database error", e);
