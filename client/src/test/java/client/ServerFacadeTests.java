@@ -18,7 +18,6 @@ public class ServerFacadeTests {
     private static ServerFacade serverFacade;
     private static ByteArrayOutputStream output = new ByteArrayOutputStream();
     private static String lineEnd = System.lineSeparator();
-    private String authToken = "";
     private UserData user = new UserData("username", "password", "email");
     private AuthData auth;
 
@@ -39,7 +38,7 @@ public class ServerFacadeTests {
     }
 
     private void createDefaultUser() {
-        authToken = serverFacade.register(user);
+        var authToken = serverFacade.register(user);
         output.reset();
         auth = new AuthData(user.username(), authToken);
     }
@@ -101,7 +100,9 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testListGames() {
-
+    public void testListGamesEmpty() {
+        createDefaultUser();
+        serverFacade.listGames(auth.authToken());
+        assertEquals("There are currently 0 games." + lineEnd, output.toString());
     }
 }

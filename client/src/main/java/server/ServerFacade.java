@@ -2,6 +2,8 @@ package server;
 
 import com.google.gson.Gson;
 import model.AuthData;
+import model.GameData;
+import model.GameDataList;
 import model.UserData;
 
 import java.net.URI;
@@ -66,6 +68,23 @@ public class ServerFacade {
             System.out.println("Bye " + auth.username() + "!");
         } else {
             System.out.println("Uh, doesn't look like you were even logged in to begin with.");
+        }
+    }
+
+    public void listGames(String authToken) {
+        var request = buildRequest("/game", authToken, null, HTTPMethod.GET);
+
+        var response = makeRequest(request);
+        if (response.statusCode() == 200) {
+            var games = serializer.fromJson(response.body(), GameDataList.class);
+            if(games.games().length == 0) {
+                System.out.println("There are currently 0 games.");
+                return;
+            }
+
+            for(GameData game : games.games()) {
+
+            }
         }
     }
 
