@@ -39,9 +39,13 @@ public class ServerFacade {
 
 
         HttpResponse<String> response = makeRequest(request);
+        if(response == null) {
+            printServerDown();
+            return null;
+        }
 
         if (response.statusCode() != 200) {
-            System.out.println("Username and password do not match.");
+
             return null;
         }
 
@@ -55,6 +59,10 @@ public class ServerFacade {
 
 
         HttpResponse<String> response = makeRequest(request);
+        if(response == null) {
+            printServerDown();
+            return null;
+        }
 
         if (response.statusCode() == 200) {
             System.out.println("User registered. You are logged in as " + user.username() + ".");
@@ -70,6 +78,11 @@ public class ServerFacade {
         var request = buildRequest("/session", auth.authToken(), null, HTTPMethod.DELETE);
 
         var response = makeRequest(request);
+        if(response == null) {
+            printServerDown();
+            return;
+        }
+
         if (response.statusCode() == 200) {
             System.out.println("Bye " + auth.username() + "!");
         } else {
@@ -81,6 +94,10 @@ public class ServerFacade {
         var request = buildRequest("/game", authToken, null, HTTPMethod.GET);
 
         var response = makeRequest(request);
+        if(response == null) {
+            printServerDown();
+            return;
+        }
         if (response.statusCode() == 200) {
             var games = serializer.fromJson(response.body(), GameDataList.class);
             if (games.games().length == 1) {
@@ -109,6 +126,10 @@ public class ServerFacade {
         var request = buildRequest("/game", authToken, json, HTTPMethod.POST);
 
         var response = makeRequest(request);
+        if(response == null) {
+            printServerDown();
+            return;
+        }
         if (response.statusCode() == 200) {
             var gameID = serializer.fromJson(response.body(), GameID.class);
             int id = remapGameID(gameID.gameID());
@@ -126,6 +147,10 @@ public class ServerFacade {
         var request = buildRequest("/game", authToken, json, HTTPMethod.PUT);
 
         var response = makeRequest(request);
+        if(response == null) {
+            printServerDown();
+            return;
+        }
         if(response.statusCode() == 200) {
             var game = serializer.fromJson(response.body(), GameData.class);
             System.out.println("Joined " + game.gameName() + " as the " + team + " player.");
@@ -204,5 +229,9 @@ public class ServerFacade {
 
     private void defaultErrorHandling() {
         System.out.println("There was an error with the server.");
+    }
+
+    private void printServerDown() {
+        System.out.println("The server is currently down.");
     }
 }
