@@ -5,7 +5,6 @@ import chess.ChessPosition;
 import chess.InvalidMoveException;
 import dataaccess.game.DatabaseGameDAO;
 import dataaccess.game.GameDAO;
-import dataaccess.game.LocalGameDAO;
 import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

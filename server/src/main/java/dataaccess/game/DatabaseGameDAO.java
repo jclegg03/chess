@@ -1,22 +1,11 @@
 package dataaccess.game;
 
 import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import model.GameData;
 import serializer.Serializer;
-
-import java.io.IOException;
-import java.io.Serial;
-import java.util.HashMap;
 
 public class DatabaseGameDAO implements GameDAO {
     private final Gson serializer;

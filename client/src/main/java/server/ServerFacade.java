@@ -1,19 +1,11 @@
 package server;
 
 import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import model.*;
 import serializer.Serializer;
 import ui.BoardPrinter;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
