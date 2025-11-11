@@ -18,6 +18,9 @@ public class ServerFacadeTests {
     private static ServerFacade serverFacade;
     private static ByteArrayOutputStream output = new ByteArrayOutputStream();
     private static String lineEnd = System.lineSeparator();
+    private String authToken = "";
+    private UserData user = new UserData("username", "password", "email");
+    private AuthData auth;
 
     @BeforeAll
     public static void init() {
@@ -33,6 +36,12 @@ public class ServerFacadeTests {
     public void reset() {
         serverFacade.clearDatabase();
         output.reset();
+    }
+
+    private void createDefaultUser() {
+        authToken = serverFacade.register(user);
+        output.reset();
+        auth = new AuthData(user.username(), authToken);
     }
 
     @AfterAll
@@ -59,19 +68,14 @@ public class ServerFacadeTests {
 
     @Test
     public void registerUserTwice() {
-        var user = new UserData("username", "password", "email");
-        serverFacade.register(user);
-        output.reset();
+        createDefaultUser();
         serverFacade.register(user);
         assertEquals("Username " + user.username() + " is already taken!" + lineEnd, output.toString());
     }
 
     @Test
     public void logoutPositiveTest() {
-        var user = new UserData("username", "password", "email");
-        var authToken = serverFacade.register(user);
-        var auth = new AuthData(user.username(), authToken);
-        output.reset();
+        createDefaultUser();
         serverFacade.logout(auth);
         assertEquals("Bye " + user.username() + "!" + lineEnd, output.toString());
     }
@@ -85,9 +89,8 @@ public class ServerFacadeTests {
 
     @Test
     public void loginPositiveTest() {
-        var user = new UserData("username", "password", "email");
-        var auth = serverFacade.register(user);
-        serverFacade.logout(new AuthData(user.username(), auth));
+        createDefaultUser();
+        serverFacade.logout(auth);
         output.reset();
         var newAuth = serverFacade.login(user);
         assertEquals("You are logged in as " + user.username() + "." + lineEnd, output.toString());
@@ -95,5 +98,10 @@ public class ServerFacadeTests {
         var otherAuth = serverFacade.login(user);
         assertNotEquals(newAuth, otherAuth);
         assertEquals("You are logged in as " + user.username() + "." + lineEnd, output.toString());
+    }
+
+    @Test
+    public void testListGames() {
+
     }
 }
