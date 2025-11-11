@@ -11,7 +11,7 @@ public class CLIManager {
     private final User user;
     private final Scanner scanner;
     private final String[] expectedLogin = {"login", "<username>", "<password>"};
-    private final String[] expectedRegister = {"login", "<username>", "<password>", "<email>"};
+    private final String[] expectedRegister = {"register", "<username>", "<password>", "<email>"};
     private final ServerFacade serverFacade;
 
     public CLIManager(User user, ServerFacade serverFacade) {
