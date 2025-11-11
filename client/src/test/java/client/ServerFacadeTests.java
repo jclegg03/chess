@@ -1,10 +1,16 @@
 package client;
 
+import chess.ChessBoard;
+import chess.ChessGame;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import server.Server;
 import server.ServerFacade;
+import ui.BoardPrinter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -163,5 +169,26 @@ public class ServerFacadeTests {
                 .append("Observers: 0" + lineEnd);
 
         assertEquals(expectedMany.toString(), output.toString());
+    }
+
+    @ParameterizedTest
+    @EnumSource(ChessGame.TeamColor.class)
+    public void testJoinGame(ChessGame.TeamColor color) {
+        createDefaultUser();
+        serverFacade.createGame(auth.authToken(), "game");
+        output.reset();
+
+        var board = new ChessBoard();
+        board.resetBoard();
+        BoardPrinter.print(board, color);
+        String expectedBoard = output.toString();
+        output.reset();
+
+        serverFacade.joinGame(auth.authToken(), 1, color);
+        var team = color == ChessGame.TeamColor.WHITE ? "white" : "black";
+        var expected = new StringBuilder("Joined game as the " + team + " player.")
+                .append(lineEnd)
+                .append(expectedBoard);
+        assertEquals(expected.toString(), output.toString());
     }
 }

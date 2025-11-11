@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import com.google.gson.Gson;
@@ -9,6 +10,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import model.*;
+import ui.BoardPrinter;
 
 import java.io.IOException;
 import java.net.URI;
@@ -150,8 +152,24 @@ public class ServerFacade {
         }
     }
     
-    public void joinGame(String authToken, int clientGameID) {
-        
+    public void joinGame(String authToken, int clientGameID, ChessGame.TeamColor color) {
+        String team = "black";
+        if(color == ChessGame.TeamColor.WHITE) {
+            team = "white";
+        }
+
+        var json = serializer.toJson(new JoinGameRequest(color, clientGameIDtoServerGameIDMap.get(clientGameID)));
+        var request = buildRequest("/game", authToken, json, HTTPMethod.PUT);
+
+        var response = makeRequest(request);
+        if(response.statusCode() == 200) {
+            var game = serializer.fromJson(response.body(), GameData.class);
+            System.out.println("Joined " + game.gameName() + " as the " + team + " player.");
+            BoardPrinter.print(game.game().getBoard(), color);
+        }
+        else {
+            System.out.println(response.statusCode());
+        }
     }
 
     public void clearDatabase() {
@@ -166,13 +184,13 @@ public class ServerFacade {
     }
 
     private int remapGameID(int serverGameID) {
-        int currentClientGameID = 1;
-        while (clientGameIDtoServerGameIDMap.get(currentClientGameID) != null) {
-            currentClientGameID++;
+        int currentID = 1;
+        while (clientGameIDtoServerGameIDMap.get(currentID) != null) {
+            currentID++;
         }
-        clientGameIDtoServerGameIDMap.put(currentClientGameID, serverGameID);
-        serverGameIDtoClientGameIDMap.put(serverGameID, currentClientGameID);
-        return currentClientGameID;
+        clientGameIDtoServerGameIDMap.put(currentID, serverGameID);
+        serverGameIDtoClientGameIDMap.put(serverGameID, currentID);
+        return currentID;
     }
 
     private HttpRequest buildRequest(String path, String header, String body, HTTPMethod method) {
