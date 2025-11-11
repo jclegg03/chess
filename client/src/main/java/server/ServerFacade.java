@@ -19,15 +19,14 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 public class ServerFacade {
     private static final HttpClient client = HttpClient.newHttpClient();
     private final String host;
     private final Gson serializer;
     private final Duration defaultTimeout = Duration.ofMillis(5000);
-    private HashMap<Integer, Integer> clientGameIDtoServerGameIDMap;
-    private HashMap<Integer, Integer> serverGameIDtoClientGameIDMap;
+    private final HashMap<Integer, Integer> clientGameIDtoServerGameIDMap;
+    private final HashMap<Integer, Integer> serverGameIDtoClientGameIDMap;
 
 
     public ServerFacade(int port) {
@@ -150,26 +149,30 @@ public class ServerFacade {
             System.out.println("Game " + name + " was created. It's ID is: " + id + ".");
         }
     }
+    
+    public void joinGame(String authToken, int clientGameID) {
+        
+    }
 
     public void clearDatabase() {
         try {
             var request = buildRequest("/db", null, null, HTTPMethod.DELETE);
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception e) {
             System.out.println("There was an error clearing the db.");
             throw new RuntimeException(e);
         }
     }
 
-    private int remapGameID(int id) {
-        int currentID = 1;
-        while (clientGameIDtoServerGameIDMap.get(currentID) != null) {
-            currentID++;
+    private int remapGameID(int serverGameID) {
+        int currentClientGameID = 1;
+        while (clientGameIDtoServerGameIDMap.get(currentClientGameID) != null) {
+            currentClientGameID++;
         }
-        clientGameIDtoServerGameIDMap.put(currentID, id);
-        serverGameIDtoClientGameIDMap.put(id, currentID);
-        return currentID;
+        clientGameIDtoServerGameIDMap.put(currentClientGameID, serverGameID);
+        serverGameIDtoClientGameIDMap.put(serverGameID, currentClientGameID);
+        return currentClientGameID;
     }
 
     private HttpRequest buildRequest(String path, String header, String body, HTTPMethod method) {
