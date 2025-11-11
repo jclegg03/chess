@@ -54,7 +54,7 @@ public class DatabaseGameDAO implements GameDAO {
         String init = """
                 CREATE TABLE IF NOT EXISTS game(
                 id INT NOT NULL UNIQUE,
-                name VARCHAR(100) NOT NULL UNIQUE,
+                name VARCHAR(100) NOT NULL,
                 white_username VARCHAR(100) DEFAULT NULL,
                 black_username VARCHAR(100) DEFAULT NULL,
                 game_data JSON NOT NULL,
