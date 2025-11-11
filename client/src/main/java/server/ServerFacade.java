@@ -10,6 +10,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import model.*;
+import serializer.Serializer;
 import ui.BoardPrinter;
 
 import java.io.IOException;
@@ -33,36 +34,7 @@ public class ServerFacade {
 
     public ServerFacade(int port) {
         host = "http://localhost:" + port;
-        serializer = new GsonBuilder()
-                .registerTypeAdapter(
-                        new TypeToken<HashMap<ChessPosition, ChessPiece>>() {
-                        }.getType(),
-                        new TypeAdapter<HashMap<ChessPosition, ChessPiece>>() {
-                            @Override
-                            public void write(JsonWriter out, HashMap<ChessPosition, ChessPiece> map) throws IOException {
-                                out.beginObject();
-                                for (var entry : map.entrySet()) {
-                                    out.name(entry.getKey().toString());
-                                    serializer.toJson(entry.getValue(), ChessPiece.class, out);
-                                }
-                                out.endObject();
-                            }
-
-                            @Override
-                            public HashMap<ChessPosition, ChessPiece> read(JsonReader in) throws IOException {
-                                HashMap<ChessPosition, ChessPiece> map = new HashMap<>();
-                                in.beginObject();
-                                while (in.hasNext()) {
-                                    String key = in.nextName();
-                                    ChessPiece value = serializer.fromJson(in, ChessPiece.class);
-                                    map.put(ChessPosition.fromString(key), value);
-                                }
-                                in.endObject();
-                                return map;
-                            }
-                        }
-                )
-                .create();
+        serializer = Serializer.serializer();
         clientGameIDtoServerGameIDMap = new HashMap<>();
         serverGameIDtoClientGameIDMap = new HashMap<>();
     }
