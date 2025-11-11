@@ -128,8 +128,8 @@ public class CLIManager {
     }
 
     private void invalidInput(String[] inputs) {
-            System.out.println("Command " + inputs[0] + " is not a valid input. Type help for a list of valid" +
-                    "inputs.");
+            System.out.println("Command \"" + inputs[0] + "\" is not a valid input. Type help for a list of valid" +
+                    " inputs.");
     }
 
     private void invalidInput(String[] inputs, String[] expectedFormat) {
