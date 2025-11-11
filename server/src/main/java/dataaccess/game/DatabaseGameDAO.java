@@ -53,7 +53,7 @@ public class DatabaseGameDAO implements GameDAO {
 
         String init = """
                 CREATE TABLE IF NOT EXISTS game(
-                id INT NOT NULL UNIQUE,
+                id INT UNIQUE AUTO_INCREMENT,
                 name VARCHAR(100) NOT NULL,
                 white_username VARCHAR(100) DEFAULT NULL,
                 black_username VARCHAR(100) DEFAULT NULL,
@@ -86,19 +86,20 @@ public class DatabaseGameDAO implements GameDAO {
     }
 
     @Override
-    public void insertGame(GameData game) throws DataAccessException {
-        String statement = "INSERT INTO game (id, name, white_username, black_username, game_data)\n";
-        String values = "VALUES ('";
+    public int insertGame(GameData game) throws DataAccessException {
+        String statement = "INSERT INTO game (name, white_username, black_username, game_data)\n" +
+                "VALUES (?, ?, ?, ?);";
+//        String values = "VALUES ('";
+//
+//        values += addEscapes(game.gameName()) + "', '";
+//        values += addEscapes(game.whiteUsername()) + "', '" +
+//                  addEscapes(game.blackUsername()) + "', '" +
+//                  gameToJSON(game.game()) + "');";
+//
+//        statement += values;
 
-        values += game.gameID() + "', '";
-        values += addEscapes(game.gameName()) + "', '";
-        values += addEscapes(game.whiteUsername()) + "', '" +
-                  addEscapes(game.blackUsername()) + "', '" +
-                  gameToJSON(game.game()) + "');";
-
-        statement += values;
-
-        DatabaseManager.executeVoidStatement(statement);
+        return DatabaseManager.executeInsertStatement(statement, game.gameName(), game.whiteUsername(),
+                game.blackUsername(), gameToJSON(game.game()));
     }
 
     @Override

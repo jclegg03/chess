@@ -4,6 +4,8 @@ import chess.ChessMove;
 import chess.ChessPosition;
 import chess.InvalidMoveException;
 import dataaccess.game.DatabaseGameDAO;
+import dataaccess.game.GameDAO;
+import dataaccess.game.LocalGameDAO;
 import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,14 +17,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameDAOTest {
-    DatabaseGameDAO gameDAO;
+    GameDAO gameDAO;
     int id = 0;
     GameData game = new GameData(id, "game");
 
     {
         try {
             gameDAO = new DatabaseGameDAO();
-        } catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
     }
@@ -39,10 +42,11 @@ class GameDAOTest {
     @Test
     void insertGameSuccess() {
         try {
-            gameDAO.insertGame(game);
+            var id = gameDAO.insertGame(game);
             var result = gameDAO.selectGame(id);
+            var expectedGame = new GameData(id, game.gameName());
 
-            assertEquals(game, result);
+            assertEquals(expectedGame, result);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -50,18 +54,14 @@ class GameDAOTest {
 
     @Test
     void insertGameFail() {
-        try {
-            gameDAO.insertGame(game);
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-        assertThrows(DataAccessException.class, () -> gameDAO.insertGame(game));
+        assertThrows(DataAccessException.class, () -> gameDAO.insertGame(new GameData(0, null)));
     }
 
     @Test
     void updateGameSuccess() {
         try {
-            gameDAO.insertGame(game);
+            id = gameDAO.insertGame(game);
+            game = new GameData(id, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
             game.game().makeMove(new ChessMove(new ChessPosition(2, 1), new ChessPosition(4, 1)));
             gameDAO.updateGame(game.gameID(), game);
             assertEquals(game, gameDAO.selectGame(game.gameID()));
@@ -97,10 +97,14 @@ class GameDAOTest {
         }
     }
 
+    GameData updateID(int id, GameData game) {
+        return new GameData(id, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+    }
+
     @Test
     void selectAllGamesSuccess() {
         try {
-            gameDAO.insertGame(game);
+            game = updateID(gameDAO.insertGame(game), game);
             var games = gameDAO.selectAllGames();
             GameData[] expected = {game};
             assertEquals(expected.length, games.length);
@@ -111,7 +115,7 @@ class GameDAOTest {
             }
 
             var game2 = new GameData(game.gameID() + 1, "cool");
-            gameDAO.insertGame(game2);
+            game2 = updateID(gameDAO.insertGame(game2), game2);
             var expected2 = new HashSet<>(List.of(game, game2));
             var arr = gameDAO.selectAllGames();
             var actual2 = new HashSet<GameData>();

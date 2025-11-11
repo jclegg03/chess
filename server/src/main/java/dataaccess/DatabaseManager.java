@@ -1,5 +1,7 @@
 package dataaccess;
 
+import io.javalin.http.HttpStatus;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,25 @@ public class DatabaseManager {
         try (var conn = getConnection();
              var preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("There was a database error", e);
+        }
+    }
+
+    public static int executeInsertStatement(String statement, String ... args) throws DataAccessException {
+        try (var conn = getConnection();
+             var preparedStatement = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
+            for(int i = 1; i <= args.length; i++) {
+                preparedStatement.setString(i, args[i-1]);
+            }
+            preparedStatement.executeUpdate();
+
+            var keys = preparedStatement.getGeneratedKeys();
+            if(keys.next()) {
+                return keys.getInt(1);
+            }
+
+            throw new DataAccessException("There was a database error", HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (SQLException e) {
             throw new DataAccessException("There was a database error", e);
         }

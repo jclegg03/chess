@@ -24,7 +24,6 @@ public class Service {
     private final UserDAO userDAO;
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
-    private static int currentGameID = 1;
 
 
     public Service() {
@@ -112,9 +111,8 @@ public class Service {
         if (gameName == null) {
             throw new ServerException("Error: bad request", HttpStatus.BAD_REQUEST);
         }
-        var game = new GameData(currentGameID, gameName);
-        addGame(game);
-        return currentGameID++;
+        var game = new GameData(0, gameName);
+        return addGame(game);
     }
 
     public GameData[] listGames(AuthData auth) throws ServerException {
@@ -161,9 +159,8 @@ public class Service {
         gameDAO.updateGame(game.gameID(), game);
     }
 
-    private void addGame(GameData game) throws DataAccessException {
-        gameDAO.insertGame(game);
-
+    private int addGame(GameData game) throws DataAccessException {
+        return gameDAO.insertGame(game);
     }
 
     private void isAuthorized(AuthData auth) throws ServerException {

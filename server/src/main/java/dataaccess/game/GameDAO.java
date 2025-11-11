@@ -4,7 +4,7 @@ import dataaccess.DataAccessException;
 import model.GameData;
 
 public interface GameDAO {
-    public void insertGame(GameData game) throws DataAccessException;
+    public int insertGame(GameData game) throws DataAccessException;
     public void updateGame(int gameID, GameData game) throws DataAccessException;
     public GameData selectGame(int gameID) throws DataAccessException;
     public GameData[] selectAllGames() throws DataAccessException;
