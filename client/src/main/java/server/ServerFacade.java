@@ -167,9 +167,6 @@ public class ServerFacade {
             System.out.println("Joined " + game.gameName() + " as the " + team + " player.");
             BoardPrinter.print(game.game().getBoard(), color);
         }
-        else {
-            System.out.println(response.statusCode());
-        }
     }
 
     public void clearDatabase() {
