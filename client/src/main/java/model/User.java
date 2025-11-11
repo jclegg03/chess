@@ -5,6 +5,22 @@ public class User {
     private String authToken;
     private String username;
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
+    public void setLoggedIn(boolean loggedIn) {
+        isLoggedIn = loggedIn;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public User() {
         isLoggedIn = false;
         authToken = null;

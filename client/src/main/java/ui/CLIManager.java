@@ -1,5 +1,6 @@
 package ui;
 
+import model.AuthData;
 import model.User;
 import model.UserData;
 import server.ServerFacade;
@@ -36,13 +37,23 @@ public class CLIManager {
     }
 
     private void loggedIn(String[] inputs) {
-
+        switch (inputs[0].toLowerCase()) {
+            case "help" -> printHelpLoggedIn();
+            case "logout" -> logout();
+            case "create" -> {
+                //TODO
+            }
+            case "list" -> {}//TODO
+            case "play" -> {} //TODO
+            case "observe" -> {}//TODO
+            default -> invalidInput(inputs);
+        }
     }
 
     private void loggedOut(String[] inputs) {
         switch (inputs[0].toLowerCase()) {
             case "help":
-                printHelp();
+                printHelpLoggedOut();
                 break;
             case "login":
                 if(inputs.length != expectedLogin.length) {
@@ -64,15 +75,29 @@ public class CLIManager {
         }
     }
 
-    private void register(String username, String password, String email) {
+    private void printHelpLoggedIn() {
 
+    }
+
+    private void createGame(String name) {
+
+    }
+
+    private void logout() {
+        serverFacade.logout(new AuthData(user.getUsername(), user.getAuthToken()));
+    }
+
+    private void register(String username, String password, String email) {
+        user.setAuthToken(serverFacade.register(new UserData(username, password, email)));
+        user.setUsername(username);
     }
 
     private void login(String username, String password) {
-        serverFacade.login(new UserData(username, password, null));
+        user.setAuthToken(serverFacade.login(new UserData(username, password, null)));
+        user.setUsername(username);
     }
 
-    private void printHelp() {
+    private void printHelpLoggedOut() {
         var helpString = EscapeSequences.SET_TEXT_COLOR_GREEN + "help" + EscapeSequences.RESET_TEXT_COLOR +
                 " - Tells you what commands you can use";
         var quitString = EscapeSequences.SET_TEXT_COLOR_GREEN + "quit" + EscapeSequences.RESET_TEXT_COLOR +
