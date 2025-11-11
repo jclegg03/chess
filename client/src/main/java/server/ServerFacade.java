@@ -1,10 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import model.AuthData;
-import model.GameData;
-import model.GameDataList;
-import model.UserData;
+import model.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -12,17 +9,21 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class ServerFacade {
     private static final HttpClient client = HttpClient.newHttpClient();
     private final String host;
     private final Gson serializer;
     private final Duration defaultTimeout = Duration.ofMillis(5000);
+    private HashMap<Integer, Integer> gameIDRemap;
 
     public ServerFacade(int port) {
         host = "http://localhost:" + port;
         serializer = new Gson();
+        gameIDRemap = new HashMap<>();
     }
 
     private enum HTTPMethod {GET, POST, DELETE, PUT}
@@ -83,8 +84,20 @@ public class ServerFacade {
             }
 
             for(GameData game : games.games()) {
-
+                //TODO
             }
+        }
+    }
+
+    public void createGame(String authToken, String name) {
+        var json = serializer.toJson(new CreateGameRequest(name), CreateGameRequest.class);
+        var request = buildRequest("/game", authToken, json, HTTPMethod.POST);
+
+        var response = makeRequest(request);
+        if (response.statusCode() == 200) {
+            var gameID = serializer.fromJson(response.body(), GameID.class);
+            int id = remapGameID(gameID.gameID());
+            System.out.println("Game " + name + " was created. It's ID is: " + id + ".");
         }
     }
 
@@ -97,6 +110,15 @@ public class ServerFacade {
             System.out.println("There was an error clearing the db.");
             throw new RuntimeException(e);
         }
+    }
+
+    private int remapGameID(int id) {
+        int currentID = 1;
+        while(gameIDRemap.get(currentID) != null) {
+            currentID++;
+        }
+        gameIDRemap.put(currentID, id);
+        return currentID;
     }
 
     private HttpRequest buildRequest(String path, String header, String body, HTTPMethod method) {

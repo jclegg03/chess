@@ -20,14 +20,18 @@ public class ServerFacadeTests {
     private static String lineEnd = System.lineSeparator();
     private UserData user = new UserData("username", "password", "email");
     private AuthData auth;
+    private static PrintStream normalOut = System.out;
+
 
     @BeforeAll
     public static void init() {
+        PrintStream normalErr = System.err;
+        System.setErr(new PrintStream(output));
         server = new Server();
         var port = server.run(0);
+        System.setErr(normalErr);
         System.out.println("Started test HTTP server on " + port);
         serverFacade = new ServerFacade(port);
-
         System.setOut(new PrintStream(output));
     }
 
@@ -47,7 +51,7 @@ public class ServerFacadeTests {
     static void stopServer() {
         server.stop();
 
-        System.setOut(System.out);
+        System.setOut(normalOut);
     }
 
 
@@ -104,5 +108,13 @@ public class ServerFacadeTests {
         createDefaultUser();
         serverFacade.listGames(auth.authToken());
         assertEquals("There are currently 0 games." + lineEnd, output.toString());
+    }
+
+    @Test
+    public void testCreateGame() {
+        createDefaultUser();
+        var name = "cool game";
+        serverFacade.createGame(auth.authToken(), name);
+        assertEquals("Game " + name + " was created. It's ID is: 1." + lineEnd, output.toString());
     }
 }
