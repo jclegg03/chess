@@ -1,8 +1,16 @@
 package server;
 
+import chess.ChessPiece;
+import chess.ChessPosition;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import model.*;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -18,12 +26,44 @@ public class ServerFacade {
     private final String host;
     private final Gson serializer;
     private final Duration defaultTimeout = Duration.ofMillis(5000);
-    private HashMap<Integer, Integer> gameIDRemap;
+    private HashMap<Integer, Integer> clientGameIDtoServerGameIDMap;
+    private HashMap<Integer, Integer> serverGameIDtoClientGameIDMap;
+
 
     public ServerFacade(int port) {
         host = "http://localhost:" + port;
-        serializer = new Gson();
-        gameIDRemap = new HashMap<>();
+        serializer = new GsonBuilder()
+                .registerTypeAdapter(
+                        new TypeToken<HashMap<ChessPosition, ChessPiece>>() {
+                        }.getType(),
+                        new TypeAdapter<HashMap<ChessPosition, ChessPiece>>() {
+                            @Override
+                            public void write(JsonWriter out, HashMap<ChessPosition, ChessPiece> map) throws IOException {
+                                out.beginObject();
+                                for (var entry : map.entrySet()) {
+                                    out.name(entry.getKey().toString());
+                                    serializer.toJson(entry.getValue(), ChessPiece.class, out);
+                                }
+                                out.endObject();
+                            }
+
+                            @Override
+                            public HashMap<ChessPosition, ChessPiece> read(JsonReader in) throws IOException {
+                                HashMap<ChessPosition, ChessPiece> map = new HashMap<>();
+                                in.beginObject();
+                                while (in.hasNext()) {
+                                    String key = in.nextName();
+                                    ChessPiece value = serializer.fromJson(in, ChessPiece.class);
+                                    map.put(ChessPosition.fromString(key), value);
+                                }
+                                in.endObject();
+                                return map;
+                            }
+                        }
+                )
+                .create();
+        clientGameIDtoServerGameIDMap = new HashMap<>();
+        serverGameIDtoClientGameIDMap = new HashMap<>();
     }
 
     private enum HTTPMethod {GET, POST, DELETE, PUT}
@@ -78,13 +118,23 @@ public class ServerFacade {
         var response = makeRequest(request);
         if (response.statusCode() == 200) {
             var games = serializer.fromJson(response.body(), GameDataList.class);
-            if(games.games().length == 0) {
-                System.out.println("There are currently 0 games.");
-                return;
+            if (games.games().length == 1) {
+                System.out.println("There is currently 1 game.");
+            }
+            else {
+                System.out.println("There are currently " + games.games().length + " games.");
             }
 
-            for(GameData game : games.games()) {
-                //TODO
+            for (GameData game : games.games()) {
+                System.out.println();
+                System.out.println(game.gameName() + ":");
+                System.out.println("Game id: " + serverGameIDtoClientGameIDMap.get(game.gameID()));
+                var whiteName = game.whiteUsername() == null ? "" : game.whiteUsername();
+                System.out.println("White Player: " + whiteName);
+                var blackName = game.blackUsername() == null ? "" : game.whiteUsername();
+                System.out.println("Black Player: " + blackName);
+                //TODO fix hard coding 0 here.
+                System.out.println("Observers: 0");
             }
         }
     }
@@ -114,10 +164,11 @@ public class ServerFacade {
 
     private int remapGameID(int id) {
         int currentID = 1;
-        while(gameIDRemap.get(currentID) != null) {
+        while (clientGameIDtoServerGameIDMap.get(currentID) != null) {
             currentID++;
         }
-        gameIDRemap.put(currentID, id);
+        clientGameIDtoServerGameIDMap.put(currentID, id);
+        serverGameIDtoClientGameIDMap.put(id, currentID);
         return currentID;
     }
 

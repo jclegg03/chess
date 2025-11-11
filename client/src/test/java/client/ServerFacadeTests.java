@@ -117,4 +117,51 @@ public class ServerFacadeTests {
         serverFacade.createGame(auth.authToken(), name);
         assertEquals("Game " + name + " was created. It's ID is: 1." + lineEnd, output.toString());
     }
+
+    @Test
+    public void testCreateAndListManyGames() {
+        createDefaultUser();
+        var name1 = "cool game";
+        var name2 = "Cooler game";
+
+        serverFacade.createGame(auth.authToken(), name1);
+        output.reset();
+        serverFacade.listGames(auth.authToken());
+        StringBuilder expected1 = new StringBuilder("There is currently 1 game." + lineEnd + lineEnd)
+                .append(name1 + ":" + lineEnd)
+                .append("Game id: " + 1 + lineEnd)
+                .append("White Player: " + lineEnd)
+                .append("Black Player: " + lineEnd)
+                .append("Observers: 0" + lineEnd);
+
+        assertEquals(expected1.toString(), output.toString());
+
+        serverFacade.createGame(auth.authToken(), name1);
+        serverFacade.createGame(auth.authToken(), name2);
+        output.reset();
+
+        serverFacade.listGames(auth.authToken());
+        StringBuilder expectedMany = new StringBuilder("There are currently 3 games." + lineEnd + lineEnd)
+                .append(name1 + ":" + lineEnd)
+                .append("Game id: " + 1 + lineEnd)
+                .append("White Player: " + lineEnd)
+                .append("Black Player: " + lineEnd)
+                .append("Observers: 0" + lineEnd);
+
+        expectedMany.append(lineEnd)
+                .append(name1 + ":" + lineEnd)
+                .append("Game id: " + 2 + lineEnd)
+                .append("White Player: " + lineEnd)
+                .append("Black Player: " + lineEnd)
+                .append("Observers: 0" + lineEnd);
+
+        expectedMany.append(lineEnd)
+                .append(name2 + ":" + lineEnd)
+                .append("Game id: " + 3 + lineEnd)
+                .append("White Player: " + lineEnd)
+                .append("Black Player: " + lineEnd)
+                .append("Observers: 0" + lineEnd);
+
+        assertEquals(expectedMany.toString(), output.toString());
+    }
 }
