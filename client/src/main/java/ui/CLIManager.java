@@ -93,7 +93,7 @@ public class CLIManager {
                         + " - watch the specified game"
         };
 
-        for(var string : helpStrings) {
+        for (var string : helpStrings) {
             System.out.println(string);
         }
     }
@@ -172,8 +172,12 @@ public class CLIManager {
     }
 
     private void register(String username, String password, String email) {
-        user.setAuthToken(serverFacade.register(new UserData(username, password, email)));
-        user.setUsername(username);
+        try {
+            user.setAuthToken(serverFacade.register(new UserData(username, password, email)));
+            user.setUsername(username);
+            user.setLoggedIn(true);
+        } catch (RuntimeException e) {
+        }
     }
 
     private void login(String username, String password) {

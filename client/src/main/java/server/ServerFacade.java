@@ -63,7 +63,7 @@ public class ServerFacade {
         HttpResponse<String> response = makeRequest(request);
         if(response == null) {
             printServerDown();
-            return null;
+            throw new RuntimeException();
         }
 
         if (response.statusCode() == 200) {
@@ -71,6 +71,7 @@ public class ServerFacade {
             return serializer.fromJson(response.body(), AuthData.class).authToken();
         } else if (response.statusCode() == 403) {
             System.out.println("Username " + user.username() + " is already taken!");
+            throw new RuntimeException();
         }
 
         return null;
