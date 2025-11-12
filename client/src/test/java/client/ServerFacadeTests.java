@@ -21,11 +21,11 @@ public class ServerFacadeTests {
 
     private static Server server;
     private static ServerFacade serverFacade;
-    private static ByteArrayOutputStream output = new ByteArrayOutputStream();
-    private static String lineEnd = System.lineSeparator();
-    private UserData user = new UserData("username", "password", "email");
+    private static final ByteArrayOutputStream output = new ByteArrayOutputStream();
+    private static final String lineEnd = System.lineSeparator();
+    private final UserData user = new UserData("username", "password", "email");
     private AuthData auth;
-    private static PrintStream normalOut = System.out;
+    private static final PrintStream normalOut = System.out;
     private static int port;
 
 
@@ -186,9 +186,9 @@ public class ServerFacadeTests {
 
         serverFacade.joinGame(auth.authToken(), 1, color);
         var team = color == ChessGame.TeamColor.WHITE ? "white" : "black";
-        var expected = new StringBuilder("Joined game as the " + team + " player.")
-                .append(lineEnd)
-                .append(expectedBoard);
-        assertEquals(expected.toString(), output.toString());
+        String expected = "Joined game as the " + team + " player." +
+                lineEnd +
+                expectedBoard;
+        assertEquals(expected, output.toString());
     }
 }

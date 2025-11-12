@@ -36,7 +36,7 @@ public class ServerFacade {
 
     public String login(UserData user) {
         String json = serializer.toJson(user, UserData.class);
-        var request = buildRequest("/session", json, HTTPMethod.POST);
+        var request = buildRequest("/session", json);
 
         //TODO Should this return a list of games too?
 
@@ -57,7 +57,7 @@ public class ServerFacade {
 
     public String register(UserData user) {
         String json = serializer.toJson(user, UserData.class);
-        var request = buildRequest("/user", json, HTTPMethod.POST);
+        var request = buildRequest("/user", json);
 
 
         HttpResponse<String> response = makeRequest(request);
@@ -245,8 +245,8 @@ public class ServerFacade {
         return null;
     }
 
-    private HttpRequest buildRequest(String path, String body, HTTPMethod method) {
-        return buildRequest(path, null, body, method);
+    private HttpRequest buildRequest(String path, String body) {
+        return buildRequest(path, null, body, HTTPMethod.POST);
     }
 
     private HttpResponse<String> makeRequest(HttpRequest request) {

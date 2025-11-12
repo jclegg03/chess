@@ -114,7 +114,7 @@ public class CLIManager {
     private void joinGame(String[] inputs) {
         try {
             var gameID = validateGameIDInput(inputs, expectedPlay);
-            var team = validateTeamColor(inputs, expectedPlay);
+            var team = validateTeamColor(inputs);
             serverFacade.joinGame(user.getAuthToken(), gameID, team);
         } catch (RuntimeException _) {
         }
@@ -129,9 +129,9 @@ public class CLIManager {
         }
     }
 
-    private ChessGame.TeamColor validateTeamColor(String[] inputs, String expected) {
+    private ChessGame.TeamColor validateTeamColor(String[] inputs) {
         if (inputs.length < 3) {
-            invalidInput(inputs, expected);
+            invalidInput(inputs, expectedRegister);
         }
 
         var color = inputs[2];
@@ -140,7 +140,7 @@ public class CLIManager {
         } else if (color.equalsIgnoreCase("black")) {
             return ChessGame.TeamColor.BLACK;
         } else {
-            invalidInput(inputs, expected);
+            invalidInput(inputs, expectedRegister);
             System.out.println("Player piece color must be either \"black\" or \"white\". Case doesn't matter.");
             throw new RuntimeException();
         }
