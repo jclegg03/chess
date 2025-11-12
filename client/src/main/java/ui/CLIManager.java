@@ -103,8 +103,9 @@ public class CLIManager {
             invalidInput(inputs, "create <game name>");
         }
 
-        var name = new StringBuilder();
-        for (int i = 1; i < inputs.length; i++) {
+        var name = new StringBuilder(inputs[1]);
+        for (int i = 2; i < inputs.length; i++) {
+            name.append(" ");
             name.append(inputs[i]);
         }
 
@@ -131,7 +132,7 @@ public class CLIManager {
 
     private ChessGame.TeamColor validateTeamColor(String[] inputs) {
         if (inputs.length < 3) {
-            invalidInput(inputs, expectedRegister);
+            invalidInput(inputs, expectedPlay);
         }
 
         var color = inputs[2];
@@ -140,7 +141,7 @@ public class CLIManager {
         } else if (color.equalsIgnoreCase("black")) {
             return ChessGame.TeamColor.BLACK;
         } else {
-            invalidInput(inputs, expectedRegister);
+            invalidInput(inputs, expectedPlay);
             System.out.println("Player piece color must be either \"black\" or \"white\". Case doesn't matter.");
             throw new RuntimeException();
         }

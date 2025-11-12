@@ -178,6 +178,13 @@ public class ServerFacade {
             System.out.println("Joined " + game.gameName() + " as the " + team + " player.");
             BoardPrinter.print(game.game().getBoard(), color);
         }
+        else if(response.statusCode() == 403) {
+            System.out.println("Someone is already playing as " + team + ". Use list to see which games don't" +
+                    " have players.");
+        }
+        else {
+            System.out.println("There was an error.");
+        }
     }
 
     public void observeGame(String authToken, int clientGameID) {
