@@ -181,7 +181,14 @@ public class ServerFacade {
     }
 
     public void observeGame(String authToken, int clientGameID) {
-        var json = serializer.toJson(new JoinGameRequest("observer", clientGameIDtoServerGameIDMap.get(clientGameID)));
+        var serverGameID = clientGameIDtoServerGameIDMap.get(clientGameID);
+
+        if(serverGameID == null) {
+            System.out.println("Bad game ID provided. Use list to get a list of valid game IDs");
+            return;
+        }
+
+        var json = serializer.toJson(new JoinGameRequest("observer", serverGameID));
         var request = buildRequest("/game", authToken, json, HTTPMethod.PUT);
 
         var response = makeRequest(request);

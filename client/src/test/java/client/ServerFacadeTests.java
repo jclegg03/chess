@@ -215,6 +215,17 @@ public class ServerFacadeTests {
     }
 
     @Test
+    public void testObserveGameBadID() {
+        createDefaultUser();
+        serverFacade.createGame(auth.authToken(), "game");
+        OUTPUT.reset();
+
+        serverFacade.observeGame(auth.authToken(), -1);
+        assertEquals("Bad game ID provided. Use list to get a list of valid game IDs" + lineEnd,
+                OUTPUT.toString());
+    }
+
+    @Test
     public void testObserveGame() {
         createDefaultUser();
         serverFacade.createGame(auth.authToken(), "ga");
