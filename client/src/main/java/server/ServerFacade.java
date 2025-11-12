@@ -110,7 +110,8 @@ public class ServerFacade {
             for (GameData game : games.games()) {
                 System.out.println();
                 System.out.println(game.gameName() + ":");
-                System.out.println("Game id: " + serverGameIDtoClientGameIDMap.get(game.gameID()));
+                var clientGameID = getClientGameID(game.gameID());
+                System.out.println("Game id: " + clientGameID);
                 var whiteName = game.whiteUsername() == null ? "" : game.whiteUsername();
                 System.out.println("White Player: " + whiteName);
                 var blackName = game.blackUsername() == null ? "" : game.whiteUsername();
@@ -119,6 +120,14 @@ public class ServerFacade {
                 System.out.println("Observers: 0");
             }
         }
+    }
+
+    private int getClientGameID(int serverGameID) {
+        var clientGameID = serverGameIDtoClientGameIDMap.get(serverGameID);
+        if(clientGameID == null) {
+            return remapGameID(serverGameID);
+        }
+        return clientGameID;
     }
 
     public void createGame(String authToken, String name) {
