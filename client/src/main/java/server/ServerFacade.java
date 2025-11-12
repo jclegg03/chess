@@ -43,7 +43,7 @@ public class ServerFacade {
         HttpResponse<String> response = makeRequest(request);
         if(response == null) {
             printServerDown();
-            return null;
+            throw new RuntimeException();
         }
 
         if (response.statusCode() != 200) {
