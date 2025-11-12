@@ -158,6 +158,10 @@ public class ServerFacade {
         }
     }
 
+    public void observeGame(String authToken, int clientGameID) {
+        //TODO
+    }
+
     public void clearDatabase() {
         try {
             var request = buildRequest("/db", null, null, HTTPMethod.DELETE);

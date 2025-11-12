@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import model.AuthData;
 import model.User;
 import model.UserData;
@@ -21,16 +22,15 @@ public class CLIManager {
     }
 
     public void repl() {
-        while(true) {
+        while (true) {
             String input = scanner.nextLine();
             var inputs = input.split(" ");
-            if(inputs[0].equalsIgnoreCase("quit") || inputs[0].equalsIgnoreCase("exit")) {
+            if (inputs[0].equalsIgnoreCase("quit") || inputs[0].equalsIgnoreCase("exit")) {
                 break;
             }
-            if(user.isLoggedIn()) {
+            if (user.isLoggedIn()) {
                 loggedIn(inputs);
-            }
-            else {
+            } else {
                 loggedOut(inputs);
             }
         }
@@ -40,12 +40,10 @@ public class CLIManager {
         switch (inputs[0].toLowerCase()) {
             case "help" -> printHelpLoggedIn();
             case "logout" -> logout();
-            case "create" -> {
-                //TODO
-            }
-            case "list" -> {}//TODO
-            case "play" -> {} //TODO
-            case "observe" -> {}//TODO
+            case "create" -> createGame(inputs);
+            case "list" -> listGames();
+            case "play" -> joinGame(inputs);
+            case "observe" -> observeGame(inputs);
             default -> invalidInput(inputs);
         }
     }
@@ -56,14 +54,14 @@ public class CLIManager {
                 printHelpLoggedOut();
                 break;
             case "login":
-                if(inputs.length != expectedLogin.length) {
+                if (inputs.length != expectedLogin.length) {
                     invalidInput(inputs, expectedLogin);
                     break;
                 }
                 login(inputs[1], inputs[2]);
                 break;
             case "register":
-                if(inputs.length != expectedRegister.length) {
+                if (inputs.length != expectedRegister.length) {
                     invalidInput(inputs, expectedRegister);
                     break;
                 }
@@ -76,11 +74,76 @@ public class CLIManager {
     }
 
     private void printHelpLoggedIn() {
-
+        //TODO
     }
 
-    private void createGame(String name) {
+    private void createGame(String[] inputs) {
+        if (inputs.length < 2) {
+            invalidInput(inputs, "create <game name>");
+        }
 
+        var name = new StringBuilder();
+        for (int i = 1; i < inputs.length; i++) {
+            name.append(inputs[i]);
+        }
+
+        serverFacade.createGame(user.getAuthToken(), name.toString());
+    }
+
+    private void joinGame(String[] inputs) {
+        var expected = "join <game id number> <player piece color>";
+        try {
+            var gameID = validateGameIDInput(inputs, expected);
+            var team = validateTeamColor(inputs, expected);
+            serverFacade.joinGame(user.getAuthToken(), gameID, team);
+        } catch (RuntimeException _) {
+        }
+    }
+
+    private void observeGame(String[] inputs) {
+        var expected = "observe <game id number>";
+        try {
+            var gameID = validateGameIDInput(inputs, expected);
+            serverFacade.observeGame(user.getAuthToken(), gameID);
+        } catch (RuntimeException _) {
+        }
+    }
+
+    private ChessGame.TeamColor validateTeamColor(String[] inputs, String expected) {
+        if(inputs.length < 3) {
+            invalidInput(inputs, expected);
+        }
+
+        var color = inputs[2];
+        if(color.equalsIgnoreCase("white")) {
+            return ChessGame.TeamColor.WHITE;
+        }
+        else if(color.equalsIgnoreCase("black")) {
+            return ChessGame.TeamColor.BLACK;
+        }
+        else {
+            invalidInput(inputs, expected);
+            System.out.println("Player piece color must be either \"black\" or \"white\". Case doesn't matter.");
+            throw new RuntimeException();
+        }
+    }
+
+    private int validateGameIDInput(String[] inputs, String expected) {
+        if(inputs.length < 2) {
+            invalidInput(inputs, expected);
+        }
+        try {
+            return Integer.parseInt(inputs[1]);
+        } catch (NumberFormatException e) {
+            invalidInput(inputs, expected);
+            System.out.println("(game id number must be a number like \"1\" or \"7\" but not" +
+                    "spelled out like \"nine\"");
+            throw new RuntimeException();
+        }
+    }
+
+    private void listGames() {
+        serverFacade.listGames(user.getAuthToken());
     }
 
     private void logout() {
@@ -104,40 +167,35 @@ public class CLIManager {
                 " - Exits the program";
         System.out.println(helpString);
         System.out.println(quitString);
-        if(user.isLoggedIn()) {
-
+        var loginString = new StringBuilder(EscapeSequences.SET_TEXT_COLOR_GREEN);
+        for (String item : expectedLogin) {
+            loginString.append(item);
+            loginString.append(" ");
         }
-        else {
-            var loginString = new StringBuilder(EscapeSequences.SET_TEXT_COLOR_GREEN);
-            for(String item : expectedLogin) {
-                loginString.append(item);
-                loginString.append(" ");
-            }
-            loginString.append(EscapeSequences.RESET_TEXT_COLOR);
-            loginString.append("- to gain access to our premium chess servers and games");
-            System.out.println(loginString);
+        loginString.append(EscapeSequences.RESET_TEXT_COLOR);
+        loginString.append("- to gain access to our premium chess servers and games");
+        System.out.println(loginString);
 
-            var registerString = new StringBuilder(EscapeSequences.SET_TEXT_COLOR_GREEN);
-            for(String item : expectedRegister) {
-                registerString.append(item).append(" ");
-            }
-            registerString.append(EscapeSequences.RESET_TEXT_COLOR);
-            registerString.append("- to create a user and login to our great server");
-            System.out.println(registerString);
+        var registerString = new StringBuilder(EscapeSequences.SET_TEXT_COLOR_GREEN);
+        for (String item : expectedRegister) {
+            registerString.append(item).append(" ");
         }
+        registerString.append(EscapeSequences.RESET_TEXT_COLOR);
+        registerString.append("- to create a user and login to our great server");
+        System.out.println(registerString);
     }
 
     private void invalidInput(String[] inputs) {
-            System.out.println("Command \"" + inputs[0] + "\" is not a valid input. Type help for a list of valid" +
-                    " inputs.");
+        System.out.println("Command \"" + inputs[0] + "\" is not a valid input. Type help for a list of valid" +
+                " inputs.");
     }
 
-    private void invalidInput(String[] inputs, String[] expectedFormat) {
+    private void invalidInput(String[] inputs, String... expectedFormat) {
         System.out.println("Invalid use of " + inputs[0] + ".");
         System.out.print("Expected: ");
-        for(String string : expectedFormat) {
+        for (String string : expectedFormat) {
             System.out.print(string + " ");
         }
-        System.out.print("\n");
+        System.out.println();
     }
 }
