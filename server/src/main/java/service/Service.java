@@ -104,6 +104,7 @@ public class Service {
         }
 
         authDAO.deleteAuth(auth);
+        //TODO Handle logging out/disconnecting while in a game
     }
 
     public int createGame(AuthData auth, String gameName) throws ServerException {
