@@ -148,6 +148,10 @@ public class ServerFacade {
     }
     
     public void joinGame(String authToken, int clientGameID, ChessGame.TeamColor color) {
+        if(color == null) {
+            System.out.println("You are a traitor and member of the rebel alliance. Take her away.");
+            return;
+        }
         String team = "black";
         if(color == ChessGame.TeamColor.WHITE) {
             team = "white";

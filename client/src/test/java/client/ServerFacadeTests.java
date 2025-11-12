@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import server.Server;
 import server.ServerFacade;
 import ui.BoardPrinter;
+import ui.EscapeSequences;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -189,6 +190,36 @@ public class ServerFacadeTests {
         String expected = "Joined game as the " + team + " player." +
                 lineEnd +
                 expectedBoard;
+        assertEquals(expected, OUTPUT.toString());
+    }
+
+    @Test
+    public void testJoinGameBad() {
+        createDefaultUser();
+        serverFacade.createGame(auth.authToken(), "game");
+        OUTPUT.reset();
+        serverFacade.joinGame(auth.authToken(), 1, null);
+        assertEquals("You are a traitor and member of the rebel alliance. Take her away." + lineEnd,
+                OUTPUT.toString());
+    }
+
+    @Test
+    public void testObserveGame() {
+        createDefaultUser();
+        serverFacade.createGame(auth.authToken(), "ga");
+        OUTPUT.reset();
+
+        var board = new ChessBoard();
+        board.resetBoard();
+        BoardPrinter.print(board, ChessGame.TeamColor.WHITE);
+        var expected = "You are now observing the epic game between " + EscapeSequences.SET_TEXT_COLOR_YELLOW
+                + "awaiting opponent" + EscapeSequences.RESET_TEXT_COLOR + " and " +
+                EscapeSequences.SET_TEXT_COLOR_MAGENTA + "awaiting contender" + EscapeSequences.RESET_TEXT_COLOR + "!"
+                + lineEnd + OUTPUT;
+
+        OUTPUT.reset();
+        serverFacade.observeGame(auth.authToken(), 1);
+
         assertEquals(expected, OUTPUT.toString());
     }
 }

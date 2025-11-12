@@ -131,6 +131,8 @@ public class Service {
 
         if(playerType.equals("observer")) {
             game = game.addObserver();
+            updateGame(game);
+            return game;
         }
 
         ChessGame.TeamColor color = null;
