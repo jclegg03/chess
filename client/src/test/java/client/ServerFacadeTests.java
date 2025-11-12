@@ -21,36 +21,36 @@ public class ServerFacadeTests {
 
     private static Server server;
     private static ServerFacade serverFacade;
-    private static final ByteArrayOutputStream output = new ByteArrayOutputStream();
-    private static final String lineEnd = System.lineSeparator();
+    private static final ByteArrayOutputStream OUTPUT = new ByteArrayOutputStream();
+    private final String lineEnd = System.lineSeparator();
     private final UserData user = new UserData("username", "password", "email");
     private AuthData auth;
-    private static final PrintStream normalOut = System.out;
+    private static final PrintStream NORMAL_OUT = System.out;
     private static int port;
 
 
     @BeforeAll
     public static void init() {
         PrintStream normalErr = System.err;
-        System.setErr(new PrintStream(output));
+        System.setErr(new PrintStream(OUTPUT));
         server = new Server();
         port = server.run(0);
         System.setErr(normalErr);
         System.out.println("Started test HTTP server on " + port);
         serverFacade = new ServerFacade(port);
-        System.setOut(new PrintStream(output));
+        System.setOut(new PrintStream(OUTPUT));
     }
 
     @BeforeEach
     public void reset() {
         serverFacade.clearDatabase();
         serverFacade = new ServerFacade(port);
-        output.reset();
+        OUTPUT.reset();
     }
 
     private void createDefaultUser() {
         var authToken = serverFacade.register(user);
-        output.reset();
+        OUTPUT.reset();
         auth = new AuthData(user.username(), authToken);
     }
 
@@ -58,7 +58,7 @@ public class ServerFacadeTests {
     static void stopServer() {
         server.stop();
 
-        System.setOut(normalOut);
+        System.setOut(NORMAL_OUT);
     }
 
 
@@ -66,55 +66,55 @@ public class ServerFacadeTests {
     public void loginNegativeTest() {
         var user = new UserData("username", "password", null);
         assertThrows(RuntimeException.class, ()-> serverFacade.login(user));
-        assertEquals("Username and password do not match." + lineEnd, output.toString());
+        assertEquals("Username and password do not match." + lineEnd, OUTPUT.toString());
     }
 
     @Test
     public void registerPositiveTest() {
         var user = new UserData("username", "password", "email");
         serverFacade.register(user);
-        assertEquals("User registered. You are logged in as " + user.username() + "." + lineEnd, output.toString());
+        assertEquals("User registered. You are logged in as " + user.username() + "." + lineEnd, OUTPUT.toString());
     }
 
     @Test
     public void registerUserTwice() {
         createDefaultUser();
         serverFacade.register(user);
-        assertEquals("Username " + user.username() + " is already taken!" + lineEnd, output.toString());
+        assertEquals("Username " + user.username() + " is already taken!" + lineEnd, OUTPUT.toString());
     }
 
     @Test
     public void logoutPositiveTest() {
         createDefaultUser();
         serverFacade.logout(auth);
-        assertEquals("Bye " + user.username() + "!" + lineEnd, output.toString());
+        assertEquals("Bye " + user.username() + "!" + lineEnd, OUTPUT.toString());
     }
 
     @Test
     public void logoutNoOne() {
         serverFacade.logout(new AuthData("", ""));
         assertEquals("Uh, doesn't look like you were even logged in to begin with." + lineEnd,
-                output.toString());
+                OUTPUT.toString());
     }
 
     @Test
     public void loginPositiveTest() {
         createDefaultUser();
         serverFacade.logout(auth);
-        output.reset();
+        OUTPUT.reset();
         var newAuth = serverFacade.login(user);
-        assertEquals("You are logged in as " + user.username() + "." + lineEnd, output.toString());
-        output.reset();
+        assertEquals("You are logged in as " + user.username() + "." + lineEnd, OUTPUT.toString());
+        OUTPUT.reset();
         var otherAuth = serverFacade.login(user);
         assertNotEquals(newAuth, otherAuth);
-        assertEquals("You are logged in as " + user.username() + "." + lineEnd, output.toString());
+        assertEquals("You are logged in as " + user.username() + "." + lineEnd, OUTPUT.toString());
     }
 
     @Test
     public void testListGamesEmpty() {
         createDefaultUser();
         serverFacade.listGames(auth.authToken());
-        assertEquals("There are currently 0 games." + lineEnd, output.toString());
+        assertEquals("There are currently 0 games." + lineEnd, OUTPUT.toString());
     }
 
     @Test
@@ -122,7 +122,7 @@ public class ServerFacadeTests {
         createDefaultUser();
         var name = "cool game";
         serverFacade.createGame(auth.authToken(), name);
-        assertEquals("Game " + name + " was created. It's ID is: 1." + lineEnd, output.toString());
+        assertEquals("Game " + name + " was created. It's ID is: 1." + lineEnd, OUTPUT.toString());
     }
 
     @Test
@@ -132,7 +132,7 @@ public class ServerFacadeTests {
         var name2 = "Cooler game";
 
         serverFacade.createGame(auth.authToken(), name1);
-        output.reset();
+        OUTPUT.reset();
         serverFacade.listGames(auth.authToken());
         String expected1 = "There is currently 1 game." + lineEnd + lineEnd +
                 name1 + ":" + lineEnd +
@@ -141,11 +141,11 @@ public class ServerFacadeTests {
                 "Black Player: " + lineEnd +
                 "Observers: 0" + lineEnd;
 
-        assertEquals(expected1, output.toString());
+        assertEquals(expected1, OUTPUT.toString());
 
         serverFacade.createGame(auth.authToken(), name1);
         serverFacade.createGame(auth.authToken(), name2);
-        output.reset();
+        OUTPUT.reset();
 
         serverFacade.listGames(auth.authToken());
 
@@ -168,7 +168,7 @@ public class ServerFacadeTests {
                 "Black Player: " + lineEnd +
                 "Observers: 0" + lineEnd;
 
-        assertEquals(expectedMany, output.toString());
+        assertEquals(expectedMany, OUTPUT.toString());
     }
 
     @ParameterizedTest
@@ -176,19 +176,19 @@ public class ServerFacadeTests {
     public void testJoinGame(ChessGame.TeamColor color) {
         createDefaultUser();
         serverFacade.createGame(auth.authToken(), "game");
-        output.reset();
+        OUTPUT.reset();
 
         var board = new ChessBoard();
         board.resetBoard();
         BoardPrinter.print(board, color);
-        String expectedBoard = output.toString();
-        output.reset();
+        String expectedBoard = OUTPUT.toString();
+        OUTPUT.reset();
 
         serverFacade.joinGame(auth.authToken(), 1, color);
         var team = color == ChessGame.TeamColor.WHITE ? "white" : "black";
         String expected = "Joined game as the " + team + " player." +
                 lineEnd +
                 expectedBoard;
-        assertEquals(expected, output.toString());
+        assertEquals(expected, OUTPUT.toString());
     }
 }

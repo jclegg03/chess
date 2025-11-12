@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 public class ServerFacade {
-    private static final HttpClient client = HttpClient.newHttpClient();
+    private final HttpClient client = HttpClient.newHttpClient();
     private final String host;
     private final Gson serializer;
     private final Duration defaultTimeout = Duration.ofMillis(5000);

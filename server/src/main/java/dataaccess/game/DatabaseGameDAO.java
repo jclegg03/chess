@@ -32,22 +32,6 @@ public class DatabaseGameDAO implements GameDAO {
         return serializer.toJson(game);
     }
 
-    private String addEscapes(String string) {
-        if(string == null) {
-            return null;
-        }
-
-        String result = "";
-        for(char c : string.toCharArray()) {
-            if(c == '\'') {
-                result += "\\";
-            }
-            result += c;
-        }
-
-        return result;
-    }
-
     @Override
     public int insertGame(GameData game) throws DataAccessException {
         String statement = "INSERT INTO game (name, white_username, black_username, game_data)\n" +
