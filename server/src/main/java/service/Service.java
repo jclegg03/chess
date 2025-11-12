@@ -124,9 +124,12 @@ public class Service {
     public GameData joinGame(AuthData auth, ChessGame.TeamColor color, int gameID) throws ServerException {
         isAuthorized(auth);
         GameData game = gameDAO.selectGame(gameID);
-        if (color == null ||
-                game == null) {
+        if (game == null) {
             throw new ServerException("Error: bad request", HttpStatus.BAD_REQUEST);
+        }
+
+        if(color == null) {
+            game = game.addObserver();
         }
 
         if (color == ChessGame.TeamColor.WHITE) {
@@ -135,7 +138,7 @@ public class Service {
             } else {
                 throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
             }
-        } else {
+        } else if (color == ChessGame.TeamColor.BLACK) {
             if (game.blackUsername() == null) {
                 game = game.setBlackUsername(auth.username());
             } else {

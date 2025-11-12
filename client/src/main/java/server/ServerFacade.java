@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import model.*;
 import serializer.Serializer;
 import ui.BoardPrinter;
+import ui.EscapeSequences;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,6 +38,7 @@ public class ServerFacade {
         String json = serializer.toJson(user, UserData.class);
         var request = buildRequest("/session", json, HTTPMethod.POST);
 
+        //TODO Should this return a list of games too?
 
         HttpResponse<String> response = makeRequest(request);
         if(response == null) {
@@ -116,8 +118,7 @@ public class ServerFacade {
                 System.out.println("White Player: " + whiteName);
                 var blackName = game.blackUsername() == null ? "" : game.whiteUsername();
                 System.out.println("Black Player: " + blackName);
-                //TODO fix hard coding 0 here.
-                System.out.println("Observers: 0");
+                System.out.println("Observers: " + game.numObservers());
             }
         }
     }
@@ -168,7 +169,24 @@ public class ServerFacade {
     }
 
     public void observeGame(String authToken, int clientGameID) {
-        //TODO
+        var json = serializer.toJson(new JoinGameRequest(null, clientGameIDtoServerGameIDMap.get(clientGameID)));
+        var request = buildRequest("/game", authToken, json, HTTPMethod.PUT);
+
+        var response = makeRequest(request);
+        if(response == null) {
+            printServerDown();
+            return;
+        }
+        if(response.statusCode() == 200) {
+            var game = serializer.fromJson(response.body(), GameData.class);
+            var whiteName = game.whiteUsername() == null? "awaiting opponent" : game.whiteUsername();
+            var blackName = game.blackUsername() == null? "awaiting contender" : game.blackUsername();
+            var observeText = "You are now observing the epic game between " + EscapeSequences.SET_TEXT_COLOR_YELLOW
+                    + whiteName + EscapeSequences.RESET_TEXT_COLOR + " and " + 
+                    EscapeSequences.SET_TEXT_COLOR_MAGENTA + blackName + EscapeSequences.RESET_TEXT_COLOR + "!";
+            System.out.println(observeText);
+            BoardPrinter.print(game.game().getBoard(), ChessGame.TeamColor.WHITE);
+        }
     }
 
     public void clearDatabase() {
@@ -245,6 +263,6 @@ public class ServerFacade {
     }
 
     private void printServerDown() {
-        System.out.println("The server is currently down.");
+        System.out.println("The server is currently down or took too long to respond.");
     }
 }
