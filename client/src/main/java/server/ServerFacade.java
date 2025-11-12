@@ -45,8 +45,8 @@ public class ServerFacade {
         }
 
         if (response.statusCode() != 200) {
-
-            return null;
+            System.out.println("There was an error logging you in.");
+            throw new RuntimeException();
         }
 
         System.out.println("You are logged in as " + user.username() + ".");

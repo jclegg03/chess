@@ -148,6 +148,9 @@ public class CLIManager {
 
     private void logout() {
         serverFacade.logout(new AuthData(user.getUsername(), user.getAuthToken()));
+        user.setAuthToken(null);
+        user.setUsername(null);
+        user.setLoggedIn(false);
     }
 
     private void register(String username, String password, String email) {
@@ -156,8 +159,12 @@ public class CLIManager {
     }
 
     private void login(String username, String password) {
-        user.setAuthToken(serverFacade.login(new UserData(username, password, null)));
-        user.setUsername(username);
+        try {
+            user.setAuthToken(serverFacade.login(new UserData(username, password, null)));
+            user.setUsername(username);
+            user.setLoggedIn(true);
+        } catch (RuntimeException _) {
+        }
     }
 
     private void printHelpLoggedOut() {
