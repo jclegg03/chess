@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class Serializer {
-    private static final Gson serializer = new GsonBuilder()
+    private static final Gson SERIALIZER = new GsonBuilder()
             .registerTypeAdapter(
                     new TypeToken<HashMap<ChessPosition, ChessPiece>>(){}.getType(),
                     new TypeAdapter<HashMap<ChessPosition, ChessPiece>>() {
@@ -22,7 +22,7 @@ public class Serializer {
                             out.beginObject();
                             for (var entry : map.entrySet()) {
                                 out.name(entry.getKey().toString());
-                                serializer.toJson(entry.getValue(), ChessPiece.class, out);
+                                SERIALIZER.toJson(entry.getValue(), ChessPiece.class, out);
                             }
                             out.endObject();
                         }
@@ -33,7 +33,7 @@ public class Serializer {
                             in.beginObject();
                             while (in.hasNext()) {
                                 String key = in.nextName();
-                                ChessPiece value = serializer.fromJson(in, ChessPiece.class);
+                                ChessPiece value = SERIALIZER.fromJson(in, ChessPiece.class);
                                 map.put(ChessPosition.fromString(key), value);
                             }
                             in.endObject();
@@ -44,6 +44,6 @@ public class Serializer {
             .serializeNulls()
             .create();
     public static Gson serializer() {
-        return serializer;
+        return SERIALIZER;
     }
 }
