@@ -80,7 +80,7 @@ public class ServerFacadeTests {
     @Test
     public void registerUserTwice() {
         createDefaultUser();
-        serverFacade.register(user);
+        assertThrows(RuntimeException.class,() -> serverFacade.register(user));
         assertEquals("Username " + user.username() + " is already taken!" + lineEnd, OUTPUT.toString());
     }
 
