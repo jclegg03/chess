@@ -116,7 +116,7 @@ public class CLIManager {
             var gameID = validateGameIDInput(inputs, expectedPlay);
             var team = validateTeamColor(inputs);
             serverFacade.joinGame(user.getAuthToken(), gameID, team);
-        } catch (RuntimeException _) {
+        } catch (RuntimeException e) {
         }
     }
 
@@ -125,7 +125,7 @@ public class CLIManager {
         try {
             var gameID = validateGameIDInput(inputs, expected);
             serverFacade.observeGame(user.getAuthToken(), gameID);
-        } catch (RuntimeException _) {
+        } catch (RuntimeException e) {
         }
     }
 
@@ -181,7 +181,7 @@ public class CLIManager {
             user.setAuthToken(serverFacade.login(new UserData(username, password, null)));
             user.setUsername(username);
             user.setLoggedIn(true);
-        } catch (RuntimeException _) {
+        } catch (RuntimeException e) {
         }
     }
 
