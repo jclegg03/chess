@@ -204,6 +204,17 @@ public class ServerFacadeTests {
     }
 
     @Test
+    public void testJoinGameBadID() {
+        createDefaultUser();
+        serverFacade.createGame(auth.authToken(), "game");
+        OUTPUT.reset();
+
+        serverFacade.joinGame(auth.authToken(), -1, ChessGame.TeamColor.WHITE);
+        assertEquals("Bad game ID provided. Use list to get a list of valid game IDs" + lineEnd,
+                OUTPUT.toString());
+    }
+
+    @Test
     public void testObserveGame() {
         createDefaultUser();
         serverFacade.createGame(auth.authToken(), "ga");

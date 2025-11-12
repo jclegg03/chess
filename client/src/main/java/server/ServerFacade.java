@@ -158,7 +158,14 @@ public class ServerFacade {
             team = "white";
         }
 
-        var json = serializer.toJson(new JoinGameRequest(color.toString(), clientGameIDtoServerGameIDMap.get(clientGameID)));
+        var serverGameID = clientGameIDtoServerGameIDMap.get(clientGameID);
+
+        if(serverGameID == null) {
+            System.out.println("Bad game ID provided. Use list to get a list of valid game IDs");
+            return;
+        }
+
+        var json = serializer.toJson(new JoinGameRequest(color.toString(), serverGameID));
         var request = buildRequest("/game", authToken, json, HTTPMethod.PUT);
 
         var response = makeRequest(request);
