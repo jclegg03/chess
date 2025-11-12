@@ -134,42 +134,41 @@ public class ServerFacadeTests {
         serverFacade.createGame(auth.authToken(), name1);
         output.reset();
         serverFacade.listGames(auth.authToken());
-        StringBuilder expected1 = new StringBuilder("There is currently 1 game." + lineEnd + lineEnd)
-                .append(name1 + ":" + lineEnd)
-                .append("Game id: " + 1 + lineEnd)
-                .append("White Player: " + lineEnd)
-                .append("Black Player: " + lineEnd)
-                .append("Observers: 0" + lineEnd);
+        String expected1 = "There is currently 1 game." + lineEnd + lineEnd +
+                name1 + ":" + lineEnd +
+                "Game id: " + 1 + lineEnd +
+                "White Player: " + lineEnd +
+                "Black Player: " + lineEnd +
+                "Observers: 0" + lineEnd;
 
-        assertEquals(expected1.toString(), output.toString());
+        assertEquals(expected1, output.toString());
 
         serverFacade.createGame(auth.authToken(), name1);
         serverFacade.createGame(auth.authToken(), name2);
         output.reset();
 
         serverFacade.listGames(auth.authToken());
-        StringBuilder expectedMany = new StringBuilder("There are currently 3 games." + lineEnd + lineEnd)
-                .append(name1 + ":" + lineEnd)
-                .append("Game id: " + 1 + lineEnd)
-                .append("White Player: " + lineEnd)
-                .append("Black Player: " + lineEnd)
-                .append("Observers: 0" + lineEnd);
 
-        expectedMany.append(lineEnd)
-                .append(name1 + ":" + lineEnd)
-                .append("Game id: " + 2 + lineEnd)
-                .append("White Player: " + lineEnd)
-                .append("Black Player: " + lineEnd)
-                .append("Observers: 0" + lineEnd);
+        String expectedMany = "There are currently 3 games." + lineEnd + lineEnd +
+                name1 + ":" + lineEnd +
+                "Game id: " + 1 + lineEnd +
+                "White Player: " + lineEnd +
+                "Black Player: " + lineEnd +
+                "Observers: 0" + lineEnd +
+                lineEnd +
+                name1 + ":" + lineEnd +
+                "Game id: " + 2 + lineEnd +
+                "White Player: " + lineEnd +
+                "Black Player: " + lineEnd +
+                "Observers: 0" + lineEnd +
+                lineEnd +
+                name2 + ":" + lineEnd +
+                "Game id: " + 3 + lineEnd +
+                "White Player: " + lineEnd +
+                "Black Player: " + lineEnd +
+                "Observers: 0" + lineEnd;
 
-        expectedMany.append(lineEnd)
-                .append(name2 + ":" + lineEnd)
-                .append("Game id: " + 3 + lineEnd)
-                .append("White Player: " + lineEnd)
-                .append("Black Player: " + lineEnd)
-                .append("Observers: 0" + lineEnd);
-
-        assertEquals(expectedMany.toString(), output.toString());
+        assertEquals(expectedMany, output.toString());
     }
 
     @ParameterizedTest
