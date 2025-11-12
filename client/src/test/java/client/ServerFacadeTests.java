@@ -65,7 +65,7 @@ public class ServerFacadeTests {
     @Test
     public void loginNegativeTest() {
         var user = new UserData("username", "password", null);
-        serverFacade.login(user);
+        assertThrows(RuntimeException.class, ()-> serverFacade.login(user));
         assertEquals("Username and password do not match." + lineEnd, output.toString());
     }
 

@@ -121,15 +121,24 @@ public class Service {
         return gameDAO.selectAllGames();
     }
 
-    public GameData joinGame(AuthData auth, ChessGame.TeamColor color, int gameID) throws ServerException {
+    public GameData joinGame(AuthData auth, String playerType, int gameID) throws ServerException {
         isAuthorized(auth);
         GameData game = gameDAO.selectGame(gameID);
-        if (game == null) {
+        if (game == null ||
+            playerType == null) {
             throw new ServerException("Error: bad request", HttpStatus.BAD_REQUEST);
         }
 
-        if(color == null) {
+        if(playerType.equals("observer")) {
             game = game.addObserver();
+        }
+
+        ChessGame.TeamColor color = null;
+        if(playerType.equalsIgnoreCase("white")) {
+            color = ChessGame.TeamColor.WHITE;
+        }
+        if(playerType.equalsIgnoreCase("black")) {
+            color = ChessGame.TeamColor.BLACK;
         }
 
         if (color == ChessGame.TeamColor.WHITE) {
@@ -138,12 +147,16 @@ public class Service {
             } else {
                 throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
             }
-        } else if (color == ChessGame.TeamColor.BLACK) {
+        }
+        else if (color == ChessGame.TeamColor.BLACK) {
             if (game.blackUsername() == null) {
                 game = game.setBlackUsername(auth.username());
             } else {
                 throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
             }
+        }
+        else {
+            throw new ServerException(playerType + " is an illegal color.", HttpStatus.BAD_REQUEST);
         }
         updateGame(game);
         return game;

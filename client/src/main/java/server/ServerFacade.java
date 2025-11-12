@@ -47,7 +47,7 @@ public class ServerFacade {
         }
 
         if (response.statusCode() != 200) {
-            System.out.println("There was an error logging you in.");
+            System.out.println("Username and password do not match.");
             throw new RuntimeException();
         }
 
@@ -153,7 +153,7 @@ public class ServerFacade {
             team = "white";
         }
 
-        var json = serializer.toJson(new JoinGameRequest(color, clientGameIDtoServerGameIDMap.get(clientGameID)));
+        var json = serializer.toJson(new JoinGameRequest(color.toString(), clientGameIDtoServerGameIDMap.get(clientGameID)));
         var request = buildRequest("/game", authToken, json, HTTPMethod.PUT);
 
         var response = makeRequest(request);
@@ -169,7 +169,7 @@ public class ServerFacade {
     }
 
     public void observeGame(String authToken, int clientGameID) {
-        var json = serializer.toJson(new JoinGameRequest(null, clientGameIDtoServerGameIDMap.get(clientGameID)));
+        var json = serializer.toJson(new JoinGameRequest("observer", clientGameIDtoServerGameIDMap.get(clientGameID)));
         var request = buildRequest("/game", authToken, json, HTTPMethod.PUT);
 
         var response = makeRequest(request);

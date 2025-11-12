@@ -88,7 +88,7 @@ public class ServiceUnitTests {
 
     @Test
     public void testNullAuthCausesFail() {
-        assertThrows(ServerException.class, () -> service.joinGame(null, ChessGame.TeamColor.WHITE, 0));
+        assertThrows(ServerException.class, () -> service.joinGame(null, "white", 0));
     }
 
     //Again impossible to test without implementing createUser
@@ -199,12 +199,12 @@ public class ServiceUnitTests {
 
     @Test
     public void testJoinGameGeneralFails() {
-        assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, ChessGame.TeamColor.WHITE, 0));
+        assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, "WHITE", 0));
 
         setup();
         int gameID = 0;
         // test joining a nonexistent game
-        assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, ChessGame.TeamColor.BLACK, gameID));
+        assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, "BLACK", gameID));
     }
 
     @Test
@@ -213,14 +213,14 @@ public class ServiceUnitTests {
             setup();
             var gameID = service.createGame(sampleAuth, "Game");
 
-            service.joinGame(sampleAuth, ChessGame.TeamColor.WHITE, gameID);
+            service.joinGame(sampleAuth, "WHITE", gameID);
             var game = service.listGames(sampleAuth)[0];
 
             var testGame = new GameData(gameID, "Game");
             testGame = testGame.setWhiteUsername(sampleAuth.username());
 
             assertEquals(testGame, game);
-            assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, ChessGame.TeamColor.WHITE, gameID));
+            assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, "WHITE", gameID));
         }
         catch (ServerException e) {
             throw new RuntimeException(e);
@@ -232,14 +232,14 @@ public class ServiceUnitTests {
         try {
             setup();
             var gameID = service.createGame(sampleAuth, "Game");
-            service.joinGame(sampleAuth, ChessGame.TeamColor.BLACK, gameID);
+            service.joinGame(sampleAuth, "BLACK", gameID);
             var game = service.listGames(sampleAuth)[0];
 
             var testGame = new GameData(gameID, "Game");
             testGame = testGame.setBlackUsername(sampleAuth.username());
             assertEquals(testGame, game);
 
-            assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, ChessGame.TeamColor.BLACK, gameID));
+            assertThrows(ServerException.class, () -> service.joinGame(sampleAuth, "BLACK", gameID));
         }
         catch (ServerException e) {
             throw new RuntimeException(e);
