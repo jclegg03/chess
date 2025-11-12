@@ -43,7 +43,7 @@ public class CLIManager {
             case "logout" -> logout();
             case "create" -> createGame(inputs);
             case "list" -> listGames();
-            case "play" -> joinGame(inputs);
+            case "play", "join" -> joinGame(inputs);
             case "observe" -> observeGame(inputs);
             default -> invalidInput(inputs);
         }
