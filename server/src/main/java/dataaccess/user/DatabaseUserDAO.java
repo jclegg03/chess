@@ -4,22 +4,20 @@ import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import model.UserData;
 
-import javax.xml.crypto.Data;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 public class DatabaseUserDAO implements UserDAO {
     public DatabaseUserDAO() throws DataAccessException {
         DatabaseManager.createDatabase();
 
-        String init = "CREATE TABLE IF NOT EXISTS users(\n" +
-                "id INT NOT NULL AUTO_INCREMENT,\n" +
-                "username VARCHAR(100) NOT NULL UNIQUE,\n" +
-                "password VARCHAR(60) NOT NULL,\n" +
-                "email VARCHAR(100) NOT NULL,\n" +
-                "PRIMARY KEY (id),\n" +
-                "INDEX(username)\n" +
-                ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
+        String init = """
+                CREATE TABLE IF NOT EXISTS users(
+                id INT NOT NULL AUTO_INCREMENT,
+                username VARCHAR(100) NOT NULL UNIQUE,
+                password VARCHAR(60) NOT NULL,
+                email VARCHAR(100) NOT NULL,
+                PRIMARY KEY (id),
+                INDEX(username)
+                )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;""";
 
         DatabaseManager.executeVoidStatement(init);
     }
