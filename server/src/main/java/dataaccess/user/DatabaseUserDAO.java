@@ -26,30 +26,26 @@ public class DatabaseUserDAO implements UserDAO {
 
     @Override
     public void insertUser(UserData user) throws DataAccessException {
-            String statement = "INSERT INTO users (username, password, email)\n";
-            String values = "VALUES ('";
+        String statement = "INSERT INTO users (username, password, email)\n";
+        String values = "VALUES (?, ?, ?);";
 
-            values += user.username() + "', '";
-            values += user.password() + "', '";
-            values += user.email() + "');";
+        statement += values;
 
-            statement += values;
-
-            DatabaseManager.executeVoidStatement(statement);
+        DatabaseManager.executeInsertStatement(statement, user.username(), user.password(), user.email());
     }
 
     @Override
     public UserData selectUser(String username) throws DataAccessException {
-        String statement = "SELECT password, email FROM users WHERE username = '" +
-                username + "';";
+        String statement = "SELECT password, email FROM users WHERE username = ?;";
         var res = DatabaseManager.executeSelectStatement(statement,
                 result -> new UserData(
                         username,
                         result.getString("password"),
                         result.getString("email")
-                ));
+                ), username
+        );
 
-        if(res.isEmpty()) {
+        if (res.isEmpty()) {
             return null;
         }
 

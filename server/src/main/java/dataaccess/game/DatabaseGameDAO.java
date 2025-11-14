@@ -53,20 +53,22 @@ public class DatabaseGameDAO implements GameDAO {
 
     @Override
     public GameData selectGame(int gameID) throws DataAccessException {
-        String statement = "SELECT name, white_username, black_username, game_data, num_observers FROM game WHERE id = '" +
-                gameID + "';";
+        String statement = "SELECT name, white_username, black_username, game_data, num_observers " +
+                "FROM game WHERE id = ?;";
 
-        var res = DatabaseManager.executeSelectStatement(statement, result -> new GameData(
-                gameID,
-                fixNullUser(result.getString("white_username")),
-                fixNullUser(result.getString("black_username")),
-                result.getString("name"),
-                getGameFromString(result.getString("game_data")),
-                result.getInt("num_observers")
-                )
+        var res = DatabaseManager.executeSelectStatement(statement,
+                result -> new GameData(
+                        gameID,
+                        fixNullUser(result.getString("white_username")),
+                        fixNullUser(result.getString("black_username")),
+                        result.getString("name"),
+                        getGameFromString(result.getString("game_data")),
+                        result.getInt("num_observers")
+                ),
+                gameID
         );
 
-        if(res.isEmpty()) {
+        if (res.isEmpty()) {
             return null;
         }
 
@@ -82,24 +84,22 @@ public class DatabaseGameDAO implements GameDAO {
         String statement = "SELECT * FROM game;";
 
         var res = DatabaseManager.executeSelectStatement(statement, result -> new GameData(
-                result.getInt("id"),
-                fixNullUser(result.getString("white_username")),
-                fixNullUser(result.getString("black_username")),
-                result.getString("name"),
-                getGameFromString(result.getString("game_data")),
-                result.getInt("num_observers")
-            )
+                        result.getInt("id"),
+                        fixNullUser(result.getString("white_username")),
+                        fixNullUser(result.getString("black_username")),
+                        result.getString("name"),
+                        getGameFromString(result.getString("game_data")),
+                        result.getInt("num_observers")
+                )
         );
 
         return res.toArray(new GameData[0]);
     }
 
     private String fixNullUser(String user) {
-        if("null".equals(user)) {
+        if ("null".equals(user)) {
             return null;
-        }
-        else
-        {
+        } else {
             return user;
         }
     }

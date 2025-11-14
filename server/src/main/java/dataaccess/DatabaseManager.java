@@ -64,10 +64,14 @@ public class DatabaseManager {
         }
     }
 
-    public static <T> List<T> executeSelectStatement(String statement, SQLtoJavaInator<T> converter)
+    public static <T> List<T> executeSelectStatement(String statement, SQLtoJavaInator<T> converter,
+                                                     Object ... args)
             throws DataAccessException {
         try (var conn = getConnection();
              var preparedStatement = conn.prepareStatement(statement)) {
+            for(int i = 0; i < args.length; i++) {
+                preparedStatement.setObject(i + 1, args[i]);
+            }
             try (var result = preparedStatement.executeQuery()) {
                 var list = new ArrayList<T>();
                 while(result.next()) {

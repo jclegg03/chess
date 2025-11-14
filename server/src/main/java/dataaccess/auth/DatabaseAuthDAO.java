@@ -21,25 +21,22 @@ public class DatabaseAuthDAO implements AuthDAO {
     @Override
     public void insertAuth(AuthData auth) throws DataAccessException {
         String statement = "INSERT INTO auth (username, token)\n";
-        String values = "VALUES ('";
-
-        values += auth.username() + "', '";
-        values += auth.authToken() + "');";
+        String values = "VALUES (?, ?);";
 
         statement += values;
 
-        DatabaseManager.executeVoidStatement(statement);
+        DatabaseManager.executeInsertStatement(statement, auth.username(), auth.authToken());
     }
 
     @Override
     public AuthData selectAuth(String authToken) throws DataAccessException {
-        String statement = "SELECT username FROM auth WHERE token = '" +
-                authToken + "';";
+        String statement = "SELECT username FROM auth WHERE token = ?;";
         var res = DatabaseManager.executeSelectStatement(statement,
                 result -> new AuthData(
                         result.getString("username"),
                         authToken
-                ));
+                ), authToken
+        );
 
         if(res.isEmpty()) {
             return null;
@@ -50,10 +47,9 @@ public class DatabaseAuthDAO implements AuthDAO {
 
     @Override
     public void deleteAuth(AuthData auth) throws DataAccessException {
-        String statement = "DELETE FROM auth WHERE token = '"
-                + auth.authToken() + "';";
+        String statement = "DELETE FROM auth WHERE token = ?;";
 
-        DatabaseManager.executeVoidStatement(statement);
+        DatabaseManager.executeVoidStatement(statement, auth.authToken());
     }
 
     @Override
