@@ -16,11 +16,13 @@ public class Server {
     private final Javalin server;
     private final Gson serializer;
     private final Service service;
+    private final WebSocketManager webSocketManager;
 
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
         serializer = new Gson();
         service = new Service();
+        webSocketManager = new WebSocketManager();
 
         server.delete("db", this::clear);
         server.delete("session", this::logout);
@@ -29,6 +31,11 @@ public class Server {
         server.post("game", this::createGame);
         server.put("game", this::joinGame);
         server.get("game", this::listGames);
+        server.ws("ws", ws -> {
+            ws.onConnect(webSocketManager);
+            ws.onMessage(webSocketManager);
+            ws.onClose(webSocketManager);
+        });
     }
 
     private void clear(Context ctx) {
