@@ -24,10 +24,8 @@ public class Service {
     private final UserDAO userDAO;
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
-    private GameRooms gameRooms;
 
-
-    public Service(GameRooms gameRooms) {
+    public Service() {
         UserDAO userDAO;
         GameDAO gameDAO;
         AuthDAO authDAO;
@@ -45,7 +43,6 @@ public class Service {
         this.userDAO = userDAO;
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
-        this.gameRooms = gameRooms;
     }
 
     public Service(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
@@ -110,7 +107,7 @@ public class Service {
     }
 
     public int createGame(AuthData auth, String gameName) throws ServerException {
-        isAuthorized(auth);
+        checkAuth(auth);
         if (gameName == null) {
             throw new ServerException("Error: bad request", HttpStatus.BAD_REQUEST);
         }
@@ -119,30 +116,16 @@ public class Service {
     }
 
     public GameData[] listGames(AuthData auth) throws ServerException {
-        isAuthorized(auth);
+        checkAuth(auth);
         return gameDAO.selectAllGames();
     }
 
-    public GameData joinGame(AuthData auth, String playerType, int gameID) throws ServerException {
-        isAuthorized(auth);
+    public GameData joinGame(AuthData auth, ChessGame.TeamColor color, int gameID) throws ServerException {
+        checkAuth(auth);
         GameData game = gameDAO.selectGame(gameID);
         if (game == null ||
-            playerType == null) {
+                color == null) {
             throw new ServerException("Error: bad request", HttpStatus.BAD_REQUEST);
-        }
-
-        if(playerType.equals("observer")) {
-            game = game.addObserver();
-            updateGame(game);
-            return game;
-        }
-
-        ChessGame.TeamColor color = null;
-        if(playerType.equalsIgnoreCase("white")) {
-            color = ChessGame.TeamColor.WHITE;
-        }
-        if(playerType.equalsIgnoreCase("black")) {
-            color = ChessGame.TeamColor.BLACK;
         }
 
         if (color == ChessGame.TeamColor.WHITE) {
@@ -151,17 +134,27 @@ public class Service {
             } else {
                 throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
             }
-        }
-        else if (color == ChessGame.TeamColor.BLACK) {
+        } else if (color == ChessGame.TeamColor.BLACK) {
             if (game.blackUsername() == null) {
                 game = game.setBlackUsername(auth.username());
             } else {
                 throw new ServerException("Error: color already taken", HttpStatus.FORBIDDEN);
             }
+        } else {
+            throw new ServerException(color + " is an illegal color.", HttpStatus.BAD_REQUEST);
         }
-        else {
-            throw new ServerException(playerType + " is an illegal color.", HttpStatus.BAD_REQUEST);
+        updateGame(game);
+        return game;
+    }
+
+    public GameData observeGame(AuthData auth, int gameID) throws ServerException {
+        checkAuth(auth);
+        GameData game = gameDAO.selectGame(gameID);
+        if (game == null) {
+            throw new ServerException("Error: bad request (game does not exist)", HttpStatus.BAD_REQUEST);
         }
+
+        game.addObserver(auth.username());
         updateGame(game);
         return game;
     }
@@ -184,7 +177,7 @@ public class Service {
         return gameDAO.insertGame(game);
     }
 
-    private void isAuthorized(AuthData auth) throws ServerException {
+    private void checkAuth(AuthData auth) throws ServerException {
         if (auth == null) {
             throw new ServerException("Error: unauthorized", HttpStatus.UNAUTHORIZED);
         }
