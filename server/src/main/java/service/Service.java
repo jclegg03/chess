@@ -24,9 +24,10 @@ public class Service {
     private final UserDAO userDAO;
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
+    private GameRooms gameRooms;
 
 
-    public Service() {
+    public Service(GameRooms gameRooms) {
         UserDAO userDAO;
         GameDAO gameDAO;
         AuthDAO authDAO;
@@ -44,6 +45,7 @@ public class Service {
         this.userDAO = userDAO;
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
+        this.gameRooms = gameRooms;
     }
 
     public Service(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
