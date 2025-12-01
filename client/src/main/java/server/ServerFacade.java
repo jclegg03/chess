@@ -119,7 +119,7 @@ public class ServerFacade {
                 System.out.println("White Player: " + whiteName);
                 var blackName = game.blackUsername() == null ? "" : game.whiteUsername();
                 System.out.println("Black Player: " + blackName);
-                System.out.println("Observers: " + game.numObservers());
+                System.out.println("Observers: " + game.observers().size());
             }
         }
     }
@@ -165,7 +165,7 @@ public class ServerFacade {
             return;
         }
 
-        var json = serializer.toJson(new JoinGameRequest(color.toString(), serverGameID));
+        var json = serializer.toJson(new JoinGameRequest(color, serverGameID));
         var request = buildRequest("/game", authToken, json, HTTPMethod.PUT);
 
         var response = makeRequest(request);
@@ -195,9 +195,8 @@ public class ServerFacade {
             return;
         }
 
-        //TODO fix observer joining with join HTTP endpoint
-        var json = serializer.toJson(new JoinGameRequest("observer", serverGameID));
-        var request = buildRequest("/game", authToken, json, HTTPMethod.PUT);
+        var json = serializer.toJson(new JoinGameRequest(serverGameID));
+        var request = buildRequest("/observe", authToken, json, HTTPMethod.PUT);
 
         var response = makeRequest(request);
         if(response == null) {
@@ -206,14 +205,18 @@ public class ServerFacade {
         }
         if(response.statusCode() == 200) {
             var game = serializer.fromJson(response.body(), GameData.class);
-            var whiteName = game.whiteUsername() == null? "awaiting opponent" : game.whiteUsername();
-            var blackName = game.blackUsername() == null? "awaiting contender" : game.blackUsername();
-            var observeText = "You are now observing the epic game between " + EscapeSequences.SET_TEXT_COLOR_YELLOW
-                    + whiteName + EscapeSequences.RESET_TEXT_COLOR + " and " + 
-                    EscapeSequences.SET_TEXT_COLOR_MAGENTA + blackName + EscapeSequences.RESET_TEXT_COLOR + "!";
+            var observeText = getObserveText(game);
             System.out.println(observeText);
             BoardPrinter.print(game.game().getBoard(), ChessGame.TeamColor.WHITE);
         }
+    }
+
+    private String getObserveText(GameData game) {
+        var whiteName = game.whiteUsername() == null? "awaiting opponent" : game.whiteUsername();
+        var blackName = game.blackUsername() == null? "awaiting contender" : game.blackUsername();
+        return "You are now observing the epic game between " + EscapeSequences.SET_TEXT_COLOR_YELLOW
+                + whiteName + EscapeSequences.RESET_TEXT_COLOR + " and " +
+                EscapeSequences.SET_TEXT_COLOR_MAGENTA + blackName + EscapeSequences.RESET_TEXT_COLOR + "!";
     }
 
     public void clearDatabase() {

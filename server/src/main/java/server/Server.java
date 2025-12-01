@@ -31,6 +31,7 @@ public class Server {
         server.post("session", this::login);
         server.post("game", this::createGame);
         server.put("game", this::joinGame);
+        server.put("observe", this::observeGame);
         server.get("game", this::listGames);
         server.ws("ws", ws -> {
             ws.onConnect(webSocketManager);
@@ -105,6 +106,19 @@ public class Server {
             var res = service.joinGame(auth,
                     req.playerColor(),
                     req.gameID());
+
+            ctx.result(serializer.toJson(res, GameData.class));
+        }
+        catch (ServerException e) {
+            handleServerException(e, ctx);
+        }
+    }
+
+    private void observeGame(Context ctx) {
+        try {
+            var auth = getAuth(ctx);
+            var req = serializer.fromJson(ctx.body(), JoinGameRequest.class);
+            var res = service.observeGame(auth, req.gameID());
 
             ctx.result(serializer.toJson(res, GameData.class));
         }
