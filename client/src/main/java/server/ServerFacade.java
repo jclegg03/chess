@@ -195,6 +195,7 @@ public class ServerFacade {
             return;
         }
 
+        //TODO fix observer joining with join HTTP endpoint
         var json = serializer.toJson(new JoinGameRequest("observer", serverGameID));
         var request = buildRequest("/game", authToken, json, HTTPMethod.PUT);
 
