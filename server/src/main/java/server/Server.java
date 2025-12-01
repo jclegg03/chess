@@ -7,6 +7,8 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 import model.*;
+import server.websocket.WebSocketManager;
+import service.GameRooms;
 import service.Service;
 
 import java.util.Map;
@@ -17,12 +19,14 @@ public class Server {
     private final Gson serializer;
     private final Service service;
     private final WebSocketManager webSocketManager;
+    private final GameRooms gameRooms;
 
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
         serializer = new Gson();
-        service = new Service();
-        webSocketManager = new WebSocketManager();
+        gameRooms = new GameRooms();
+        service = new Service(gameRooms);
+        webSocketManager = new WebSocketManager(gameRooms);
 
         server.delete("db", this::clear);
         server.delete("session", this::logout);
