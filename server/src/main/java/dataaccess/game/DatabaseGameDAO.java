@@ -7,6 +7,8 @@ import dataaccess.DatabaseManager;
 import model.GameData;
 import serializer.Serializer;
 
+import java.util.ArrayList;
+
 public class DatabaseGameDAO implements GameDAO {
     private final Gson serializer;
 
@@ -20,7 +22,7 @@ public class DatabaseGameDAO implements GameDAO {
                 white_username VARCHAR(100) DEFAULT NULL,
                 black_username VARCHAR(100) DEFAULT NULL,
                 game_data JSON NOT NULL,
-                num_observers INT DEFAULT 0,
+                observers JSON NOT NULL,
                 PRIMARY KEY (id),
                 INDEX(name)
                 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;""";
@@ -34,26 +36,26 @@ public class DatabaseGameDAO implements GameDAO {
 
     @Override
     public int insertGame(GameData game) throws DataAccessException {
-        String statement = "INSERT INTO game (name, white_username, black_username, game_data)\n" +
-                "VALUES (?, ?, ?, ?);";
+        String statement = "INSERT INTO game (name, white_username, black_username, game_data, observers)\n" +
+                "VALUES (?, ?, ?, ?, ?);";
 
         return DatabaseManager.executeInsertStatement(statement, game.gameName(), game.whiteUsername(),
-                game.blackUsername(), gameToJSON(game.game()));
+                game.blackUsername(), gameToJSON(game.game()), serializer.toJson(game.observers()));
     }
 
     @Override
     public void updateGame(int gameID, GameData game) throws DataAccessException {
         String statement = "UPDATE game SET white_username = ?, black_username = ?, " +
-                "game_data = ?, num_observers = ? " +
+                "game_data = ?, observers = ? " +
                 "WHERE id = ?;";
 
         DatabaseManager.executeVoidStatement(statement, game.whiteUsername(),
-                game.blackUsername(), gameToJSON(game.game()), game.numObservers(), gameID);
+                game.blackUsername(), gameToJSON(game.game()), serializer.toJson(game.observers()), gameID);
     }
 
     @Override
     public GameData selectGame(int gameID) throws DataAccessException {
-        String statement = "SELECT name, white_username, black_username, game_data, num_observers " +
+        String statement = "SELECT name, white_username, black_username, game_data, observers " +
                 "FROM game WHERE id = ?;";
 
         var res = DatabaseManager.executeSelectStatement(statement,
@@ -63,7 +65,7 @@ public class DatabaseGameDAO implements GameDAO {
                         fixNullUser(result.getString("black_username")),
                         result.getString("name"),
                         getGameFromString(result.getString("game_data")),
-                        result.getInt("num_observers")
+                        serializer.fromJson(result.getString("observers"), ArrayList.class)
                 ),
                 gameID
         );
@@ -89,7 +91,7 @@ public class DatabaseGameDAO implements GameDAO {
                         fixNullUser(result.getString("black_username")),
                         result.getString("name"),
                         getGameFromString(result.getString("game_data")),
-                        result.getInt("num_observers")
+                        serializer.fromJson(result.getString("observers"), ArrayList.class)
                 )
         );
 

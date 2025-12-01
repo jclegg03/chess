@@ -9,6 +9,7 @@ import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -60,7 +61,7 @@ class GameDAOTest {
     void updateGameSuccess() {
         try {
             id = gameDAO.insertGame(game);
-            game = new GameData(id, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game(), 0);
+            game = new GameData(id, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game(), new ArrayList<>());
             game.game().makeMove(new ChessMove(new ChessPosition(2, 1), new ChessPosition(4, 1)));
             gameDAO.updateGame(game.gameID(), game);
             assertEquals(game, gameDAO.selectGame(game.gameID()));
@@ -97,7 +98,7 @@ class GameDAOTest {
     }
 
     GameData updateID(int id, GameData game) {
-        return new GameData(id, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game(), 0);
+        return new GameData(id, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game(), game.observers());
     }
 
     @Test
