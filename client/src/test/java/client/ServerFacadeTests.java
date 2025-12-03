@@ -214,30 +214,26 @@ public class ServerFacadeTests {
     public void testObserveGameBadID() {
         createDefaultUser();
         serverFacade.createGame(auth.authToken(), "game");
-        OUTPUT.reset();
 
-        serverFacade.observeGame(auth.authToken(), -1);
-        assertEquals("Bad game ID provided. Use list to get a list of valid game IDs" + lineEnd,
-                OUTPUT.toString());
+        var response = serverFacade.observeGame(auth.authToken(), -1);
+        var expected = new JoinGameResponse(false, null,
+                "Bad game ID provided. Use list to get a list of valid game IDs");
+        assertEquals(expected, response);
     }
 
     @Test
     public void testObserveGame() {
         createDefaultUser();
         serverFacade.createGame(auth.authToken(), "ga");
-        OUTPUT.reset();
 
-        var board = new ChessBoard();
-        board.resetBoard();
-        BoardPrinter.print(board, ChessGame.TeamColor.WHITE);
-        var expected = "You are now observing the epic game between " + EscapeSequences.SET_TEXT_COLOR_YELLOW
+        var game = new ChessGame();
+        var expected = new JoinGameResponse(true, game,
+                "You are now observing the epic game between " + EscapeSequences.SET_TEXT_COLOR_YELLOW
                 + "awaiting opponent" + EscapeSequences.RESET_TEXT_COLOR + " and " +
-                EscapeSequences.SET_TEXT_COLOR_MAGENTA + "awaiting contender" + EscapeSequences.RESET_TEXT_COLOR + "!"
-                + lineEnd + OUTPUT;
+                EscapeSequences.SET_TEXT_COLOR_MAGENTA + "awaiting contender" + EscapeSequences.RESET_TEXT_COLOR + "!");
 
-        OUTPUT.reset();
-        serverFacade.observeGame(auth.authToken(), 1);
+        var response = serverFacade.observeGame(auth.authToken(), 1);
 
-        assertEquals(expected, OUTPUT.toString());
+        assertEquals(expected, response);
     }
 }

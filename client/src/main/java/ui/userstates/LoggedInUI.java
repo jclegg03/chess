@@ -96,7 +96,13 @@ public class LoggedInUI extends CLIUserInterface {
         var expected = "observe <game id number>";
         try {
             var gameID = validateGameIDInput(inputs, expected);
-            serverFacade.observeGame(user.getAuthToken(), gameID);
+            var response = serverFacade.observeGame(user.getAuthToken(), gameID);
+
+            System.out.println(response.message());
+
+            if(response.joinedGame()) {
+                BoardPrinter.print(response.game().getBoard(), ChessGame.TeamColor.WHITE);
+            }
         } catch (RuntimeException e) {
         }
     }

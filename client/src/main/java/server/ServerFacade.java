@@ -188,12 +188,12 @@ public class ServerFacade {
         }
     }
 
-    public void observeGame(String authToken, int clientGameID) {
+    public JoinGameResponse observeGame(String authToken, int clientGameID) {
         var serverGameID = clientGameIDtoServerGameIDMap.get(clientGameID);
 
         if(serverGameID == null) {
-            System.out.println("Bad game ID provided. Use list to get a list of valid game IDs");
-            return;
+            return new JoinGameResponse(false, null,
+                    "Bad game ID provided. Use list to get a list of valid game IDs");
         }
 
         var json = serializer.toJson(new JoinGameRequest(serverGameID));
@@ -201,15 +201,15 @@ public class ServerFacade {
 
         var response = makeRequest(request);
         if(response == null) {
-            printServerDown();
-            return;
+            return new JoinGameResponse(false, null,
+                    "The server is currently down or took too long to respond.");
         }
         if(response.statusCode() == 200) {
             var game = serializer.fromJson(response.body(), GameData.class);
-            var observeText = getObserveText(game);
-            System.out.println(observeText);
-            BoardPrinter.print(game.game().getBoard(), ChessGame.TeamColor.WHITE);
+            return new JoinGameResponse(true, game.game(), getObserveText(game));
         }
+
+        return new JoinGameResponse(false, null, "There was an error");
     }
 
     private String getObserveText(GameData game) {
