@@ -20,10 +20,10 @@ public class GameplayUI extends CLIUserInterface {
             case "help" -> help();
             case "redraw" -> redraw();
             case "leave" -> leave();
-            case "make", "move" -> makeMove();
+            case "make", "move" -> makeMove(input);
             case "resign" -> resign();
             case "highlight" -> highlightLegalMoves();
-            default -> defaultInput();
+            default -> defaultInput(input);
         }
 
         return ui;
@@ -67,7 +67,7 @@ public class GameplayUI extends CLIUserInterface {
 
     }
 
-    private void makeMove() {
+    private void makeMove(String[] input) {
 
     }
 
@@ -79,7 +79,27 @@ public class GameplayUI extends CLIUserInterface {
 
     }
 
-    private void defaultInput() {
+    private void defaultInput(String[] inputs) {
+        StringBuilder input = new StringBuilder();
+        for(int i = 0; i < inputs.length - 1; i ++) {
+            var text = inputs[i];
+            input.append(text);
+            input.append(" ");
+        }
+        if(inputs.length != 0) {
+            input.append(inputs[inputs.length - 1]);
+        }
 
+        if(inputs.length > 1 && ! user.isObserver()) {
+            System.out.println("Look, \"" + input + "\" is a bad input; however, I am a nice person and will try" +
+                    " interpreting your garbage as a move.");
+
+            String[] move = {inputs[inputs.length-2], inputs[inputs.length - 1]};
+
+            makeMove(move);
+        }
+        else {
+            invalidInput(inputs);
+        }
     }
 }
