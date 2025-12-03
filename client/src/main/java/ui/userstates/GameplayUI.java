@@ -41,12 +41,13 @@ public class GameplayUI extends CLIUserInterface {
 
                 EscapeSequences.SET_TEXT_COLOR_GREEN + "make move <start position> <end position>" + EscapeSequences.RESET_TEXT_COLOR
                         + " - moves the piece on the start position to the end position, or yells at you " +
-                        "if you try something illegal. You will be prompted select a promotion type if a move leads" +
-                        " to a pawn promotion",
+                        "if you try something illegal",
+                "\t(you will be prompted select a promotion type if a move leads" +
+                        " to a pawn promotion)",
 
                 EscapeSequences.SET_TEXT_COLOR_GREEN + "resign" + EscapeSequences.RESET_TEXT_COLOR
-                        + " - prompts you to confirm that you want to resign, then ends the game. Use leave to quit " +
-                        "without ending the game",
+                        + " - prompts you to confirm that you want to resign, then ends the game (use leave to quit " +
+                        "without ending the game)",
 
                 EscapeSequences.SET_TEXT_COLOR_GREEN + "highlight legal moves <position>" +
                         EscapeSequences.RESET_TEXT_COLOR + " - shows all moves the piece at the specified position can make"
