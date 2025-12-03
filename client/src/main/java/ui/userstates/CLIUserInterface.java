@@ -1,7 +1,8 @@
-package ui;
+package ui.userstates;
 
 import model.User;
 import server.ServerFacade;
+import ui.EscapeSequences;
 
 public abstract class CLIUserInterface {
     protected final ServerFacade serverFacade;
@@ -14,7 +15,7 @@ public abstract class CLIUserInterface {
 
     public abstract CLIUserInterface handleInput(String[] input);
 
-    protected void printDefaultHelp() {
+    protected void help() {
         var helpString = EscapeSequences.SET_TEXT_COLOR_GREEN + "help" + EscapeSequences.RESET_TEXT_COLOR +
                 " - Tells you what commands you can use";
         var quitString = EscapeSequences.SET_TEXT_COLOR_GREEN + "quit" + EscapeSequences.RESET_TEXT_COLOR +

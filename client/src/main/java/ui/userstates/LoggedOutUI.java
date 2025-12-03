@@ -17,7 +17,7 @@ public class LoggedOutUI extends CLIUserInterface {
         CLIUserInterface ui = this;
 
         switch (inputs[0].toLowerCase()) {
-            case "help" -> printHelpLoggedOut();
+            case "help" -> help();
             case "login" -> {
                 if (inputs.length != expectedLogin.length) {
                     invalidInput(inputs, expectedLogin);
@@ -62,8 +62,8 @@ public class LoggedOutUI extends CLIUserInterface {
         }
     }
 
-    private void printHelpLoggedOut() {
-        printDefaultHelp();
+    protected void help() {
+        super.help();
         var loginString = new StringBuilder(EscapeSequences.SET_TEXT_COLOR_GREEN);
         for (String item : expectedLogin) {
             loginString.append(item);

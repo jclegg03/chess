@@ -2,6 +2,8 @@ package ui;
 
 import model.User;
 import server.ServerFacade;
+import ui.userstates.CLIUserInterface;
+import ui.userstates.LoggedOutUI;
 
 import java.util.Scanner;
 

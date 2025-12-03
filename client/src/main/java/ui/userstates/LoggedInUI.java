@@ -17,7 +17,7 @@ public class LoggedInUI extends CLIUserInterface {
         CLIUserInterface ui = this;
 
         switch (inputs[0].toLowerCase()) {
-            case "help" -> printHelpLoggedIn();
+            case "help" -> help();
             case "logout" -> {
                 logout();
                 ui = new LoggedOutUI(user, serverFacade);
@@ -38,8 +38,8 @@ public class LoggedInUI extends CLIUserInterface {
         return ui;
     }
 
-    private void printHelpLoggedIn() {
-        printDefaultHelp();
+    protected void help() {
+        super.help();
         String[] helpStrings = {
                 EscapeSequences.SET_TEXT_COLOR_GREEN + "logout" + EscapeSequences.RESET_TEXT_COLOR
                         + " - logs you out",
