@@ -148,10 +148,10 @@ public class ServerFacade {
         }
     }
     
-    public void joinGame(String authToken, int clientGameID, ChessGame.TeamColor color) {
+    public JoinGameResponse joinGame(String authToken, int clientGameID, ChessGame.TeamColor color) {
         if(color == null) {
-            System.out.println("You are a traitor and member of the rebel alliance. Take her away.");
-            return;
+            return new JoinGameResponse(false, null,
+                    "You are a traitor and member of the rebel alliance. Take her away.");
         }
         String team = "black";
         if(color == ChessGame.TeamColor.WHITE) {
@@ -161,8 +161,8 @@ public class ServerFacade {
         var serverGameID = clientGameIDtoServerGameIDMap.get(clientGameID);
 
         if(serverGameID == null) {
-            System.out.println("Bad game ID provided. Use list to get a list of valid game IDs");
-            return;
+            return new JoinGameResponse(false, null,
+                    "Bad game ID provided. Use list to get a list of valid game IDs");
         }
 
         var json = serializer.toJson(new JoinGameRequest(color, serverGameID));
@@ -170,20 +170,21 @@ public class ServerFacade {
 
         var response = makeRequest(request);
         if(response == null) {
-            printServerDown();
-            return;
+            return new JoinGameResponse(false, null,
+                    "The server is currently down or took too long to respond.");
         }
         if(response.statusCode() == 200) {
             var game = serializer.fromJson(response.body(), GameData.class);
-            System.out.println("Joined " + game.gameName() + " as the " + team + " player.");
-            BoardPrinter.print(game.game().getBoard(), color);
+            return new JoinGameResponse(true, game.game(),
+                    "Joined " + game.gameName() + " as the " + team + " player.");
         }
         else if(response.statusCode() == 403) {
-            System.out.println("Someone is already playing as " + team + ". Use list to see which games don't" +
+            return new JoinGameResponse(false, null,
+                    "Someone is already playing as " + team + ". Use list to see which games don't" +
                     " have players.");
         }
         else {
-            System.out.println("There was an error.");
+            return new JoinGameResponse(false, null, "There was an error.");
         }
     }
 

@@ -4,6 +4,7 @@ import chess.ChessGame;
 import model.AuthData;
 import model.User;
 import server.ServerFacade;
+import ui.BoardPrinter;
 import ui.EscapeSequences;
 
 public class LoggedInUI extends CLIUserInterface {
@@ -65,6 +66,7 @@ public class LoggedInUI extends CLIUserInterface {
     private void createGame(String[] inputs) {
         if (inputs.length < 2) {
             invalidInput(inputs, "create <game name>");
+            return;
         }
 
         var name = new StringBuilder(inputs[1]);
@@ -80,7 +82,12 @@ public class LoggedInUI extends CLIUserInterface {
         try {
             var gameID = validateGameIDInput(inputs, expectedPlay);
             var team = validateTeamColor(inputs);
-            serverFacade.joinGame(user.getAuthToken(), gameID, team);
+            var response = serverFacade.joinGame(user.getAuthToken(), gameID, team);
+            System.out.println(response.message());
+
+            if(response.joinedGame()) {
+                BoardPrinter.print(response.game().getBoard(), team);
+            }
         } catch (RuntimeException e) {
         }
     }

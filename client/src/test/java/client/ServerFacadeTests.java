@@ -7,6 +7,7 @@ import model.UserData;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import server.JoinGameResponse;
 import server.Server;
 import server.ServerFacade;
 import ui.BoardPrinter;
@@ -177,41 +178,36 @@ public class ServerFacadeTests {
     public void testJoinGame(ChessGame.TeamColor color) {
         createDefaultUser();
         serverFacade.createGame(auth.authToken(), "game");
-        OUTPUT.reset();
 
-        var board = new ChessBoard();
-        board.resetBoard();
-        BoardPrinter.print(board, color);
-        String expectedBoard = OUTPUT.toString();
-        OUTPUT.reset();
+        var game = new ChessGame();
 
-        serverFacade.joinGame(auth.authToken(), 1, color);
+        var response = serverFacade.joinGame(auth.authToken(), 1, color);
         var team = color == ChessGame.TeamColor.WHITE ? "white" : "black";
-        String expected = "Joined game as the " + team + " player." +
-                lineEnd +
-                expectedBoard;
-        assertEquals(expected, OUTPUT.toString());
+        var expected = new JoinGameResponse(true, game,
+                "Joined game as the " + team + " player.");
+        assertEquals(expected, response);
     }
 
     @Test
     public void testJoinGameBad() {
         createDefaultUser();
         serverFacade.createGame(auth.authToken(), "game");
-        OUTPUT.reset();
-        serverFacade.joinGame(auth.authToken(), 1, null);
-        assertEquals("You are a traitor and member of the rebel alliance. Take her away." + lineEnd,
-                OUTPUT.toString());
+        var response = serverFacade.joinGame(auth.authToken(), 1, null);
+        var expected = new JoinGameResponse(false, null,
+                "You are a traitor and member of the rebel alliance. Take her away.");
+        assertEquals(expected, response);
     }
 
     @Test
     public void testJoinGameBadID() {
         createDefaultUser();
         serverFacade.createGame(auth.authToken(), "game");
-        OUTPUT.reset();
 
-        serverFacade.joinGame(auth.authToken(), -1, ChessGame.TeamColor.WHITE);
-        assertEquals("Bad game ID provided. Use list to get a list of valid game IDs" + lineEnd,
-                OUTPUT.toString());
+        var response = serverFacade.joinGame(auth.authToken(), -1, ChessGame.TeamColor.WHITE);
+        var expected = new JoinGameResponse(false, null,
+                "Bad game ID provided. Use list to get a list of valid game IDs");
+
+        assertEquals(expected, response);
     }
 
     @Test
