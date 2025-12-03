@@ -1,9 +1,13 @@
 package model;
 
+import chess.ChessGame;
+
 public class User {
     private boolean isLoggedIn;
     private String authToken;
     private String username;
+    private ChessGame game;
+    private ChessGame.TeamColor color;
 
     public String getUsername() {
         return username;
@@ -39,5 +43,21 @@ public class User {
 
     public String getAuthToken() {
         return authToken;
+    }
+
+    public ChessGame getGame() {
+        return game;
+    }
+
+    public void setGame(ChessGame game) {
+        this.game = game;
+    }
+
+    public ChessGame.TeamColor getColor() {
+        return color;
+    }
+
+    public void setColor(ChessGame.TeamColor color) {
+        this.color = color;
     }
 }

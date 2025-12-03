@@ -26,14 +26,8 @@ public class LoggedInUI extends CLIUserInterface {
             }
             case "create" -> createGame(inputs);
             case "list" -> listGames();
-            case "play", "join" -> {
-                //TODO change to play ui
-                joinGame(inputs);
-            }
-            case "observe" -> {
-                //TODO change to play ui
-                observeGame(inputs);
-            }
+            case "play", "join" -> ui = joinGame(inputs);
+            case "observe" -> ui = observeGame(inputs);
             default -> invalidInput(inputs);
         }
 
@@ -79,7 +73,7 @@ public class LoggedInUI extends CLIUserInterface {
         serverFacade.createGame(user.getAuthToken(), name.toString());
     }
 
-    private void joinGame(String[] inputs) {
+    private CLIUserInterface joinGame(String[] inputs) {
         try {
             var gameID = validateGameIDInput(inputs, expectedPlay);
             var team = validateTeamColor(inputs);
@@ -88,12 +82,17 @@ public class LoggedInUI extends CLIUserInterface {
 
             if(response.joinedGame()) {
                 BoardPrinter.print(response.game().getBoard(), team);
+                user.setGame(response.game());
+                user.setColor(team);
+                return new GameplayUI(user, serverFacade);
             }
+            return this;
         } catch (RuntimeException e) {
+            return this;
         }
     }
 
-    private void observeGame(String[] inputs) {
+    private CLIUserInterface observeGame(String[] inputs) {
 
         try {
             var gameID = validateGameIDInput(inputs, expectedObserve);
@@ -103,8 +102,13 @@ public class LoggedInUI extends CLIUserInterface {
 
             if(response.joinedGame()) {
                 BoardPrinter.print(response.game().getBoard(), ChessGame.TeamColor.WHITE);
+                user.setGame(response.game());
+                return new GameplayUI(user, serverFacade);
             }
+
+            return this;
         } catch (RuntimeException e) {
+            return this;
         }
     }
 
