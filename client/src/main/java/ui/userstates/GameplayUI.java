@@ -103,7 +103,7 @@ public class GameplayUI extends CLIUserInterface {
             highlight.add(move.getEndPosition());
         }
 
-        BoardPrinter.print(user.getGame().getBoard(), user.getPerspective(), highlight);
+        BoardPrinter.print(user.getGame().getBoard(), user.getPerspective(), position, highlight);
     }
 
     private void defaultInput(String[] inputs) {

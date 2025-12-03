@@ -8,24 +8,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class BoardPrinter {
+    private static final ArrayList<Integer> ROW_NUMBERS = new ArrayList<Integer>();
+
+    private static final ArrayList<Character> COL_NAMES = new ArrayList<Character>();
+
     public static void print(ChessBoard board, ChessGame.TeamColor perspective) {
-        print(board, perspective, new ArrayList<>());
+        print(board, perspective, null, new ArrayList<>());
     }
 
-    public static void print(ChessBoard board, ChessGame.TeamColor perspective, ArrayList<ChessPosition> highlight) {
-        var rowNums = new ArrayList<Integer>();
+    public static void print(ChessBoard board, ChessGame.TeamColor perspective, ChessPosition piecePos,
+                             ArrayList<ChessPosition> highlight) {
         for(int i = 8; i >= 1; i--) {
-            rowNums.add(i);
+            ROW_NUMBERS.add(i);
         }
 
-        var colNames = new ArrayList<Character>();
         for(char c = 'a'; c <= 'h'; c++) {
-            colNames.add(c);
+            COL_NAMES.add(c);
         }
 
         if(perspective == ChessGame.TeamColor.BLACK) {
-            Collections.reverse(rowNums);
-            Collections.reverse(colNames);
+            Collections.reverse(ROW_NUMBERS);
+            Collections.reverse(COL_NAMES);
         }
 
         StringBuilder string = new StringBuilder(EscapeSequences.SET_TEXT_BOLD);
@@ -35,12 +38,10 @@ public class BoardPrinter {
             for(int j = 0; j < 10; j++) {
                 boolean isSquareOnBoard = i > 0 && i < 9 && j > 0 && j < 9;
                 if(isSquareOnBoard) {
-                    String bg = isLight ? EscapeSequences.SET_BG_COLOR_BLUE : EscapeSequences.SET_BG_COLOR_BLACK;
-                    bg = isHighlighted("" + colNames.get(j - 1) + rowNums.get(i - 1), highlight) ?
-                            EscapeSequences.SET_BG_COLOR_GREEN : bg;
+                    String bg = getBg(getPosition(i, j), isLight, piecePos, highlight);
                     string.append(bg);
                     isLight = !isLight;
-                    var piece = board.getPiece(ChessPosition.fromString("" + colNames.get(j - 1) + rowNums.get(i - 1)));
+                    var piece = board.getPiece(getPosition(i, j));
                     var pieceString = piece == null ? " " : piece.toString();
                     string.append(" ").append(pieceString).append(" ");
                 }
@@ -54,12 +55,12 @@ public class BoardPrinter {
 
                     boolean isRowOfColNames = (i == 0 || i == 9) && j < 9 && j > 0;
                     if(isRowOfColNames) {
-                        string.append(" ").append(colNames.get(j - 1)).append(" ");
+                        string.append(" ").append(COL_NAMES.get(j - 1)).append(" ");
                     }
 
                     boolean isColOfRowNums = (j == 0 || j == 9) && i < 9 && i > 0;
                     if(isColOfRowNums) {
-                        string.append(" ").append(rowNums.get(i - 1)).append(" ");
+                        string.append(" ").append(ROW_NUMBERS.get(i - 1)).append(" ");
                     }
 
                 }
@@ -72,8 +73,19 @@ public class BoardPrinter {
         System.out.println(string);
     }
 
-    private static boolean isHighlighted(String positionString, ArrayList<ChessPosition> highlight) {
-        var pos = ChessPosition.fromString(positionString);
+    private static String getBg(ChessPosition printingPos, boolean isLight, ChessPosition piecePos,
+                                 ArrayList<ChessPosition> highlight) {
+        String bg = isLight ? EscapeSequences.SET_BG_COLOR_BLUE : EscapeSequences.SET_BG_COLOR_BLACK;
+
+        if(isHighlighted(printingPos, highlight)) {
+            bg = isLight ? EscapeSequences.SET_BG_COLOR_GREEN : EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+        }
+        bg = printingPos.equals(piecePos) ? EscapeSequences.SET_BG_COLOR_YELLOW : bg;
+
+        return bg;
+    }
+
+    private static boolean isHighlighted(ChessPosition pos, ArrayList<ChessPosition> highlight) {
         for(var position : highlight) {
             if(position.equals(pos)) {
                 return true;
@@ -81,5 +93,9 @@ public class BoardPrinter {
         }
 
         return false;
+    }
+
+    private static ChessPosition getPosition(int i, int j) {
+        return ChessPosition.fromString("" + COL_NAMES.get(j - 1) + ROW_NUMBERS.get(i - 1));
     }
 }
