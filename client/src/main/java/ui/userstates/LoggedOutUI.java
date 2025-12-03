@@ -1,8 +1,9 @@
-package ui;
+package ui.userstates;
 
 import model.User;
 import model.UserData;
 import server.ServerFacade;
+import ui.EscapeSequences;
 
 public class LoggedOutUI extends CLIUserInterface {
     private final String[] expectedLogin = {"login", "<username>", "<password>"};
@@ -22,16 +23,14 @@ public class LoggedOutUI extends CLIUserInterface {
                     invalidInput(inputs, expectedLogin);
                     break;
                 }
-                login(inputs[1], inputs[2]);
-                ui = new LoggedInUI(user, serverFacade);
+                ui = login(inputs[1], inputs[2]);
             }
             case "register" -> {
                 if (inputs.length != expectedRegister.length) {
                     invalidInput(inputs, expectedRegister);
                     break;
                 }
-                register(inputs[1], inputs[2], inputs[3]);
-                ui = new LoggedInUI(user, serverFacade);
+                ui = register(inputs[1], inputs[2], inputs[3]);
             }
             default -> invalidInput(inputs);
         }
@@ -39,21 +38,27 @@ public class LoggedOutUI extends CLIUserInterface {
         return ui;
     }
 
-    private void register(String username, String password, String email) {
+    private CLIUserInterface register(String username, String password, String email) {
         try {
             user.setAuthToken(serverFacade.register(new UserData(username, password, email)));
             user.setUsername(username);
             user.setLoggedIn(true);
+
+            return new LoggedInUI(user, serverFacade);
         } catch (RuntimeException e) {
+            return this;
         }
     }
 
-    private void login(String username, String password) {
+    private CLIUserInterface login(String username, String password) {
         try {
             user.setAuthToken(serverFacade.login(new UserData(username, password, null)));
             user.setUsername(username);
             user.setLoggedIn(true);
+
+            return new LoggedInUI(user, serverFacade);
         } catch (RuntimeException e) {
+            return this;
         }
     }
 

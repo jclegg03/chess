@@ -1,9 +1,10 @@
-package ui;
+package ui.userstates;
 
 import chess.ChessGame;
 import model.AuthData;
 import model.User;
 import server.ServerFacade;
+import ui.EscapeSequences;
 
 public class LoggedInUI extends CLIUserInterface {
     private final String expectedPlay = "play <game id number> <player piece color>";
