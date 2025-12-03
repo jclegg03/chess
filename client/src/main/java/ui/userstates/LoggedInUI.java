@@ -9,6 +9,7 @@ import ui.EscapeSequences;
 
 public class LoggedInUI extends CLIUserInterface {
     private final String expectedPlay = "play <game id number> <player piece color>";
+    private final String expectedObserve = "observe <game id number>";
 
     public LoggedInUI(User user, ServerFacade serverFacade) {
         super(user, serverFacade);
@@ -54,7 +55,7 @@ public class LoggedInUI extends CLIUserInterface {
                 EscapeSequences.SET_TEXT_COLOR_GREEN + expectedPlay + EscapeSequences.RESET_TEXT_COLOR
                         + " - play the specified game with the specified piece color",
 
-                EscapeSequences.SET_TEXT_COLOR_GREEN + expectedPlay + EscapeSequences.RESET_TEXT_COLOR
+                EscapeSequences.SET_TEXT_COLOR_GREEN + expectedObserve + EscapeSequences.RESET_TEXT_COLOR
                         + " - watch the specified game"
         };
 
@@ -93,9 +94,9 @@ public class LoggedInUI extends CLIUserInterface {
     }
 
     private void observeGame(String[] inputs) {
-        var expected = "observe <game id number>";
+
         try {
-            var gameID = validateGameIDInput(inputs, expected);
+            var gameID = validateGameIDInput(inputs, expectedObserve);
             var response = serverFacade.observeGame(user.getAuthToken(), gameID);
 
             System.out.println(response.message());
