@@ -74,7 +74,7 @@ public class ChessPosition {
 
     public static ChessPosition fromString(String key) {
         String colString = key.substring(0, 1);
-        int row = Integer.parseInt(key.substring(1));
+        int row = 0;
         int col = 0;
         for(Column name : Column.values()) {
             if(name.name().equals(colString)) {
@@ -82,6 +82,17 @@ public class ChessPosition {
                 break;
             }
         }
+
+        try {
+            row = Integer.parseInt(key.substring(1));
+        } catch (NumberFormatException e) {
+            return null;
+        }
+
+        if(row < 1 || row > 8 || col < 1 || col > 8) {
+            return null;
+        }
+
         return new ChessPosition(row, col);
     }
 }

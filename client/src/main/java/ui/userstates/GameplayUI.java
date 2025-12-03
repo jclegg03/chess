@@ -1,5 +1,6 @@
 package ui.userstates;
 
+import chess.ChessPosition;
 import model.User;
 import server.ServerFacade;
 import ui.BoardPrinter;
@@ -22,7 +23,7 @@ public class GameplayUI extends CLIUserInterface {
             case "leave" -> leave();
             case "make", "move" -> makeMove(input);
             case "resign" -> resign();
-            case "highlight" -> highlightLegalMoves();
+            case "highlight" -> highlightLegalMoves(input);
             default -> defaultInput(input);
         }
 
@@ -75,8 +76,21 @@ public class GameplayUI extends CLIUserInterface {
 
     }
 
-    private void highlightLegalMoves() {
+    private void highlightLegalMoves(String[] input) {
+        if(input.length < 2) {
+            invalidInput(input, "highlight ... <position>", "(you can literally type anything between highlight and " +
+                    "position. Position just has to be the last input)");
+        }
 
+        var pos = input[input.length - 1];
+
+        ChessPosition position = ChessPosition.fromString(pos);
+        if(position == null) {
+            invalidInput(input, "highlight", "...", "<position>", "(invalid position: " + pos + ")");
+            return;
+        }
+
+        //TODO print board
     }
 
     private void defaultInput(String[] inputs) {
