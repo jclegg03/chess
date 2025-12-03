@@ -1,10 +1,13 @@
 package ui.userstates;
 
+import chess.ChessMove;
 import chess.ChessPosition;
 import model.User;
 import server.ServerFacade;
 import ui.BoardPrinter;
 import ui.EscapeSequences;
+
+import java.util.ArrayList;
 
 public class GameplayUI extends CLIUserInterface {
 
@@ -90,7 +93,17 @@ public class GameplayUI extends CLIUserInterface {
             return;
         }
 
-        //TODO print board
+        var moves = user.getGame().validMoves(position);
+        if(moves == null) {
+            moves = new ArrayList<ChessMove>();
+        }
+
+        var highlight = new ArrayList<ChessPosition>(moves.size());
+        for(var move: moves) {
+            highlight.add(move.getEndPosition());
+        }
+
+        BoardPrinter.print(user.getGame().getBoard(), user.getPerspective(), highlight);
     }
 
     private void defaultInput(String[] inputs) {
