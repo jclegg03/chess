@@ -7,7 +7,8 @@ public class User {
     private String authToken;
     private String username;
     private ChessGame game;
-    private ChessGame.TeamColor color;
+    private ChessGame.TeamColor perspective;
+    private boolean isObserver;
 
     public String getUsername() {
         return username;
@@ -53,11 +54,19 @@ public class User {
         this.game = game;
     }
 
-    public ChessGame.TeamColor getColor() {
-        return color;
+    public ChessGame.TeamColor getPerspective() {
+        return perspective;
     }
 
-    public void setColor(ChessGame.TeamColor color) {
-        this.color = color;
+    public void setPerspective(ChessGame.TeamColor perspective) {
+        this.perspective = perspective;
+    }
+
+    public boolean isObserver() {
+        return isObserver;
+    }
+
+    public void setObserver(boolean observer) {
+        isObserver = observer;
     }
 }

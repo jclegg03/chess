@@ -2,6 +2,7 @@ package ui.userstates;
 
 import model.User;
 import server.ServerFacade;
+import ui.BoardPrinter;
 import ui.EscapeSequences;
 
 public class GameplayUI extends CLIUserInterface {
@@ -59,7 +60,7 @@ public class GameplayUI extends CLIUserInterface {
     }
 
     private void redraw() {
-
+        BoardPrinter.print(user.getGame().getBoard(), user.getPerspective());
     }
 
     private void leave() {
