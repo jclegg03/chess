@@ -1,13 +1,16 @@
 package ui.userstates;
 
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
+import chess.InvalidMoveException;
 import model.User;
 import server.ServerFacade;
 import ui.BoardPrinter;
 import ui.EscapeSequences;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class GameplayUI extends CLIUserInterface {
 
@@ -72,7 +75,86 @@ public class GameplayUI extends CLIUserInterface {
     }
 
     private void makeMove(String[] input) {
+        if(user.isObserver()) {
+            System.out.println("Observers can't make moves. Silly observer!");
+            return;
+        }
 
+        if(input.length < 2) {
+            invalidInput(input, "... <start position> <end position>",
+                    "(you can make a move by just entering 2 valid positions)");
+            return;
+        }
+
+        String startStr = input[input.length - 2];
+        String endStr = input[input.length - 1];
+
+        ChessPosition startPos = ChessPosition.fromString(startStr);
+        ChessPosition endPos = ChessPosition.fromString(endStr);
+
+        if(startPos == null) {
+            System.out.println(startStr + " is not a valid chess position.");
+            return;
+        }
+        if(endPos == null) {
+            System.out.println(endStr + " is not a valid chess position.");
+            return;
+        }
+
+        if(user.getGame().getTeamTurn() != user.getPerspective()) {
+            System.out.println("Not your turn!");
+            return;
+        }
+
+        var move = new ChessMove(startPos, endPos);
+
+        try {
+            user.getGame().makeMove(move);
+            //TODO server
+            return;
+        } catch (InvalidMoveException e) {
+            if(e.getMessage().equalsIgnoreCase("You need to promote that pawn")) {
+                move = new ChessMove(startPos, endPos, handlePromotion());
+            }
+            else {
+                System.out.println("NO! Don't make that move. (It is illegal)");
+                System.out.println(e.getMessage());
+                return;
+            }
+        }
+
+        try {
+            user.getGame().makeMove(move);
+            //TODO server
+        } catch (InvalidMoveException e) {
+            System.out.println("NO! Don't make that move. (It is illegal)");
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private ChessPiece.PieceType handlePromotion() {
+        System.out.println("Please enter one of the following to promote your pawn: \"queen\", " +
+                "\"knight\", \"rook\", or \"bishop\"");
+
+        while (true) {
+            var scanner = new Scanner(System.in);
+            var promotionStr = scanner.nextLine();
+            switch (promotionStr.toLowerCase()) {
+                case "queen", "q" -> {
+                    return ChessPiece.PieceType.QUEEN;
+                }
+                case "knight", "n", "k" -> {
+                    return ChessPiece.PieceType.KNIGHT;
+                }
+                case "rook", "r" -> {
+                    return ChessPiece.PieceType.ROOK;
+                }
+                case "bishop", "b" -> {
+                    return ChessPiece.PieceType.BISHOP;
+                }
+                default -> System.out.println("There is no escape now. You touched the piece and must make a move!");
+            }
+        }
     }
 
     private void resign() {

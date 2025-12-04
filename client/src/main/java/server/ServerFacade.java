@@ -4,7 +4,6 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import model.*;
 import serializer.Serializer;
-import ui.BoardPrinter;
 import ui.EscapeSequences;
 
 import java.net.URI;
