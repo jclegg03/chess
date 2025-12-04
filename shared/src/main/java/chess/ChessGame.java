@@ -173,6 +173,15 @@ public class ChessGame {
 
         if(! validMoves.contains(move)) {
             board = boardBeforeMove;
+            if(board.getPiece(move.getStartPosition()).getPieceType() != ChessPiece.PieceType.PAWN) {
+                throw new InvalidMoveException("Woah there! That isn't legal and the " +
+                        "programmer is too lazy to tell you why.");
+            }
+
+            if(validMoves.contains(new ChessMove(move.getStartPosition(), move.getEndPosition(), ChessPiece.PieceType.QUEEN))) {
+                throw new InvalidMoveException("You need to promote that pawn");
+            }
+
             throw new InvalidMoveException("Woah there! That isn't legal and the " +
                     "programmer is too lazy to tell you why.");
         }
