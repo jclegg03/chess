@@ -1,6 +1,8 @@
 package service;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import dataaccess.DataAccessException;
 import dataaccess.auth.AuthDAO;
 import dataaccess.auth.DatabaseAuthDAO;
@@ -168,6 +170,55 @@ public class Service {
         }
 
         return game;
+    }
+
+    public GameData makeMove(AuthData auth, int gameID, ChessMove move) throws ServerException {
+        checkAuth(auth);
+        var game = getGame(auth, gameID);
+        var turnUsername = game.game().getTeamTurn() == ChessGame.TeamColor.WHITE ?
+                game.whiteUsername() : game.blackUsername();
+        if(auth.username().equals(turnUsername)) {
+            try {
+                game.game().makeMove(move);
+                var turn = game.game().getTeamTurn();
+                var isCheckmate = game.game().isInCheckmate(turn);
+                var isStalemate = game.game().isInStalemate(turn);
+                game.game().setGameOver(isCheckmate || isStalemate);
+                gameDAO.updateGame(gameID, game);
+            } catch (InvalidMoveException e) {
+                throw new ServerException("Illegal move", HttpStatus.BAD_REQUEST, e);
+            }
+        }
+        else {
+            throw new ServerException("Not your turn.", HttpStatus.BAD_REQUEST);
+        }
+
+        return game;
+    }
+
+    public void resign(AuthData auth, int gameID) throws ServerException {
+        checkAuth(auth);
+        var game = getGame(auth, gameID);
+        if((auth.username().equals(game.blackUsername()) || auth.username().equals(game.whiteUsername())) &&
+                !game.game().isGameOver()) {
+            game.game().setGameOver(true);
+            gameDAO.updateGame(gameID, game);
+        } else {
+            throw new ServerException("You can't resign.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public void leaveGame(AuthData auth, int gameID) throws ServerException {
+        checkAuth(auth);
+        var game = getGame(auth, gameID);
+        if(auth.username().equals(game.whiteUsername())) {
+            game = game.setWhiteUsername(null);
+            gameDAO.updateGame(gameID, game);
+        }
+        else if(auth.username().equals(game.blackUsername())) {
+            game = game.setBlackUsername(null);
+            gameDAO.updateGame(gameID, game);
+        }
     }
 
     public void clearData() throws DataAccessException {

@@ -1,7 +1,10 @@
 package server.websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
+import io.javalin.http.HttpStatus;
 import io.javalin.websocket.*;
+import server.ServerException;
 import service.Service;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -40,7 +43,20 @@ public class WebSocketManager implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void makeMove(UserGameCommand command, WsMessageContext ctx) {
+        try {
+            var room = getRoom(command.getGameID());
+            var auth = service.getAuth(command.getAuthToken());
 
+            var game = service.makeMove(auth, command.getGameID(), command.getMove());
+            var updateMessage = new ServerMessage(game.game());
+            room.tellEveryone(updateMessage, null);
+
+            String text = command.getMove().toString();
+            var serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, text);
+            room.tellEveryone(serverMessage, ctx.session);
+        } catch (Exception e) {
+            handleError(e, ctx);
+        }
     }
 
     private void connect(UserGameCommand command, WsMessageContext ctx) {
@@ -48,11 +64,17 @@ public class WebSocketManager implements WsConnectHandler, WsMessageHandler, WsC
             var room = getRoom(command.getGameID());
             room.addParticipant(ctx.session);
             var auth = service.getAuth(command.getAuthToken());
+
+            var game = service.getGame(auth, command.getGameID());
+            if(game == null) {
+                handleError(new ServerException("Bad game ID provided", HttpStatus.BAD_REQUEST), ctx);
+            }
+
             String text = auth.username() + " joined" + getConnectText(command.getJoinType());
             var serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, text);
             room.tellEveryone(serverMessage, ctx.session);
 
-            var game = service.getGame(auth, command.getGameID());
+
             var gameMessage = new ServerMessage(game.game());
             ctx.session.getRemote().sendString(new Gson().toJson(gameMessage));
         } catch (Exception e) {
@@ -70,7 +92,19 @@ public class WebSocketManager implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void resign(UserGameCommand command, WsMessageContext ctx) {
+        try {
+            var room = getRoom(command.getGameID());
+            var auth = service.getAuth(command.getAuthToken());
+            String text = auth.username() + " has resigned.";
 
+            service.resign(auth, command.getGameID());
+
+            var serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, text);
+            room.tellEveryone(serverMessage, null);
+
+        } catch (Exception e) {
+            handleError(e, ctx);
+        }
     }
 
     private void leave(UserGameCommand command, WsMessageContext ctx) {
@@ -79,6 +113,9 @@ public class WebSocketManager implements WsConnectHandler, WsMessageHandler, WsC
             room.removeParticipant(ctx.session);
             var auth = service.getAuth(command.getAuthToken());
             String text = auth.username() + " has left the game.";
+
+            service.leaveGame(auth, command.getGameID());
+
             var serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, text);
             room.tellEveryone(serverMessage, ctx.session);
         } catch (Exception e) {
@@ -96,10 +133,7 @@ public class WebSocketManager implements WsConnectHandler, WsMessageHandler, WsC
     private void handleError(Exception e, WsMessageContext ctx) {
         try {
             ctx.session.getRemote().sendString(
-                    new Gson().toJson(
-                            new ServerMessage(
-                                    ServerMessage.ServerMessageType.ERROR, e.getMessage()
-                            )));
+                    new Gson().toJson(new ServerMessage(e.getMessage())));
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

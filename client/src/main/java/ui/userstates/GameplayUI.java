@@ -15,10 +15,12 @@ import java.util.Scanner;
 
 public class GameplayUI extends CLIUserInterface implements NotificationHandler {
     private ClientWebsocket ws;
+    private final int gameID;
 
     public GameplayUI(User user, ServerFacade serverFacade, UserGameCommand command) {
         super(user, serverFacade);
         this.ws = new ClientWebsocket(serverFacade.getHost(), this);
+        this.gameID = command.getGameID();
         ws.sendMessage(command);
     }
 
@@ -29,7 +31,10 @@ public class GameplayUI extends CLIUserInterface implements NotificationHandler 
         switch (input[0].toLowerCase()) {
             case "help" -> help();
             case "redraw" -> redraw();
-            case "leave" -> leave();
+            case "leave" -> {
+                leave();
+                return new LoggedInUI(user, serverFacade);
+            }
             case "make", "move" -> makeMove(input);
             case "resign" -> resign();
             case "highlight" -> highlightLegalMoves(input);
@@ -74,7 +79,9 @@ public class GameplayUI extends CLIUserInterface implements NotificationHandler 
     }
 
     private void leave() {
-
+        ws.sendMessage(new UserGameCommand(UserGameCommand.CommandType.LEAVE, user.getAuthToken(), gameID));
+        user.setGame(null);
+        user.setPerspective(null);
     }
 
     private void makeMove(String[] input) {
@@ -113,7 +120,8 @@ public class GameplayUI extends CLIUserInterface implements NotificationHandler 
 
         try {
             user.getGame().makeMove(move);
-            //TODO server
+            var command = new UserGameCommand(user.getAuthToken(), gameID, move);
+            ws.sendMessage(command);
             return;
         } catch (InvalidMoveException e) {
             if(e.getMessage().equalsIgnoreCase("You need to promote that pawn")) {
@@ -217,7 +225,7 @@ public class GameplayUI extends CLIUserInterface implements NotificationHandler 
 
     @Override
     public void notify(ServerMessage message) {
-        System.out.println(message.getText());
+        System.out.println(message.getMessage());
     }
 
     @Override

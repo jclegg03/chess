@@ -184,7 +184,7 @@ public class ServerFacadeTests {
         var response = serverFacade.joinGame(auth.authToken(), 1, color);
         var team = color == ChessGame.TeamColor.WHITE ? "white" : "black";
         var expected = new JoinGameResponse(true, game,
-                "Joined game as the " + team + " player.");
+                "Joined game as the " + team + " player.", 1);
         assertEquals(expected, response);
     }
 
@@ -230,7 +230,7 @@ public class ServerFacadeTests {
         var expected = new JoinGameResponse(true, game,
                 "You are now observing the epic game between " + EscapeSequences.SET_TEXT_COLOR_YELLOW
                 + "awaiting opponent" + EscapeSequences.RESET_TEXT_COLOR + " and " +
-                EscapeSequences.SET_TEXT_COLOR_MAGENTA + "awaiting contender" + EscapeSequences.RESET_TEXT_COLOR + "!");
+                EscapeSequences.SET_TEXT_COLOR_MAGENTA + "awaiting contender" + EscapeSequences.RESET_TEXT_COLOR + "!",1);
 
         var response = serverFacade.observeGame(auth.authToken(), 1);
 
