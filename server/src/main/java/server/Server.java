@@ -23,7 +23,7 @@ public class Server {
         server = Javalin.create(config -> config.staticFiles.add("web"));
         serializer = new Gson();
         service = new Service();
-        webSocketManager = new WebSocketManager();
+        webSocketManager = new WebSocketManager(service);
 
         server.delete("db", this::clear);
         server.delete("session", this::logout);
