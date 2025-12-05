@@ -2,6 +2,7 @@ package ui.userstates;
 
 import chess.*;
 import model.User;
+import server.ClientWebsocket;
 import server.NotificationHandler;
 import server.ServerFacade;
 import ui.BoardPrinter;
@@ -12,10 +13,11 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class GameplayUI extends CLIUserInterface implements NotificationHandler {
-
+    private ClientWebsocket ws;
 
     public GameplayUI(User user, ServerFacade serverFacade) {
         super(user, serverFacade);
+        this.ws = new ClientWebsocket(serverFacade.getHost(), this);
     }
 
     @Override

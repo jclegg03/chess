@@ -31,6 +31,10 @@ public class ServerFacade {
         serverGameIDtoClientGameIDMap = new HashMap<>();
     }
 
+    public String getHost() {
+        return this.host;
+    }
+
     private enum HTTPMethod {GET, POST, DELETE, PUT}
 
     public String login(UserData user) {
