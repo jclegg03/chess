@@ -64,6 +64,9 @@ public class WebSocketManager implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private GameRoom getRoom(int id) {
+        if(id == -1) {
+            throw new RuntimeException("Bad game id");
+        }
         return rooms.computeIfAbsent(id, k -> new GameRoom());
     }
 

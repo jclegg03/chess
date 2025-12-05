@@ -6,6 +6,7 @@ import model.User;
 import server.ServerFacade;
 import ui.BoardPrinter;
 import ui.EscapeSequences;
+import websocket.commands.UserGameCommand;
 
 public class LoggedInUI extends CLIUserInterface {
     private final String expectedPlay = "play <game id number> <player piece color>";
@@ -85,7 +86,10 @@ public class LoggedInUI extends CLIUserInterface {
                 user.setGame(response.game());
                 user.setPerspective(team);
                 user.setObserver(false);
-                return new GameplayUI(user, serverFacade);
+
+                var joinType = team == ChessGame.TeamColor.WHITE ? UserGameCommand.JoinType.WHITE : UserGameCommand.JoinType.BLACK;
+                var joinCommand = new UserGameCommand(user.getAuthToken(), response.id(), joinType);
+                return new GameplayUI(user, serverFacade, joinCommand);
             }
             return this;
         } catch (RuntimeException e) {
@@ -106,7 +110,8 @@ public class LoggedInUI extends CLIUserInterface {
                 user.setGame(response.game());
                 user.setPerspective(ChessGame.TeamColor.WHITE);
                 user.setObserver(true);
-                return new GameplayUI(user, serverFacade);
+                var connect = new UserGameCommand(user.getAuthToken(), response.id(), UserGameCommand.JoinType.OBSERVER);
+                return new GameplayUI(user, serverFacade, connect);
             }
 
             return this;

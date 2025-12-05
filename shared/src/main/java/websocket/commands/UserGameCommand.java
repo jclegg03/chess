@@ -20,10 +20,17 @@ public class UserGameCommand {
 
     private ChessMove move;
 
+    private JoinType joinType;
+
     public UserGameCommand(CommandType commandType, String authToken, Integer gameID) {
         this.commandType = commandType;
         this.authToken = authToken;
         this.gameID = gameID;
+    }
+
+    public UserGameCommand(String auth, Integer id, JoinType joinType) {
+        this(CommandType.CONNECT, auth, id);
+        this.joinType = joinType;
     }
 
     public UserGameCommand(String authToken, Integer id, ChessMove move) {
@@ -36,6 +43,12 @@ public class UserGameCommand {
         MAKE_MOVE,
         LEAVE,
         RESIGN
+    }
+
+    public enum JoinType {
+        OBSERVER,
+        BLACK,
+        WHITE
     }
 
     public CommandType getCommandType() {

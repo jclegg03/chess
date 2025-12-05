@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import jakarta.websocket.*;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ChessUpdateMessage;
 import websocket.messages.ServerMessage;
 
@@ -47,5 +48,13 @@ public class ClientWebsocket extends Endpoint {
 
     private ChessUpdateMessage getChessMessage(String message) {
         return new Gson().fromJson(message, ChessUpdateMessage.class);
+    }
+
+    public void sendMessage(UserGameCommand message) {
+        try {
+            this.session.getBasicRemote().sendText(new Gson().toJson(message));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

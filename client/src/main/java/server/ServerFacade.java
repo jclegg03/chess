@@ -179,7 +179,7 @@ public class ServerFacade {
         if(response.statusCode() == 200) {
             var game = serializer.fromJson(response.body(), GameData.class);
             return new JoinGameResponse(true, game.game(),
-                    "Joined " + game.gameName() + " as the " + team + " player.");
+                    "Joined " + game.gameName() + " as the " + team + " player.", serverGameID);
         }
         else if(response.statusCode() == 403) {
             return new JoinGameResponse(false, null,
@@ -209,7 +209,7 @@ public class ServerFacade {
         }
         if(response.statusCode() == 200) {
             var game = serializer.fromJson(response.body(), GameData.class);
-            return new JoinGameResponse(true, game.game(), getObserveText(game));
+            return new JoinGameResponse(true, game.game(), getObserveText(game), serverGameID);
         }
 
         return new JoinGameResponse(false, null, "There was an error");

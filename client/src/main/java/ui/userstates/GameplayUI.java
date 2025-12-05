@@ -7,6 +7,7 @@ import server.NotificationHandler;
 import server.ServerFacade;
 import ui.BoardPrinter;
 import ui.EscapeSequences;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 import java.util.ArrayList;
@@ -15,9 +16,10 @@ import java.util.Scanner;
 public class GameplayUI extends CLIUserInterface implements NotificationHandler {
     private ClientWebsocket ws;
 
-    public GameplayUI(User user, ServerFacade serverFacade) {
+    public GameplayUI(User user, ServerFacade serverFacade, UserGameCommand command) {
         super(user, serverFacade);
         this.ws = new ClientWebsocket(serverFacade.getHost(), this);
+        ws.sendMessage(command);
     }
 
     @Override
