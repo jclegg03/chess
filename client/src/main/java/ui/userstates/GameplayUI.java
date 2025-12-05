@@ -1,18 +1,17 @@
 package ui.userstates;
 
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.ChessPosition;
-import chess.InvalidMoveException;
+import chess.*;
 import model.User;
+import server.NotificationHandler;
 import server.ServerFacade;
 import ui.BoardPrinter;
 import ui.EscapeSequences;
+import websocket.messages.ServerMessage;
 
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class GameplayUI extends CLIUserInterface {
+public class GameplayUI extends CLIUserInterface implements NotificationHandler {
 
 
     public GameplayUI(User user, ServerFacade serverFacade) {
@@ -210,5 +209,16 @@ public class GameplayUI extends CLIUserInterface {
         else {
             invalidInput(inputs);
         }
+    }
+
+    @Override
+    public void notify(ServerMessage message) {
+        System.out.println(message.getText());
+    }
+
+    @Override
+    public void updateGame(ChessGame game) {
+        user.setGame(game);
+        BoardPrinter.print(game.getBoard(), user.getPerspective());
     }
 }
