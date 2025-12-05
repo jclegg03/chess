@@ -20,12 +20,6 @@ public class GameRoom {
         }
     }
 
-    private void sendGameUpdate(ServerMessage update, Session person) throws IOException {
-        if(person != null && person.isOpen()) {
-            person.getRemote().sendString(new Gson().toJson(update));
-        }
-    }
-
     public void addParticipant(Session participant) {
         participants.add(participant);
     }
