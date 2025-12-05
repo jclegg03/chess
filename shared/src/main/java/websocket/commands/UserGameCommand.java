@@ -38,6 +38,10 @@ public class UserGameCommand {
         this.move = move;
     }
 
+    public JoinType getJoinType() {
+        return joinType;
+    }
+
     public enum CommandType {
         CONNECT,
         MAKE_MOVE,

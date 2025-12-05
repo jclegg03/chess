@@ -2,7 +2,6 @@ package server.websocket;
 
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
-import websocket.messages.ChessUpdateMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -21,7 +20,7 @@ public class GameRoom {
         }
     }
 
-    private void sendGameUpdate(ChessUpdateMessage update, Session person) throws IOException {
+    private void sendGameUpdate(ServerMessage update, Session person) throws IOException {
         if(person != null && person.isOpen()) {
             person.getRemote().sendString(new Gson().toJson(update));
         }

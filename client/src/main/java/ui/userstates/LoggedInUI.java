@@ -82,7 +82,6 @@ public class LoggedInUI extends CLIUserInterface {
             System.out.println(response.message());
 
             if(response.joinedGame()) {
-                BoardPrinter.print(response.game().getBoard(), team);
                 user.setGame(response.game());
                 user.setPerspective(team);
                 user.setObserver(false);
@@ -106,7 +105,6 @@ public class LoggedInUI extends CLIUserInterface {
             System.out.println(response.message());
 
             if(response.joinedGame()) {
-                BoardPrinter.print(response.game().getBoard(), ChessGame.TeamColor.WHITE);
                 user.setGame(response.game());
                 user.setPerspective(ChessGame.TeamColor.WHITE);
                 user.setObserver(true);

@@ -48,11 +48,25 @@ public class WebSocketManager implements WsConnectHandler, WsMessageHandler, WsC
             var room = getRoom(command.getGameID());
             room.addParticipant(ctx.session);
             var auth = service.getAuth(command.getAuthToken());
-            var msg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, auth.username());
-            room.tellEveryone(msg, null);
+            String text = auth.username() + " joined" + getConnectText(command.getJoinType());
+            var serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, text);
+            room.tellEveryone(serverMessage, ctx.session);
+
+            var game = service.getGame(auth, command.getGameID());
+            var gameMessage = new ServerMessage(game.game());
+            ctx.session.getRemote().sendString(new Gson().toJson(gameMessage));
         } catch (Exception e) {
             handleError(e, ctx);
         }
+    }
+
+    private String getConnectText(UserGameCommand.JoinType type) {
+        if(type == UserGameCommand.JoinType.OBSERVER) {
+            return " as an observer.";
+        }
+
+        String color = type == UserGameCommand.JoinType.WHITE ? "white" : "black";
+        return " as the " + color + " player.";
     }
 
     private void resign(UserGameCommand command, WsMessageContext ctx) {
@@ -60,7 +74,16 @@ public class WebSocketManager implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void leave(UserGameCommand command, WsMessageContext ctx) {
-
+        try {
+            var room = getRoom(command.getGameID());
+            room.removeParticipant(ctx.session);
+            var auth = service.getAuth(command.getAuthToken());
+            String text = auth.username() + " has left the game.";
+            var serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, text);
+            room.tellEveryone(serverMessage, ctx.session);
+        } catch (Exception e) {
+            handleError(e, ctx);
+        }
     }
 
     private GameRoom getRoom(int id) {

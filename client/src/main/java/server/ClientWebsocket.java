@@ -3,16 +3,17 @@ package server;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
 import websocket.commands.UserGameCommand;
-import websocket.messages.ChessUpdateMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import serializer.Serializer;
 
 public class ClientWebsocket extends Endpoint {
     private Session session;
     private NotificationHandler notificationHandler;
+    private Gson serializer = Serializer.serializer();
 
     public ClientWebsocket(String url, NotificationHandler handler) {
         try {
@@ -27,11 +28,11 @@ public class ClientWebsocket extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
+                    ServerMessage notification = serializer.fromJson(message, ServerMessage.class);
 
                     if(notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-                        var chessUpdate = getChessMessage(message);
-                        notificationHandler.updateGame(chessUpdate.getGame());
+                        notificationHandler.updateGame(notification.getGame());
+                        return;
                     }
 
                     notificationHandler.notify(notification);
@@ -44,10 +45,6 @@ public class ClientWebsocket extends Endpoint {
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
-    }
-
-    private ChessUpdateMessage getChessMessage(String message) {
-        return new Gson().fromJson(message, ChessUpdateMessage.class);
     }
 
     public void sendMessage(UserGameCommand message) {

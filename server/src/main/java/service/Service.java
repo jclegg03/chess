@@ -16,6 +16,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
+import server.Server;
 import server.ServerException;
 
 import java.util.UUID;
@@ -156,6 +157,16 @@ public class Service {
 
         game.addObserver(auth.username());
         updateGame(game);
+        return game;
+    }
+
+    public GameData getGame(AuthData auth, int gameID) throws ServerException {
+        checkAuth(auth);
+        GameData game = gameDAO.selectGame(gameID);
+        if (game == null) {
+            throw new ServerException("Error: bad request (game does not exist)", HttpStatus.BAD_REQUEST);
+        }
+
         return game;
     }
 
